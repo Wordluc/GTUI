@@ -1,9 +1,5 @@
 package Color
 
-type Color struct {
-	Foreground iColor
-	Background iColor
-}   
 
 type iColor int8
 const (

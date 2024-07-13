@@ -7,6 +7,7 @@ import "GTUI/internal/Color"
 type Core struct {
 	GlobalColor Color.Color
 	term iTerminal.ITerminal
+	buff []string
 }
 
 func NewCore() (*Core,error) {
@@ -19,7 +20,7 @@ func NewCore() (*Core,error) {
 }
 
 func (c *Core) Close() {
-	c.ResetColor()
+	c.IResetGlobalColor()
 	c.term.Clear()
 	c.term.Stop()
 }

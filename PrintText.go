@@ -2,42 +2,37 @@ package GTUI
 
 import (
 	"GTUI/internal/Color"
+	"GTUI/internal/Drawing"
 	"strings"
 )
 type MetaData struct {
 	Color Color.Color
 }
 
-func (c *Core) Print(str string) {
-	c.term.PrintStr(str)
-}
 
-func (c *Core) Prints(strs ...string) {
+func (c *Core) InsertStrs(strs ...string) {
 	var strBuilder  strings.Builder
 	for _, str := range strs {
 		strBuilder.WriteString(str)
 	}
-	c.term.PrintStr(strBuilder.String())
+	c.IInsertToBuff(strBuilder.String())
 }
 
-func (c *Core) Printf(str string, opt MetaData) {
+func (c *Core) InsertStrsf( opt MetaData ,strs ...string) {
 	var strBuilder  strings.Builder
-	strBuilder.WriteString(Color.SetColor(opt.Color))
-	strBuilder.WriteString(str)
-	strBuilder.WriteString(Color.SetColor(c.GlobalColor))
-
-	c.term.PrintStr(strBuilder.String())
-}
-
-func (c *Core) Printfs( opt MetaData ,strs ...string) {
-	var strBuilder  strings.Builder
-	strBuilder.WriteString(Color.SetColor(opt.Color))
+	strBuilder.WriteString(Color.GetAnsiColor(opt.Color))
 	for _, str := range strs {
 		strBuilder.WriteString(str)
 	}
-	strBuilder.WriteString(Color.SetColor(c.GlobalColor))
+	strBuilder.WriteString(Color.GetAnsiColor(c.GlobalColor))
 
-	c.term.PrintStr(strBuilder.String())
+	c.IInsertToBuff(strBuilder.String())
 }
 
-
+func (c *Core) InsertColor(color Color.Color,str string) {
+	c.IInsertToBuff(Color.GetAnsiColor(color)+str)
+	c.GlobalColor = color
+}
+func (c *Core) ClearPortion(x,y,xpos, ypos int) {
+	c.IInsertToBuff(Drawing.GetAnsiClear(x, y, xpos, ypos))
+}
