@@ -8,4 +8,5 @@ type ITerminal interface {
 	PrintStr(str string)
 	Len() (int,int)
 	GetCursor() (int, int)
+	SetCursor(x, y int)
 }

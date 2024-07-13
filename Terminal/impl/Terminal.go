@@ -4,7 +4,6 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-
 	"golang.org/x/term"
 )
 
@@ -30,6 +29,7 @@ func (t *Terminal) Stop() {
 func (t *Terminal) Clear() {
 	os.Stdout.Write([]byte("\033[H\033[2J"))
 }
+
 
 func (t *Terminal) Print(byte []byte) {
 	os.Stdout.Write(byte)
@@ -60,4 +60,7 @@ func (t *Terminal) GetCursor() (int, int) {
 	x,_:=strconv.Atoi(string(a[0][2]))
 	y,_:=strconv.Atoi(string(a[0][1]))
 	return x,y
+}
+func (t *Terminal) SetCursor(x, y int) {
+	t.PrintStr("\033[" + strconv.Itoa(y) + ";" + strconv.Itoa(x) + "H")
 }
