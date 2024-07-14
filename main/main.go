@@ -28,6 +28,7 @@ func main() {
 		case "l":
 			line := Drawing.CreateLine("line", 1, 10, 10, 0)
 			core.InsertEntity(line)
+			line.XPos=10
 		case "p":
 			rectangle := Drawing.CreateRectangle("rectangle", 1, 1, 10, 10)
 			core.InsertEntity(rectangle)

@@ -8,19 +8,19 @@ import (
 
 type TextBox struct {
 	isChanged    bool
-	defaultColor Color.Color
+	Color Color.Color
 	ansiCode     string
 	name         string
-	xPos         int
-	yPos         int
+	XPos         int
+	YPos         int
 	text         strings.Builder
 }
 
 func CreateTextBox(name string, x, y int) *TextBox {
 	return &TextBox{
 		name:         name,
-		xPos:         x,
-		yPos:         y,
+		XPos:         x,
+		YPos:         y,
 		isChanged:    true,
 	}
 }
@@ -39,7 +39,7 @@ func (s *TextBox) GetAnsiCode() string {
 
 func (s *TextBox) getAnsiTextBox() string {
 	var str strings.Builder
-	str.WriteString(U.GetAnsiMoveTo(s.xPos, s.yPos))
+	str.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
 	str.WriteString(s.text.String())
 	return str.String()
 }
@@ -52,10 +52,3 @@ func (s *TextBox) GetName() string {
 	return s.name
 }
 
-func (s *TextBox) SetColor(c Color.Color) {
-	s.defaultColor = c
-}
-
-func (s *TextBox) GetColor() Color.Color {
-	return s.defaultColor
-}
