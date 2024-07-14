@@ -1,10 +1,11 @@
 package GTUI
 
 import (
+	C "GTUI/Core"
 	"GTUI/Core/Color"
 	iTerminal "GTUI/Terminal"
 	implTerm "GTUI/Terminal/impl"
-	C "GTUI/Core"
+	"strings"
 )
 
 type GTui struct {
@@ -19,7 +20,7 @@ func NewGtui() (*GTui,error) {
 	if e!=nil {
 		return nil,e
 	}
-	return &GTui{term: term},nil
+	return &GTui{term: term,buff: make(map[string]C.IEntity)},nil
 }
 
 func (c *GTui) Close() {
@@ -33,10 +34,12 @@ func (c *GTui) InsertEntity(entity C.IEntity) {
 }
 
 func (c *GTui) IRefreshAll() {
+	var str strings.Builder
+	str.WriteString(c.GlobalColor.GetAnsiColor())
 	for _, b := range c.buff {
-		str := b.GetAnsiCode()
-		c.term.PrintStr(str)
+		str.WriteString (b.GetAnsiCode())
 	}
+	c.term.PrintStr(str.String())
 }
 
 func (c *GTui) IRefresh(name string) {

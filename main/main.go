@@ -10,7 +10,7 @@ import (
 func main() {
 	command := make([]byte, 1)
 	core, _ := Core.NewGtui()
-	defer core.Close()	
+	defer core.Close()
 	for {
 		os.Stdin.Read(command)
 		switch string(command) {
@@ -19,21 +19,18 @@ func main() {
 		case "r":
 			core.IResetGlobalColor()
 		case "t":
-			core.IRefresh()
+			core.IRefreshAll()
 		case "c":
-			core.InsertStrs("1234567890abcdefghijklmnopqrstuvwxyz\n")
-			core.InsertStrs("1234567890abcdefghijklmnopqrstuvwxyz\n")
-			core.InsertStrs("1234567890abcdefghijklmnopqrstuvwxyz\n")
-			core.InsertStrs("1234567890abcdefghijklmnopqrstuvwxyz\n")
-			core.InsertStrs("1234567890abcdefghijklmnopqrstuvwxyz\n")
-			core.ClearPortion(4,3,1,1)
+			textBox := Drawing.CreateTextBox("textbox", 0, 0)
+			textBox.Type("1234567890abcdefghijklmnopqrstuvwxyz\n")
+			textBox.Type("1234567890abcdefghijklmnopqrstuvwxyz\n")
+			core.InsertEntity(textBox)
 		case "l":
-			  line:=Drawing.CreateLine("line",1,1,10,0)
-				core.InsertEntity(line)
-			
+			line := Drawing.CreateLine("line", 1, 10, 10, 0)
+			core.InsertEntity(line)
 		case "p":
-			  rectangle:=Drawing.CreateRectangle("rectangle",1,1,10,10)
-				core.InsertEntity(rectangle)
+			rectangle := Drawing.CreateRectangle("rectangle", 1, 1, 10, 10)
+			core.InsertEntity(rectangle)
 		default:
 			return
 		}
