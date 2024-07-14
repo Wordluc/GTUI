@@ -11,18 +11,20 @@ type Line struct {
 	ansiCode  string
 	name      string
 	color     Color.Color
-	xPos int
-	yPos int
-	len  int
-	angle int16
+	xPos      int
+	yPos      int
+	len       int
+	angle     int16
 }
-func CreateLine(name string,x, y, len int, angle int16) *Line {
+
+func CreateLine(name string, x, y, len int, angle int16) *Line {
 	return &Line{
-		ansiCode: "",
-		xPos:     x,
-		yPos:     y,
-		len:      len,
-		angle:    angle,
+		ansiCode:  "",
+		xPos:      x,
+		yPos:      y,
+		len:       len,
+		angle:     angle,
+		isChanged: true,
 	}
 }
 
@@ -38,7 +40,7 @@ func (r *Line) GetAnsiCode() string {
 	return r.ansiCode
 }
 
-func 	(r *Line) GetName() string {
+func (r *Line) GetName() string {
 	return r.name
 }
 
@@ -50,46 +52,44 @@ func (s *Line) SetColor(c Color.Color) {
 	s.color = c
 }
 
-func (l Line)getAnsiLine ()string {
+func (l Line) getAnsiLine() string {
 	var str *strings.Builder = new(strings.Builder)
 	str.WriteString(U.SaveCursor)
 	switch l.angle {
 	case 0:
-		ansiLineAngle0(l,str)
+		ansiLineAngle0(l, str)
 	case 45:
-		ansiLineAngle45(l,str)
+		ansiLineAngle45(l, str)
 	case 90:
-		ansiLineAngle90(l,str)
+		ansiLineAngle90(l, str)
 	case 270:
-		ansiLineAngle270(l,str)
-	default:
-		return ""
+		ansiLineAngle270(l, str)
 	}
 	str.WriteString(U.RestoreCursor)
 	return str.String()
 }
 
-func ansiLineAngle0(l Line,str *strings.Builder) {
-	str.WriteString( strings.Repeat(" ", l.len))
+func ansiLineAngle0(l Line, str *strings.Builder) {
+	str.WriteString(strings.Repeat(U.HorizontalLine, l.len))
 }
 
-func ansiLineAngle270(l Line,str *strings.Builder){
-		for i := 1; i < l.len; i++ {
-			str.WriteString(U.GetAnsiMoveTo(l.xPos+i, l.yPos+i))
-			str.WriteString(U.TopLine)
-		}
+func ansiLineAngle270(l Line, str *strings.Builder) {
+	for i := 1; i < l.len; i++ {
+		str.WriteString(U.GetAnsiMoveTo(l.xPos+i, l.yPos+i))
+		str.WriteString(U.HorizontalLine)
+	}
 }
 
-func ansiLineAngle90(l Line,str *strings.Builder){
+func ansiLineAngle90(l Line, str *strings.Builder) {
 	for i := 0; i < l.len; i++ {
 		str.WriteString(U.GetAnsiMoveTo(l.xPos, l.yPos+i))
 		str.WriteString(U.VerticalLine)
 	}
 }
 
-func ansiLineAngle45(l Line,str *strings.Builder) {
-		for i := 0; i < l.len; i++ {
-			str.WriteString(U.GetAnsiMoveTo(l.xPos+i, l.yPos-i))
-			str.WriteString(U.TopLine)
+func ansiLineAngle45(l Line, str *strings.Builder) {
+	for i := 0; i < l.len; i++ {
+		str.WriteString(U.GetAnsiMoveTo(l.xPos+i, l.yPos-i))
+		str.WriteString(U.HorizontalLine)
 	}
 }

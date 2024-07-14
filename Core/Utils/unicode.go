@@ -1,6 +1,6 @@
 package Utils
 const (
-   TopLine = "\u2501"
+   HorizontalLine = "\u2501"
 	 VerticalLine = "\u2503"
 	 TopLeftCorner = "\u250F"
 	 TopRightCorner = "\u2513"

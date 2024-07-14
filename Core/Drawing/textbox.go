@@ -2,6 +2,7 @@ package Drawing
 
 import (
 	"GTUI/Core/Color"
+	U "GTUI/Core/Utils"
 	"strings"
 )
 
@@ -20,7 +21,7 @@ func CreateTextBox(name string, x, y int) *TextBox {
 		name:         name,
 		xPos:         x,
 		yPos:         y,
-		defaultColor: Color.GetDefaultColor(),
+		isChanged:    true,
 	}
 }
 
@@ -38,7 +39,7 @@ func (s *TextBox) GetAnsiCode() string {
 
 func (s *TextBox) getAnsiTextBox() string {
 	var str strings.Builder
-	str.WriteString(s.defaultColor.GetAnsiColor())
+	str.WriteString(U.GetAnsiMoveTo(s.xPos, s.yPos))
 	str.WriteString(s.text.String())
 	return str.String()
 }

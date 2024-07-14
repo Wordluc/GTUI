@@ -24,6 +24,7 @@ func CreateRectangle(name string,x, y, width, height int) *Rectangle {
 		xPos:     x,
 		yPos:     y,
 		width:    width,
+		isChanged:    true,
 		height:   height,
 	}
 }
@@ -50,7 +51,7 @@ func (s *Rectangle) GetColor() Color.Color {
 	return s.color
 }
 func (s *Rectangle) getAnsiRectangle() string {
-	var horizontal = strings.Repeat(U.TopLine, s.width-2)
+	var horizontal = strings.Repeat(U.HorizontalLine, s.width-2)
 	var builStr strings.Builder
 	builStr.WriteString(U.SaveCursor)
 	builStr.WriteString(U.GetAnsiMoveTo(s.xPos, s.yPos))
