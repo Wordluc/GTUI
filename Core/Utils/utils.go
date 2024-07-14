@@ -1,7 +1,7 @@
-package Drawing
+package Utils
 
 import "strconv"
 
-func getAnsiMoveTo(y, x int) string {
+func GetAnsiMoveTo(y, x int) string {
 	return "\033[" + strconv.Itoa(x+1) + ";" + strconv.Itoa(y+1) + "H"
 }

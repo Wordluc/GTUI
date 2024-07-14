@@ -8,8 +8,11 @@ type Color struct {
 	Foreground iColor
 	Background iColor
 }   
+func GetDefaultColor() Color {
+	return Color{Foreground: ResetF, Background: ResetB}
+}
 
-func GetAnsiColor(c Color) string {
+func (c Color) GetAnsiColor() string{
 	return ("\x1b[;" + strconv.Itoa(int(c.Foreground)) + ";" + strconv.Itoa(int(c.Background)) + "m")
 }
 

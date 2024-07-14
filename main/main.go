@@ -2,22 +2,18 @@ package main
 
 import (
 	Core "GTUI"
-	Color "GTUI/internal/Color"
-	Figures "GTUI/internal/Drawing"
+	"GTUI/Core/Color"
+	"GTUI/Core/Drawing"
 	"os"
 )
 
 func main() {
 	command := make([]byte, 1)
-	core, _ := Core.NewCore()
+	core, _ := Core.NewGtui()
 	defer core.Close()	
 	for {
 		os.Stdin.Read(command)
 		switch string(command) {
-		case "a":
-			core.InsertStrs("cioa\n")
-		case "z":
-			core.InsertStrsf(Core.MetaData{Color: Color.Color{Foreground: Color.RedF, Background: Color.BlueB}},"Hello World", )
 		case "s":
 			core.ISetGlobalColor(Color.Color{Foreground: Color.CyanF, Background: Color.BlueB})
 		case "r":
@@ -32,13 +28,12 @@ func main() {
 			core.InsertStrs("1234567890abcdefghijklmnopqrstuvwxyz\n")
 			core.ClearPortion(4,3,1,1)
 		case "l":
-			if str,e:=Figures.GetAnsiLine(Figures.Line{Angle: 90, Len: 10, XPos: 10, YPos: 1});e==nil{
-				core.InsertStrs(str)
-			}
+			  line:=Drawing.CreateLine("line",1,1,10,0)
+				core.InsertEntity(line)
+			
 		case "p":
-			if str,e:=Figures.GetAnsiRectangle(Figures.Rectangle{Width: 10, Height: 10, XPos: 1, YPos: 1});e==nil{
-				core.InsertStrs(str)
-			}
+			  rectangle:=Drawing.CreateRectangle("rectangle",1,1,10,10)
+				core.InsertEntity(rectangle)
 		default:
 			return
 		}
