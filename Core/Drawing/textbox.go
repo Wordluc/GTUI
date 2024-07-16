@@ -8,7 +8,7 @@ import (
 
 type TextBox struct {
 	isChanged    bool
-	Color Color.Color
+	color Color.Color
 	ansiCode     string
 	name         string
 	XPos         int
@@ -46,11 +46,14 @@ func (s *TextBox) SetPos(x, y int) {
 func (s *TextBox) GetPos() (int, int) {
 	return s.XPos, s.YPos
 }
-
+func (s *TextBox) SetColor(color Color.Color) {
+	s.color = color
+	s.Touch()
+}
 func (s *TextBox) getAnsiTextBox() string {
 	var str strings.Builder
 	str.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
-	str.WriteString(s.Color.GetAnsiColor())
+	str.WriteString(s.color.GetAnsiColor())
 	str.WriteString(s.text.String())
 	return str.String()
 }

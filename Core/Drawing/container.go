@@ -2,21 +2,23 @@ package Drawing
 
 import (
 	"GTUI/Core"
+	"GTUI/Core/Color"
 	"strings"
 )
 
 type Container struct {
 	name     string
-	XPos     int
-	YPos     int
+	xPos     int
+	yPos     int
 	children []Core.IEntity
+	color    Color.Color
 }
 
 func CreateContainer(name string, x, y int) *Container {
 	return &Container{
 		name: name,
-		XPos: x,
-		YPos: y,
+		xPos: x,
+		yPos: y,
 	}
 }
 func (c *Container) GetChildren() []Core.IEntity {
@@ -33,6 +35,7 @@ func (c *Container) Touch() {
 func (c *Container) GetAnsiCode() string {
 	var str strings.Builder
 	for _, child := range c.children {
+		str.WriteString(c.color.GetAnsiColor())
 		str.WriteString(child.GetAnsiCode())
 	}
 	return str.String()
@@ -41,16 +44,20 @@ func (c *Container) GetName() string {
 	return c.name
 }
 func (c *Container) SetPos(x, y int) {
-	deltaX := x - c.XPos
-	deltaY := y - c.YPos
-	c.XPos = x
-	c.YPos = y
+	deltaX := x - c.xPos
+	deltaY := y - c.yPos
+	c.xPos = x
+	c.yPos = y
 	for _, child := range c.children {
 		xChild,yChild:=child.GetPos()
 		child.SetPos(xChild+deltaX, yChild+deltaY)
 	}
+	c.Touch()
 }
 func (c *Container) GetPos() (int, int) {
-	return c.XPos, c.YPos
+	return c.xPos, c.yPos
 }
-
+func (c *Container) SetColor(color Color.Color) {
+	c.color = color
+	c.Touch()
+}

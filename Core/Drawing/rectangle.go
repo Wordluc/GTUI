@@ -3,13 +3,14 @@ package Drawing
 import (
 	"GTUI/Core/Color"
 	U "GTUI/Core/Utils"
+	"errors"
 	"strings"
 )
 
 type Rectangle struct {
 	isChanged bool
 	ansiCode  string
-	Color     Color.Color
+	color     Color.Color
 	name      string
 	XPos      int
 	YPos      int
@@ -44,6 +45,21 @@ func (r *Rectangle) GetAnsiCode() string {
 func (l *Rectangle) SetPos(x, y int) {
 	l.XPos = x
 	l.YPos = y
+	l.Touch()
+}
+func (l *Rectangle) SetSize(x, y int) error{
+  if x < 0 || y < 0 {
+		return errors.New("invalid size")
+	}
+	l.Width = x
+	l.Height = y
+	l.Touch()
+	return nil
+}
+
+func (c *Rectangle) SetColor(color Color.Color) {
+	c.color = color
+	c.Touch()
 }
 func (l *Rectangle) GetPos() (int,int) {
 	return l.XPos, l.YPos
@@ -56,7 +72,7 @@ func (s *Rectangle) getAnsiRectangle() string {
 	var builStr strings.Builder
 	builStr.WriteString(U.SaveCursor)
 	builStr.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
-	builStr.WriteString(s.Color.GetAnsiColor())
+	builStr.WriteString(s.color.GetAnsiColor())
 	builStr.WriteString(U.TopLeftCorner)
 	builStr.WriteString(horizontal)
 	for i := 1; i < s.Height-1; i++ {
