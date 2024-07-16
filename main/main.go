@@ -19,7 +19,7 @@ func main() {
 
 	contHead := Drawing.CreateContainer("head", 0, 0)
 	rectHead := Drawing.CreateRectangle("testo", 0, 0, 10, 5)
-	rectHead.Color= Color.Color{Foreground: Color.RedF, Background: Color.BlueB}
+	rectHead.SetColor(Color.Color{Foreground: Color.RedF, Background: Color.BlueB})
 	contHead.AddChild(rectHead)
 	contHead.AddChild(cont)
 	core.InsertEntity(contHead)
@@ -28,38 +28,36 @@ func main() {
 		core.IRefreshAll()
 		os.Stdin.Read(command)
 		if string(command) == "c" {
-			textBox.Color = Color.Color{Foreground: Color.CyanF, Background: Color.BlueB}
-			textBox.Touch()
+			textBox.SetColor(Color.Color{Foreground: Color.CyanF, Background: Color.BlueB})
 			continue
 		} else if string(command) == "C" {
-			textBox.Color = Color.GetDefaultColor()
-			textBox.Touch()
+			textBox.SetColor(Color.GetDefaultColor())
 			continue
 		}
 		if string(command) == "q" {
 			return
 		}
 		if string(command) == "l" {
-			cont.SetPos(cont.XPos+1, cont.YPos)
-			cont.Touch()
+			Xpos, Ypos := cont.GetPos()
+			cont.SetPos(Xpos+1, Ypos)
 			core.IClear()
 			continue
 		}
 		if string(command) == "k" {
-			cont.SetPos(cont.XPos, cont.YPos+1)
-			cont.Touch()
+			Xpos, Ypos := cont.GetPos()
+			cont.SetPos(Xpos, Ypos+1)
 			core.IClear()
 			continue
 		}
 		if string(command) == "L" {
-			contHead.SetPos(contHead.XPos+1, contHead.YPos)
-			contHead.Touch()
+			Xpos, Ypos := contHead.GetPos()
+			contHead.SetPos(Xpos+1, Ypos)
 			core.IClear()
 			continue
 		}
 		if string(command) == "K" {
-			contHead.SetPos(contHead.XPos, contHead.YPos+1)
-			contHead.Touch()
+			Xpos, Ypos := contHead.GetPos()
+			contHead.SetPos(Xpos, Ypos+1)
 			core.IClear()
 			continue
 		}

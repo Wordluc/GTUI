@@ -1,5 +1,6 @@
 package Core
 
+import "GTUI/Core/Color"
 
 type IEntity interface {
 	Touch()
@@ -7,4 +8,5 @@ type IEntity interface {
 	GetName() string
 	SetPos(x, y int)
 	GetPos() (int, int)
+	SetColor(color Color.Color)
 }
