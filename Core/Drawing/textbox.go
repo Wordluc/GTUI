@@ -27,6 +27,7 @@ func CreateTextBox(name string, x, y int) *TextBox {
 
 func (s *TextBox) Type(text string) {
 	  s.text.WriteString(text)
+		s.Touch()
 }
 
 func (s *TextBox) GetAnsiCode() string {
@@ -37,9 +38,19 @@ func (s *TextBox) GetAnsiCode() string {
 	return s.ansiCode
 }
 
+func (s *TextBox) SetPos(x, y int) {
+	s.XPos = x
+	s.YPos = y
+}
+
+func (s *TextBox) GetPos() (int, int) {
+	return s.XPos, s.YPos
+}
+
 func (s *TextBox) getAnsiTextBox() string {
 	var str strings.Builder
 	str.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
+	str.WriteString(s.Color.GetAnsiColor())
 	str.WriteString(s.text.String())
 	return str.String()
 }

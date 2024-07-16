@@ -31,3 +31,6 @@ func (c *GTui) ISetCursor(x, y int) {
 	c.term.SetCursor(x+1, y+1)
 }
 
+func (c *GTui) IClear() {
+	c.term.Clear()
+}
