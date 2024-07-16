@@ -3,6 +3,7 @@ package Drawing
 import (
 	"GTUI/Core/Color"
 	U "GTUI/Core/Utils"
+	"errors"
 	"strings"
 )
 
@@ -53,9 +54,24 @@ func (r *Line) SetAngle(angle int16) {
 	}
 }
 
-func (l Line) getAnsiLine() string {
+func (l *Line) SetPos(x, y int) {
+	l.XPos = x
+	l.YPos = y
+}
+func (l *Line) SetLen(len int)error {
+	if len < 0 {
+		return errors.New("len < 0")
+	}
+	l.Len = len
+	return nil
+}
+func (l *Line) GetPos() (int,int) {
+	return l.XPos, l.YPos
+}
+func (l *Line) getAnsiLine() string {
 	var str *strings.Builder = new(strings.Builder)
 	str.WriteString(U.SaveCursor)
+	str.WriteString(l.Color.GetAnsiColor())
 	switch l.angle {
 	case 0:
 		ansiLineAngle0(l, str)
@@ -70,26 +86,26 @@ func (l Line) getAnsiLine() string {
 	return str.String()
 }
 
-func ansiLineAngle0(l Line, str *strings.Builder) {
+func ansiLineAngle0(l *Line, str *strings.Builder) {
 	str.WriteString(U.GetAnsiMoveTo(l.XPos, l.YPos))
 	str.WriteString(strings.Repeat(U.HorizontalLine, l.Len))
 }
 
-func ansiLineAngle270(l Line, str *strings.Builder) {
+func ansiLineAngle270(l *Line, str *strings.Builder) {
 	for i := 1; i < l.Len; i++ {
 		str.WriteString(U.GetAnsiMoveTo(l.XPos+i, l.YPos+i))
 		str.WriteString(U.HorizontalLine)
 	}
 }
 
-func ansiLineAngle90(l Line, str *strings.Builder) {
+func ansiLineAngle90(l *Line, str *strings.Builder) {
 	for i := 0; i < l.Len; i++ {
 		str.WriteString(U.GetAnsiMoveTo(l.XPos, l.YPos+i))
 		str.WriteString(U.VerticalLine)
 	}
 }
 
-func ansiLineAngle45(l Line, str *strings.Builder) {
+func ansiLineAngle45(l *Line, str *strings.Builder) {
 	for i := 0; i < l.Len; i++ {
 		str.WriteString(U.GetAnsiMoveTo(l.XPos+i, l.YPos-i))
 		str.WriteString(U.HorizontalLine)

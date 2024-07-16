@@ -38,6 +38,7 @@ func (c *GTui) IRefreshAll() {
 	str.WriteString(c.GlobalColor.GetAnsiColor())
 	for _, b := range c.buff {
 		str.WriteString (b.GetAnsiCode())
+		str.WriteString (c.GlobalColor.GetAnsiColor())
 	}
 	c.term.PrintStr(str.String())
 }

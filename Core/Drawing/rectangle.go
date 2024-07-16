@@ -41,6 +41,13 @@ func (r *Rectangle) GetAnsiCode() string {
 	return r.ansiCode
 }
 
+func (l *Rectangle) SetPos(x, y int) {
+	l.XPos = x
+	l.YPos = y
+}
+func (l *Rectangle) GetPos() (int,int) {
+	return l.XPos, l.YPos
+}
 func (s *Rectangle) GetName() string {
 	return s.name
 }
@@ -49,6 +56,7 @@ func (s *Rectangle) getAnsiRectangle() string {
 	var builStr strings.Builder
 	builStr.WriteString(U.SaveCursor)
 	builStr.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
+	builStr.WriteString(s.Color.GetAnsiColor())
 	builStr.WriteString(U.TopLeftCorner)
 	builStr.WriteString(horizontal)
 	for i := 1; i < s.Height-1; i++ {
