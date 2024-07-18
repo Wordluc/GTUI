@@ -10,18 +10,17 @@ type TextBox struct {
 	isChanged    bool
 	color Color.Color
 	ansiCode     string
-	name         string
 	XPos         int
 	YPos         int
 	text         strings.Builder
 }
 
-func CreateTextBox(name string, x, y int) *TextBox {
+func CreateTextBox(x, y int) *TextBox {
 	return &TextBox{
-		name:         name,
 		XPos:         x,
 		YPos:         y,
 		isChanged:    true,
+		color:        Color.GetNoneColor(),
 	}
 }
 
@@ -30,10 +29,10 @@ func (s *TextBox) Type(text string) {
 		s.Touch()
 }
 
-func (s *TextBox) GetAnsiCode() string {
+func (s *TextBox) GetAnsiCode(defaultColor Color.Color) string {
 	if s.isChanged {
 		s.isChanged = false
-		s.ansiCode = s.getAnsiTextBox()
+		s.ansiCode = s.getAnsiTextBox(defaultColor)
 	}
 	return s.ansiCode
 }
@@ -50,19 +49,15 @@ func (s *TextBox) SetColor(color Color.Color) {
 	s.color = color
 	s.Touch()
 }
-func (s *TextBox) getAnsiTextBox() string {
+func (s *TextBox) getAnsiTextBox(defaultColor Color.Color) string {
 	var str strings.Builder
 	str.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
-	str.WriteString(s.color.GetAnsiColor())
+	str.WriteString(s.color.GetMixedColor(defaultColor).GetAnsiColor())
 	str.WriteString(s.text.String())
+	str.WriteString(Color.GetResetColor())
 	return str.String()
 }
 
 func (s *TextBox) Touch() {
 	s.isChanged = true
 }
-
-func (s *TextBox) GetName() string {
-	return s.name
-}
-

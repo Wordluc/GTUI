@@ -39,7 +39,7 @@ func (t *Terminal) PrintStr(str string) {
 	os.Stdout.Write([]byte(str))
 }
 
-func (t *Terminal) Len() (int,int) {
+func (t *Terminal) Size() (int,int) {
 	var e error
 	x,y,e := term.GetSize(int(os.Stdout.Fd()))
 	if e != nil {

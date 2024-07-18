@@ -10,7 +10,6 @@ import (
 type Line struct {
 	isChanged bool
 	ansiCode  string
-	name      string
 	color     Color.Color
 	xPos      int
 	yPos      int
@@ -18,7 +17,7 @@ type Line struct {
 	angle     int16
 }
 
-func CreateLine(name string, x, y, len int, angle int16) *Line {
+func CreateLine(x, y, len int, angle int16) *Line {
 	return &Line{
 		ansiCode:  "",
 		xPos:      x,
@@ -26,6 +25,7 @@ func CreateLine(name string, x, y, len int, angle int16) *Line {
 		Len:       len,
 		angle:     angle,
 		isChanged: true,
+		color:     Color.GetNoneColor(),
 	}
 }
 
@@ -33,16 +33,12 @@ func (r *Line) Touch() {
 	r.isChanged = true
 }
 
-func (r *Line) GetAnsiCode() string {
+func (r *Line) GetAnsiCode(defaultColor Color.Color) string {
 	if r.isChanged {
-		r.ansiCode = r.getAnsiLine()
+		r.ansiCode = r.getAnsiLine(defaultColor)
 		r.isChanged = false
 	}
 	return r.ansiCode
-}
-
-func (r *Line) GetName() string {
-	return r.name
 }
 
 func (r *Line) SetAngle(angle int16) {
@@ -52,33 +48,33 @@ func (r *Line) SetAngle(angle int16) {
 	default:
 		return
 	}
-	r.Touch()	
+	r.Touch()
 }
 
 func (l *Line) SetPos(x, y int) {
 	l.xPos = x
 	l.yPos = y
-	l.Touch()	
+	l.Touch()
 }
 func (c *Line) SetColor(color Color.Color) {
 	c.color = color
 	c.Touch()
 }
-func (l *Line) SetLen(len int)error {
+func (l *Line) SetLen(len int) error {
 	if len < 0 {
 		return errors.New("len < 0")
 	}
 	l.Len = len
-	l.Touch()	
+	l.Touch()
 	return nil
 }
-func (l *Line) GetPos() (int,int) {
+func (l *Line) GetPos() (int, int) {
 	return l.xPos, l.yPos
 }
-func (l *Line) getAnsiLine() string {
+func (l *Line) getAnsiLine(defaultColor Color.Color) string {
 	var str *strings.Builder = new(strings.Builder)
 	str.WriteString(U.SaveCursor)
-	str.WriteString(l.color.GetAnsiColor())
+	str.WriteString(l.color.GetMixedColor(defaultColor).GetAnsiColor())
 	switch l.angle {
 	case 0:
 		ansiLineAngle0(l, str)
@@ -90,6 +86,7 @@ func (l *Line) getAnsiLine() string {
 		ansiLineAngle270(l, str)
 	}
 	str.WriteString(U.RestoreCursor)
+	str.WriteString(Color.GetResetColor())
 	return str.String()
 }
 
