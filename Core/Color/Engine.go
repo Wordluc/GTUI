@@ -5,15 +5,15 @@ import (
 )
 
 type Color struct {
-	foreground iColor
-	Background iColor
+	foreground IColor
+	Background IColor
 }
 
-func (c *Color) SetForeground(color iColor)  {
+func (c *Color) SetForeground(color IColor)  {
 	c.foreground=color
 }
 
-func (c *Color) SetBackground(color iColor)  {
+func (c *Color) SetBackground(color IColor)  {
 	c.Background=gBg(color)
 }
 
@@ -21,11 +21,11 @@ func (c Color) isEqual(other Color) bool {
 	return c.foreground == other.foreground && c.Background == other.Background
 }
 
-func Get(foreGround iColor, backGround iColor) Color {
+func Get(foreGround IColor, backGround IColor) Color {
 	return Color{foreground: foreGround, Background: gBg(backGround)}
 }
 
-func gBg(i iColor) iColor {
+func gBg(i IColor) IColor {
 	return i + 10
 }
 
