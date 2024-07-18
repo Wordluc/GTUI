@@ -9,9 +9,9 @@ import (
 )
 
 type GTui struct {
-	GlobalColor Color.Color
+	globalColor Color.Color
 	term iTerminal.ITerminal
-	buff map[string]C.IEntity
+	buff []C.IEntity
 }
 
 func NewGtui() (*GTui,error) {
@@ -20,7 +20,7 @@ func NewGtui() (*GTui,error) {
 	if e!=nil {
 		return nil,e
 	}
-	return &GTui{term: term,buff: make(map[string]C.IEntity)},nil
+	return &GTui{term: term,buff: make([]C.IEntity,0)},nil
 }
 
 func (c *GTui) Close() {
@@ -30,21 +30,15 @@ func (c *GTui) Close() {
 }
 
 func (c *GTui) InsertEntity(entity C.IEntity) {
-	c.buff[entity.GetName()]=entity
+	c.buff=append(c.buff,entity)
 }
 
 func (c *GTui) IRefreshAll() {
 	var str strings.Builder
-	str.WriteString(c.GlobalColor.GetAnsiColor())
+	str.WriteString(c.globalColor.GetAnsiColor())
 	for _, b := range c.buff {
-		str.WriteString (b.GetAnsiCode())
-		str.WriteString (c.GlobalColor.GetAnsiColor())
+		str.WriteString (b.GetAnsiCode(c.globalColor))
+		str.WriteString(c.globalColor.GetAnsiColor())
 	}
 	c.term.PrintStr(str.String())
-}
-
-func (c *GTui) IRefresh(name string) {
-	b := c.buff[name]
-	str := b.GetAnsiCode()
-	c.term.PrintStr(str)
 }
