@@ -1,9 +1,9 @@
 package Color
 
 
-type iColor int8
+type IColor int8
 const (//Foreground
-	Black iColor = 30
+	Black IColor = 30
 	Red        = iota + 30
 	Green
 	Yellow

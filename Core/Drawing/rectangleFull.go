@@ -47,8 +47,8 @@ func (r *RectangleFull) GetAnsiCode(defaultColor Color.Color) string {
 	return r.ansiCode
 }
 
-func (r *RectangleFull) SetColor(color Color.Color) {
-	r.insideColor = color
+func (r *RectangleFull) SetInsideColor(color Color.IColor) {
+	r.insideColor = Color.Get(Color.None,color)
 	r.Touch()
 	r.border.Touch()
 }

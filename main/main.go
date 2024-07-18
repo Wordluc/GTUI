@@ -24,7 +24,7 @@ func main() {
 
 	contHead := Drawing.CreateContainer(0, 0)
 	rectHead := Drawing.CreateRectangleFull( 1, 1, 20, 10)
-	rectHead.SetColor(Color.Get(Color.Green, Color.Green))
+	rectHead.SetInsideColor(Color.Green)
 	rectHead.GetBorder().SetColor(Color.Get(Color.Red, Color.None))
 	contHead.AddChild(rectHead)
 	contHead.AddChild(cont)
@@ -54,11 +54,11 @@ func main() {
 			continue
 		}
 		if string(command) == "p" {
-			rectHead.SetColor(Color.Get(Color.Blue, Color.None))
+			rectHead.SetInsideColor(Color.Blue)
 			continue
 		}
 		if string(command) == "P" {
-			rectHead.SetColor(Color.Get(Color.None, Color.Red))
+			rectHead.SetInsideColor(Color.Red)
 			rectHead.GetBorder().SetColor(Color.Get(Color.Green, Color.None))
 			continue
 		}
