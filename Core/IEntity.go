@@ -7,4 +7,6 @@ type IEntity interface {
 	GetAnsiCode(defaultColor Color.Color) string
 	SetPos(x, y int)
 	GetPos() (int, int)
+	SetVisibility(visible bool)
+	GetVisibility() bool
 }

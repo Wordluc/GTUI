@@ -11,6 +11,7 @@ type Container struct {
 	yPos     int
 	children []Core.IEntity
 	color    Color.Color
+	visible  bool
 }
 
 func CreateContainer( x, y int) *Container {
@@ -18,8 +19,10 @@ func CreateContainer( x, y int) *Container {
 		xPos:  x,
 		yPos:  y,
 		color: Color.GetNoneColor(),
+		visible: true,
 	}
 }
+
 func (c *Container) GetChildren() []Core.IEntity {
 	return c.children
 }
@@ -34,7 +37,18 @@ func (c *Container) Touch() {
 	}
 }
 
+func (c *Container) SetVisibility(visible bool) {
+	c.visible = visible
+}
+
+func (c *Container) GetVisibility() bool {
+	return c.visible
+}
+
 func (c *Container) GetAnsiCode(defaultColor Color.Color) string {
+	if !c.visible {
+		return ""
+	}
 	var str strings.Builder
 	str.WriteString(c.color.GetMixedColor(defaultColor).GetAnsiColor())
 	for _, child := range c.children {

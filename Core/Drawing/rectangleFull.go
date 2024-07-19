@@ -15,6 +15,7 @@ type RectangleFull struct {
 	YPos        int
 	Width       int
 	Height      int
+	visible     bool
 }
 
 func CreateRectangleFull(x, y, width, height int) *RectangleFull {
@@ -28,6 +29,7 @@ func CreateRectangleFull(x, y, width, height int) *RectangleFull {
 		isChanged:   true,
 		insideColor: Color.GetNoneColor(),
 		border:      border,
+		visible:     true,
 	}
 }
 
@@ -36,6 +38,9 @@ func (r *RectangleFull) Touch() {
 	r.border.Touch()
 }
 func (r *RectangleFull) GetAnsiCode(defaultColor Color.Color) string {
+	if !r.visible {
+		return ""
+	}
 	if r.isChanged {
 		var str strings.Builder
 		str.WriteString(r.getAnsiRectangle(defaultColor))
@@ -48,7 +53,7 @@ func (r *RectangleFull) GetAnsiCode(defaultColor Color.Color) string {
 }
 
 func (r *RectangleFull) SetInsideColor(color Color.IColor) {
-	r.insideColor = Color.Get(Color.None,color)
+	r.insideColor = Color.Get(Color.None, color)
 	r.Touch()
 	r.border.Touch()
 }
@@ -79,10 +84,18 @@ func (r *RectangleFull) SetSize(x, y int) {
 	r.Touch()
 }
 
+func (s *RectangleFull) SetVisibility(visible bool) {
+	s.visible = visible
+}
+
+func (s *RectangleFull) GetVisibility() bool {
+	return s.visible
+}
+
 func (s *RectangleFull) getAnsiRectangle(defaultColor Color.Color) string {
 	var str strings.Builder
 	var line = strings.Repeat(" ", s.Width-2)
-	color:=s.insideColor.GetMixedColor(defaultColor).GetAnsiColor()
+	color := s.insideColor.GetMixedColor(defaultColor).GetAnsiColor()
 	y := 0
 	for y < s.Height-2 {
 		str.WriteString(color)

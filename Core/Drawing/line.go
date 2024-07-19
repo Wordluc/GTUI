@@ -15,6 +15,7 @@ type Line struct {
 	yPos      int
 	Len       int
 	angle     int16
+	visible   bool
 }
 
 func CreateLine(x, y, len int, angle int16) *Line {
@@ -26,6 +27,7 @@ func CreateLine(x, y, len int, angle int16) *Line {
 		angle:     angle,
 		isChanged: true,
 		color:     Color.GetNoneColor(),
+		visible:   true,
 	}
 }
 
@@ -34,6 +36,9 @@ func (r *Line) Touch() {
 }
 
 func (r *Line) GetAnsiCode(defaultColor Color.Color) string {
+	if !r.visible {
+		return ""
+	}
 	if r.isChanged {
 		r.ansiCode = r.getAnsiLine(defaultColor)
 		r.isChanged = false
@@ -56,10 +61,12 @@ func (l *Line) SetPos(x, y int) {
 	l.yPos = y
 	l.Touch()
 }
+
 func (c *Line) SetColor(color Color.Color) {
 	c.color = color
 	c.Touch()
 }
+
 func (l *Line) SetLen(len int) error {
 	if len < 0 {
 		return errors.New("len < 0")
@@ -68,9 +75,19 @@ func (l *Line) SetLen(len int) error {
 	l.Touch()
 	return nil
 }
+
+func (s *Line) SetVisibility(visible bool) {
+	s.visible = visible
+}
+
+func (s *Line) GetVisibility() bool {
+	return s.visible
+}
+
 func (l *Line) GetPos() (int, int) {
 	return l.xPos, l.yPos
 }
+
 func (l *Line) getAnsiLine(defaultColor Color.Color) string {
 	var str *strings.Builder = new(strings.Builder)
 	str.WriteString(U.SaveCursor)
