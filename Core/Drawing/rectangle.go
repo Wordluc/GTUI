@@ -15,6 +15,7 @@ type Rectangle struct {
 	YPos      int
 	Width     int
 	Height    int
+	visible   bool
 }
 
 func CreateRectangle(x, y, width, height int) *Rectangle {
@@ -26,6 +27,7 @@ func CreateRectangle(x, y, width, height int) *Rectangle {
 		isChanged: true,
 		Height:    height,
 		color:     Color.GetNoneColor(),
+		visible:   true,
 	}
 }
 
@@ -34,6 +36,9 @@ func (r *Rectangle) Touch() {
 }
 
 func (r *Rectangle) GetAnsiCode(defaultColor Color.Color) string {
+	if !r.visible {
+		return ""
+	}
 	if r.isChanged {
 		r.ansiCode = r.getAnsiRectangle(defaultColor)
 		r.isChanged = false
@@ -46,6 +51,7 @@ func (l *Rectangle) SetPos(x, y int) {
 	l.YPos = y
 	l.Touch()
 }
+
 func (l *Rectangle) SetSize(x, y int) error {
 	if x < 0 || y < 0 {
 		return errors.New("invalid size")
@@ -60,9 +66,19 @@ func (c *Rectangle) SetColor(color Color.Color) {
 	c.color = color
 	c.Touch()
 }
+
 func (l *Rectangle) GetPos() (int, int) {
 	return l.XPos, l.YPos
 }
+
+func (s *Rectangle) SetVisibility(visible bool) {
+	s.visible = visible
+}
+
+func (l *Rectangle) GetVisibility() bool {
+	return l.visible
+}
+ 
 func (s *Rectangle) getAnsiRectangle(defaultColor Color.Color) string {
 	var horizontal = strings.Repeat(U.HorizontalLine, s.Width-2)
 	var color = s.color.GetMixedColor(defaultColor).GetAnsiColor()

@@ -25,7 +25,7 @@ func main() {
 	contHead := Drawing.CreateContainer(0, 0)
 	rectHead := Drawing.CreateRectangleFull( 1, 1, 20, 10)
 	rectHead.SetInsideColor(Color.Green)
-	rectHead.GetBorder().SetColor(Color.Get(Color.Red, Color.None))
+	rectHead.GetBorder().SetColor(Color.Get(Color.Red, Color.Red))
 	contHead.AddChild(rectHead)
 	contHead.AddChild(cont)
 	core.InsertEntity(contHead)
@@ -55,6 +55,11 @@ func main() {
 		}
 		if string(command) == "p" {
 			rectHead.SetInsideColor(Color.Blue)
+			continue
+		}
+		if string(command) == "h" {
+			textBox.SetVisibility(!textBox.GetVisibility())
+			core.IClear()
 			continue
 		}
 		if string(command) == "P" {
