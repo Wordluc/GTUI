@@ -12,6 +12,7 @@ func main() {
 	core, _ := Core.NewGtui()
 	core.ISetGlobalColor(Color.GetDefaultColor())
 	defer core.Close()
+
 	rec := Drawing.CreateRectangle( 3, 3, 20, 10)
 	textBox := Drawing.CreateTextBox( 4, 4)
 	textBox1 := Drawing.CreateTextBox( 4, 5)
@@ -29,8 +30,9 @@ func main() {
 	contHead.AddChild(rectHead)
 	contHead.AddChild(cont)
 	core.InsertEntity(contHead)
-	t:=Drawing.CreateTextBox( 10, 30)
+	t:=Drawing.CreateTextBox(10, 30)
 	t.Type("hecwjckljklj")
+
 	core.InsertEntity(t)
 	for {
 		core.IRefreshAll()
