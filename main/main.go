@@ -2,7 +2,7 @@ package main
 
 import (
 	Core "GTUI"
-	"GTUI/Core/Color"
+	"GTUI/Core/Utils/Color"
 	"GTUI/Core/Drawing"
 	"os"
 )

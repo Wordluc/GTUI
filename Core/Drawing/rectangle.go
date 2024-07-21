@@ -1,7 +1,7 @@
 package Drawing
 
 import (
-	"GTUI/Core/Color"
+	"GTUI/Core/Utils/Color"
 	U "GTUI/Core/Utils"
 	"errors"
 	"strings"
