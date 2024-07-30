@@ -59,6 +59,6 @@ func (c *Gtui) IRefreshAll() {
 		str.WriteString(b.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 	}
-	str.WriteString(c.SetCursor(x,y))
+	str.WriteString(c.SetCursor(x-1,y-1))
 	c.term.PrintStr(str.String())
 }

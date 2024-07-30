@@ -15,12 +15,18 @@ type stateKey struct {
 	rune rune
 }
 
-func (t *Keyboard) Start(loop IKeyboard.Loop) error {
+func (t *Keyboard) Start() error {
 	keyboard.Open()
+	t.IsRunning = true
 	eventKey, e := keyboard.GetKeys(10)
 	if e != nil {
 		return e
 	}
+	go t.loop(eventKey)
+	return nil
+}
+
+func (t *Keyboard) loop(eventKey <-chan keyboard.KeyEvent) {
 	for {
 		v := <-eventKey
 		t.key = stateKey{key: v.Key, rune: v.Rune}
@@ -28,7 +34,6 @@ func (t *Keyboard) Start(loop IKeyboard.Loop) error {
        break
 		}
 	}
-	return nil
 }
 
 func (t *Keyboard) Stop() {
