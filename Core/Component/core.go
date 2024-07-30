@@ -1,36 +1,44 @@
 package Component
 
 import (
-		"errors"
-	)
+	"errors"
+	"fmt"
+)
 
-type Search struct {
+type ComponentM struct {
 	Map       *[][]*[]IComponent
 	ChunkSize int
 }
 
-func Create(xSize, ySize, chunkSize int) *Search {
+func Create(xSize, ySize, chunkSize int) *ComponentM {
 	xChunk := xSize / chunkSize
 	yChunk := ySize / chunkSize
 	matrix := make([][]*[]IComponent, xChunk)
-	for i := range matrix {
+	for i := range xChunk {
 		matrix[i] = make([]*[]IComponent, yChunk)
 	}
-	return &Search{
-		Map: &matrix,
+	return &ComponentM{
+		Map:       &matrix,
+		ChunkSize: chunkSize,
 	}
 }
 
-func (s *Search) Add(comp IComponent) error {
+func (s *ComponentM) Add(comp IComponent) error {
 	return comp.insertingToMap(s)
 }
 
-func (s *Search) Search(x, y int) (IComponent, error) {
-	xiChunk := x / s.ChunkSize
-	yiChunk := y / s.ChunkSize
+func (s *ComponentM) Search(x, y int) (IComponent, error) {
+	if s == nil {
+		return nil, errors.New("component manager is nil")
+	}
+	var xiChunk int = x / s.ChunkSize
+	var yiChunk int = y / s.ChunkSize
+	if xiChunk >= len(*s.Map) || yiChunk >= len((*s.Map)[xiChunk]) {
+		return nil, fmt.Errorf("no node found at %d, %d", x, y)
+	}
 	eles := (*s.Map)[xiChunk][yiChunk]
 	if eles == nil {
-		return nil, errors.New("no node founded")
+		return nil, fmt.Errorf("no node found at %d, %d", x, y)
 	}
 	for _, ele := range *eles {
 		if ele.isOn(x, y) {

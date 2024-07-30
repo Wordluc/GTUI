@@ -1,18 +1,21 @@
 package Component
 
 import (
+	"GTUI/Core"
 	"GTUI/Core/Drawing"
+	"GTUI/Core/Utils/Color"
 	"errors"
 )
 
 type OnEvent func()
 type Button struct {
-	graphics  *Drawing.Container
-	interactiveArea      *Drawing.Rectangle
-	onClick   OnEvent
-	onRelease OnEvent
-	onHover   OnEvent
-	onLeave   OnEvent
+	graphics        *Drawing.Container
+	interactiveArea *Drawing.Rectangle
+	onClick         OnEvent
+	onRelease       OnEvent
+	onHover         OnEvent
+	onLeave         OnEvent
+	isClicked       bool
 }
 
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
@@ -20,11 +23,15 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
 	textD := Drawing.CreateTextBox(0, 0)
 	textD.Type(text)
+	xC, yC := sizeX/2-len(text)/2, sizeY/2
+	textD.SetPos(xC, yC)
 	cont.AddChild(rect)
 	cont.AddChild(textD)
+	cont.SetPos(x, y)
 	return &Button{
-		graphics: cont,
-		interactiveArea:     rect,
+		graphics:        cont,
+		interactiveArea: rect,
+		isClicked:       false,
 	}
 }
 
@@ -39,8 +46,15 @@ func (b *Button) SetOnHover(onHover OnEvent) {
 }
 
 func (b *Button) OnClick() {
-	if b.onClick != nil {
-		b.onClick()
+	if b.isClicked {
+		b.interactiveArea.SetColor(Color.GetDefaultColor())
+		b.isClicked = false
+	} else {
+		if b.onClick != nil {
+			b.onClick()
+		}
+		b.interactiveArea.SetColor(Color.Get(Color.Blue, Color.None))
+		b.isClicked = true
 	}
 }
 func (b *Button) OnRelease() {
@@ -58,22 +72,29 @@ func (b *Button) OnLeave() {
 		b.OnLeave()
 	}
 }
-func (b *Button)isOn(xCur,yCur int)bool{
-	x,y:=b.interactiveArea.GetPos()
-	return xCur>=x && xCur<=x+b.interactiveArea.Width && yCur>=y && yCur<=y+b.interactiveArea.Height
+func (b *Button) isOn(xCur, yCur int) bool {
+	x, y := b.interactiveArea.GetPos()
+	return xCur >= x && xCur < x+b.interactiveArea.Width && yCur >= y && yCur < y+b.interactiveArea.Height
 }
-func (b *Button) insertingToMap(s *Search) error {
-	for _, e := range b.graphics.GetChildren() {
-		x, y := e.GetPos()
-		xiChunk := x / s.ChunkSize
-		yiChunk := y / s.ChunkSize
-		ele := (*s.Map)[xiChunk][yiChunk]
-		if ele != nil {
-			return errors.New("error adding component")
+func (b *Button) GetGraphics() Core.IEntity {
+	return b.graphics
+}
+func (b *Button) insertingToMap(s *ComponentM) error {
+	if s == nil {
+		return errors.New("component manager is nil")
+	}
+	x, y := b.interactiveArea.GetPos()
+  finalX,finalY:=x+b.interactiveArea.Width,y+b.interactiveArea.Height
+	for i := x; i < finalX; i++ {
+		for j := y; j < finalY; j++ {
+			xC, yC := i/s.ChunkSize, j/s.ChunkSize
+			ele := (*s.Map)[xC][yC]
+			if ele == nil {
+				(*s.Map)[xC][yC] = &[]IComponent{b}
+			} else {
+				(*ele) = append(*ele, b)
+			}
 		}
-
-		ele = &[]IComponent{b}
-		(*ele) = append(*ele, b)
 	}
 	return nil
 }

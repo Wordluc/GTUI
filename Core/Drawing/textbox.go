@@ -21,7 +21,7 @@ func CreateTextBox(x, y int) *TextBox {
 		XPos:      x,
 		YPos:      y,
 		isChanged: true,
-		color:     Color.GetNoneColor(),
+		color:     Color.GetDefaultColor(),
 		visible:   true,
 	}
 }

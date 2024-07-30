@@ -1,5 +1,6 @@
 module GTUI
 
+
 go 1.22.1
 
 require (
