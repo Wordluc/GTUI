@@ -6,7 +6,8 @@ type ITerminal interface {
 	Clear()
 	Print(byte []byte)
 	PrintStr(str string)
-	Size() (int,int)
+	Size() (int, int)
 	GetCursor() (int, int)
 	SetCursor(x, y int)
+	GetSetCursor(x, y int) string
 }

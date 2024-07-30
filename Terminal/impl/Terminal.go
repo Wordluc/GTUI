@@ -64,3 +64,6 @@ func (t *Terminal) GetCursor() (int, int) {
 func (t *Terminal) SetCursor(x, y int) {
 	t.PrintStr("\033[" + strconv.Itoa(y) + ";" + strconv.Itoa(x) + "H")
 }
+func (t *Terminal) GetSetCursor(x, y int) string {
+	return "\033[" + strconv.Itoa(y) + ";" + strconv.Itoa(x) + "H"
+}

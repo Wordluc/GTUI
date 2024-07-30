@@ -1,5 +1,6 @@
 package GTUI
 
+
 import (
 	"GTUI/Core/Utils/Color"
 )
@@ -31,6 +32,9 @@ func (c *Gtui) ISetCursor(x, y int) {
 	c.term.SetCursor(x+1, y+1)
 }
 
+func (c *Gtui) SetCursor(x, y int)string {
+	return c.term.GetSetCursor(x+1, y+1)
+}
 func (c *Gtui) IClear() {
 	c.term.Clear()
 }
