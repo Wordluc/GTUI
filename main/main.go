@@ -4,26 +4,28 @@ import (
 	Core "GTUI"
 	"GTUI/Core/Component"
 	"GTUI/Core/Utils/Color"
-	"os"
+	"GTUI/Keyboard/impl"
+	"time"
 )
 
+	var x, y = 0, 0
+	var core, _ = Core.NewGtui()
+	
+	var keyb=impl.Keyboard{}
 func main() {
-	command := make([]byte, 1)
-	core, _ := Core.NewGtui()
 	core.ISetGlobalColor(Color.GetDefaultColor())
 	defer core.Close()
-	b := Component.CreateButton(1, 1, 10, 5, "prova")
+	b := Component.CreateButton(5, 5, 10, 5, "prova")
+	keyb.Start()
 	core.InsertComponent(b)
-	x, y := 0, 0
-			core.ISetCursor(x, y)
-	for {
+	core.IRefreshAll()
+	loop()
+	defer keyb.Stop()
+}
+
+func loop(){
+	command, _ := keyb.GetKey()
 		core.IRefreshAll()
-		os.Stdin.Read(command)
-		core.ISetCursor(x, y)
-		if string(command) == "c" {
-			core.Interact(x, y)
-			continue
-		}
 		switch string(command) {
 		case "w":
 			y--
@@ -37,10 +39,13 @@ func main() {
 		case "d":
 			x++
 			break
-		}
-		if string(command) == "q" {
+			case "q":
+			return
+		case "c":
+			core.Interact(x, y)
 			break
 		}
 		core.ISetCursor(x, y)
+		time.Sleep(time.Millisecond * 50)
+		loop()
 	}
-}

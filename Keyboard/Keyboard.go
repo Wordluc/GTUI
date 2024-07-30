@@ -1,8 +1,5 @@
 package Keyboard
 
-import (
-
-)
 type Token struct {
 	
 }
