@@ -27,7 +27,7 @@ func (s *ComponentM) Add(comp IComponent) error {
 	return comp.insertingToMap(s)
 }
 
-func (s *ComponentM) Search(x, y int) (IComponent, error) {
+func (s *ComponentM) Search(x, y int) ([]IComponent, error) {
 	if s == nil {
 		return nil, errors.New("component manager is nil")
 	}
@@ -40,10 +40,12 @@ func (s *ComponentM) Search(x, y int) (IComponent, error) {
 	if eles == nil {
 		return nil, fmt.Errorf("no node found at %d, %d", x, y)
 	}
+	res := []IComponent{}
 	for _, ele := range *eles {
-		if ele.isOn(x, y) {
-			return ele, nil
+		if !ele.isOn(x, y) {
+		   continue
 		}
+		res = append(res, ele)
 	}
-	return nil, errors.New("no node founded")
+	return res, nil
 }

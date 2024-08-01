@@ -85,8 +85,8 @@ func (b *Button) insertingToMap(s *ComponentM) error {
 	}
 	x, y := b.interactiveArea.GetPos()
   finalX,finalY:=x+b.interactiveArea.Width,y+b.interactiveArea.Height
-	for i := x; i < finalX; i++ {
-		for j := y; j < finalY; j++ {
+	for i := x; i <= finalX; i+=s.ChunkSize {
+		for j := y; j <= finalY; j+=s.ChunkSize {
 			xC, yC := i/s.ChunkSize, j/s.ChunkSize
 			ele := (*s.Map)[xC][yC]
 			if ele == nil {

@@ -17,7 +17,7 @@ func main() {
 	core.ISetGlobalColor(Color.GetDefaultColor())
 	defer core.Close()
 	b := Component.CreateButton(5, 5, 10, 5, "prova")
-	c := Component.CreateButton(50, 5, 11, 5, "provissima")
+	c := Component.CreateButton(3, 5, 11, 5, "provissima")
 	keyb.Start()
 	core.InsertComponent(b)
 	core.InsertComponent(c)
