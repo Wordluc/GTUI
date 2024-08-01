@@ -43,11 +43,13 @@ func (c *Gtui) InsertComponent(component Component.IComponent) {
 }
 
 func (c *Gtui) Interact(x, y int) error {
-	r, e := c.componentManager.Search(x, y)
+	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
 		return e
 	}
-	r.OnClick()
+	for i:= range resultArray {
+		resultArray[i].OnClick()
+	}
 	return nil
 }
 
