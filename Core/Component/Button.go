@@ -85,14 +85,16 @@ func (b *Button) insertingToMap(s *ComponentM) error {
 	}
 	x, y := b.interactiveArea.GetPos()
   finalX,finalY:=x+b.interactiveArea.Width,y+b.interactiveArea.Height
-	for i := x; i <= finalX; i+=s.ChunkSize {
-		for j := y; j <= finalY; j+=s.ChunkSize {
+	for i := x; i <= finalX; i+=1{
+		for j := y; j <= finalY; j+=1{
 			xC, yC := i/s.ChunkSize, j/s.ChunkSize
 			ele := (*s.Map)[xC][yC]
 			if ele == nil {
 				(*s.Map)[xC][yC] = &[]IComponent{b}
 			} else {
-				(*ele) = append(*ele, b)
+				  if (*ele)[len((*ele))-1] != b {
+						(*ele) = append(*ele, b)
+				  }
 			}
 		}
 	}
