@@ -4,7 +4,12 @@ import (
 	"errors"
 	"fmt"
 )
-
+type InteractiveShape struct {
+	xPos int
+	yPos int
+	Width int
+	Height int
+}
 type ComponentM struct {
 	Map       *[][]*[]IComponent
 	ChunkSize int
@@ -24,7 +29,28 @@ func Create(xSize, ySize, chunkSize int) *ComponentM {
 }
 
 func (s *ComponentM) Add(comp IComponent) error {
-	return comp.insertingToMap(s)
+	if s == nil {
+		return errors.New("component manager is nil")
+	}
+	shape,e:=comp.getShape()
+	if e!=nil{
+		return e
+	}
+  finalX,finalY:=shape.xPos+shape.Width,shape.yPos+shape.Height
+	for i := shape.xPos; i <= finalX; i+=1{
+		for j := shape.yPos; j <= finalY; j+=1{
+			xC, yC := i/s.ChunkSize, j/s.ChunkSize
+			ele := (*s.Map)[xC][yC]
+			if ele == nil {
+				(*s.Map)[xC][yC] = &[]IComponent{comp}
+			} else {
+				  if (*ele)[len((*ele))-1] != comp {
+						(*ele) = append(*ele, comp)
+				  }
+			}
+		}
+	}
+	return nil
 }
 
 func (s *ComponentM) Search(x, y int) ([]IComponent, error) {
@@ -42,10 +68,13 @@ func (s *ComponentM) Search(x, y int) ([]IComponent, error) {
 	}
 	res := []IComponent{}
 	for _, ele := range *eles {
-		if !ele.isOn(x, y) {
-		   continue
+		shape, e:= ele.getShape()
+    if e!=nil{
+			return nil, e
 		}
-		res = append(res, ele)
+		if x>=shape.xPos && x<shape.xPos+shape.Width && y>=shape.yPos && y<shape.yPos+shape.Height{
+			res = append(res, ele)
+		}
 	}
 	return res, nil
 }

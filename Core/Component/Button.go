@@ -72,31 +72,15 @@ func (b *Button) OnLeave() {
 		b.OnLeave()
 	}
 }
-func (b *Button) isOn(xCur, yCur int) bool {
-	x, y := b.interactiveArea.GetPos()
-	return xCur >= x && xCur < x+b.interactiveArea.Width && yCur >= y && yCur < y+b.interactiveArea.Height
-}
 func (b *Button) GetGraphics() Core.IEntity {
 	return b.graphics
 }
-func (b *Button) insertingToMap(s *ComponentM) error {
-	if s == nil {
-		return errors.New("component manager is nil")
+func (b *Button) getShape() (InteractiveShape,error) {
+	if b.interactiveArea == nil {
+		return InteractiveShape{}, errors.New("interactive area is nil")
 	}
-	x, y := b.interactiveArea.GetPos()
-  finalX,finalY:=x+b.interactiveArea.Width,y+b.interactiveArea.Height
-	for i := x; i <= finalX; i+=1{
-		for j := y; j <= finalY; j+=1{
-			xC, yC := i/s.ChunkSize, j/s.ChunkSize
-			ele := (*s.Map)[xC][yC]
-			if ele == nil {
-				(*s.Map)[xC][yC] = &[]IComponent{b}
-			} else {
-				  if (*ele)[len((*ele))-1] != b {
-						(*ele) = append(*ele, b)
-				  }
-			}
-		}
-	}
-	return nil
+	shape:=InteractiveShape{}
+	shape.xPos,shape.yPos= b.interactiveArea.GetPos()
+	shape.Width,shape.Height= b.interactiveArea.GetSize()
+	return shape,nil
 }

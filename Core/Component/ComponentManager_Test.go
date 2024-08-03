@@ -7,7 +7,7 @@ import (
 func Test_InsertComponent(t *testing.T) {
 	man := Create(15, 15, 5)
 	comp := CreateButton(0, 0, 10, 10, "prova")
-	err := comp.insertingToMap(man)
+	err:=man.Add(comp)
 	if err != nil {
 		t.Errorf("Error inserting component: %v", err)
 	}
@@ -37,7 +37,7 @@ func Test_InsertComponent(t *testing.T) {
 func Test_InsertComponent2(t *testing.T) {
 	man := Create(15, 15, 5)
 	comp := CreateButton(0, 4, 10, 10, "prova")
-	err := comp.insertingToMap(man)
+	err:=man.Add(comp)
 	if err != nil {
 		t.Errorf("Error inserting component: %v", err)
 	}

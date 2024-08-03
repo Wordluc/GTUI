@@ -10,6 +10,5 @@ type IComponent interface {
 	OnHover()
 	OnLeave()
 	GetGraphics() Core.IEntity
-	insertingToMap(*ComponentM) error
-	isOn(x, y int) bool
+	getShape() (InteractiveShape,error)
 }
