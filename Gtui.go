@@ -42,13 +42,20 @@ func (c *Gtui) InsertComponent(component Component.IComponent) {
 	c.componentManager.Add(component)
 }
 
-func (c *Gtui) Interact(x, y int) error {
+type InteractiveType int8
+const (
+   Click InteractiveType = iota
+)
+func (c *Gtui) Interact(x, y int, t InteractiveType) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
 		return e
 	}
 	for i:= range resultArray {
-		resultArray[i].OnClick()
+		switch t {
+		case Click:
+			resultArray[i].OnClick()
+		}
 	}
 	return nil
 }
@@ -64,3 +71,4 @@ func (c *Gtui) IRefreshAll() {
 	str.WriteString(c.SetCursor(x-1,y-1))
 	c.term.PrintStr(str.String())
 }
+

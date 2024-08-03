@@ -1,6 +1,7 @@
 package main
 
 import (
+	"GTUI"
 	Core "GTUI"
 	"GTUI/Core/Component"
 	"GTUI/Core/Utils/Color"
@@ -45,7 +46,7 @@ func loop() {
 	case "q":
 		return
 	case "c":
-		core.Interact(x, y)
+		core.Interact(x, y,GTUI.Click)
 		break
 	}
 	core.ISetCursor(x, y)
