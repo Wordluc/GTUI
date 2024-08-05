@@ -5,16 +5,14 @@ import (
 	Core "GTUI"
 	"GTUI/Core/Component"
 	"GTUI/Core/Utils/Color"
-	"GTUI/Keyboard"
-	"GTUI/Keyboard/impl"
+	Kd "GTUI/Keyboard"
 )
 
 var x, y = 0, 0
 var core *Core.Gtui 
+var keyb Kd.IKeyBoard = &Kd.Keyboard{}
 
-var keyb Keyboard.IKeyBoard = &impl.Keyboard{}
-
-func Creation(k Keyboard.IKeyBoard) Component.StreamCharacter {
+func Creation(k Kd.IKeyBoard) Component.StreamCharacter {
 	stream := Component.StreamCharacter{}
 	stream.Get = func() chan string {
 		i := k.NewChannel()
@@ -40,7 +38,7 @@ func main() {
 	keyb.Start(loop)
 }
 
-func loop(keyb Keyboard.IKeyBoard) bool{
+func loop(keyb Kd.IKeyBoard) bool{
 	command, _ := keyb.GetKey()
 	switch string(command) {
 	case "w":
