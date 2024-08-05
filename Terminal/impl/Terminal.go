@@ -2,7 +2,6 @@ package impl
 
 import (
 	"os"
-	"regexp"
 	"strconv"
 	"golang.org/x/term"
 )
@@ -48,19 +47,6 @@ func (t *Terminal) Size() (int,int) {
 	return x,y
 }
 
-func (t *Terminal) GetCursor() (int, int) {
-	t.PrintStr("\033[6n")
-	pos:= make([]byte, 32)
-	os.Stdin.Read(pos)
-	regex:=regexp.MustCompile("\\[?([0-9]+);([0-9]+)R")
-	a:=regex.FindAllSubmatch(pos, -1)
-	if len(a) == 0 || len(a[0]) != 3 {
-		return t.GetCursor()
-	}
-	x,_:=strconv.Atoi(string(a[0][2]))
-	y,_:=strconv.Atoi(string(a[0][1]))
-	return x,y
-}
 func (t *Terminal) SetCursor(x, y int) {
 	t.PrintStr("\033[" + strconv.Itoa(y) + ";" + strconv.Itoa(x) + "H")
 }

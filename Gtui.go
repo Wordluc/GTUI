@@ -62,13 +62,10 @@ func (c *Gtui) Interact(x, y int, t InteractiveType) error {
 
 func (c *Gtui) IRefreshAll() {
 	var str strings.Builder
-	x,y:=c.term.GetCursor()
-	str.WriteString(c.globalColor.GetAnsiColor())
 	for _, b := range c.buff {
 		str.WriteString(b.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 	}
-	str.WriteString(c.SetCursor(x-1,y-1))
 	c.term.PrintStr(str.String())
 }
 

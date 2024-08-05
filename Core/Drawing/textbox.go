@@ -23,6 +23,7 @@ func CreateTextBox(x, y int) *TextBox {
 		isChanged: true,
 		color:     Color.GetDefaultColor(),
 		visible:   true,
+		text:      strings.Builder{},
 	}
 }
 

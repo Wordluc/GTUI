@@ -4,6 +4,11 @@ import (
 	"errors"
 	"fmt"
 )
+type StreamCharacter struct{
+   Get func ()chan string
+	 IChannel int
+   Delete func()
+}
 type InteractiveShape struct {
 	xPos int
 	yPos int
