@@ -42,24 +42,27 @@ func (c *Gtui) InsertComponent(component Component.IComponent) {
 	c.componentManager.Add(component)
 }
 
-type InteractiveType int8
-const (
-   Click InteractiveType = iota
-)
-func (c *Gtui) Interact(x, y int, t InteractiveType) error {
+func (c *Gtui) Interact(x, y int) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
 		return e
 	}
 	for i:= range resultArray {
-		switch t {
-		case Click:
-			resultArray[i].OnClick()
-		}
+		i=i///ahhhhh cazzi tuoi
 	}
 	return nil
 }
 
+func (c *Gtui) Click(x, y int) error {
+	resultArray, e := c.componentManager.Search(x, y)
+	if e != nil {
+		return e
+	}
+	for i:= range resultArray {
+			resultArray[i].OnClick()
+	}
+	return nil
+}
 func (c *Gtui) IRefreshAll() {
 	var str strings.Builder
 	for _, b := range c.buff {
