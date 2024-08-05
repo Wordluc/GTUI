@@ -1,7 +1,6 @@
 package main
 
 import (
-	"GTUI"
 	Core "GTUI"
 	"GTUI/Core/Component"
 	"GTUI/Core/Utils/Color"
@@ -39,25 +38,26 @@ func main() {
 }
 
 func loop(keyb Kd.IKeyBoard) bool{
-	command, _ := keyb.GetKey()
-	switch string(command) {
-	case "w":
-		y--
-		break
-	case "a":
-		x--
-		break
-	case "s":
+	if keyb.TokenPressed(Kd.KeyArrowDown) {
 		y++
-		break
-	case "d":
+	}
+	if keyb.TokenPressed(Kd.KeyArrowUp) {
+		y--
+	}
+	if keyb.TokenPressed(Kd.KeyArrowRight) {
 		x++
-		break
-	case "q":
+	}
+	if keyb.TokenPressed(Kd.KeyArrowLeft) {
+		x--
+	}
+	if keyb.TokenPressed(Kd.KeyEnter) {
+		y++
+	}
+	if keyb.IsKeyPressed('c') {
+		core.Click(x, y)
+	}
+	if keyb.IsKeyPressed('q') {
 		return false
-	case "c":
-		core.Interact(x, y, GTUI.Click)
-		break
 	}
 	core.ISetCursor(x, y)
 	core.IRefreshAll()

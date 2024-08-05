@@ -11,7 +11,7 @@ type Keyboard struct {
 	Loop      func(IKeyBoard) bool
 }
 type stateKey struct {
-	key  keyboard.Key
+	key  Key
 	rune rune
 }
 
@@ -45,7 +45,7 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 		if v.Key == keyboard.KeySpace {
 			v.Rune = ' '
 		}
-		t.key = stateKey{key: v.Key, rune: v.Rune}
+		t.key = stateKey{key: Key(v.Key), rune: v.Rune}
 		for _, b := range t.GetChannels() {
 			key, e := t.GetKey()
 			if e != nil {
@@ -66,30 +66,14 @@ func (t *Keyboard) GetKey() (byte, error) {
 	return byte(t.key.rune), nil
 }
 
-func (t *Keyboard) TokenPressed(token Token) bool {
-	key := t.key.key
-	if v, e := mapTokenToKey(key); e == nil {
-		if v == key {
-			return true
-		}
-	}
-	return false
+func (t *Keyboard) TokenPressed(key Key) bool {
+	return t.key.key==key
 }
 
-func (t *Keyboard) IsKeyPressed(key byte) bool {
-	return byte(t.key.rune) == key
+func (t *Keyboard) IsKeyPressed(key rune) bool {
+	return t.key.rune == key
 }
 
-func mapTokenToKey(token keyboard.Key) (keyboard.Key, error) {
-	switch token {
-	case keyboard.KeyArrowLeft:
-		return keyboard.KeyArrowLeft, nil
-	case keyboard.KeyArrowRight:
-		return keyboard.KeyArrowRight, nil
-	case keyboard.KeyArrowUp:
-		return keyboard.KeyArrowUp, nil
-	case keyboard.KeyArrowDown:
-		return keyboard.KeyArrowDown, nil
-	}
-	return 0, nil
+func (t *Keyboard) mappingKeySpecial(k keyboard.Key) Key {
+	return Key(k)
 }
