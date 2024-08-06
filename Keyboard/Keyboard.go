@@ -66,14 +66,10 @@ func (t *Keyboard) GetKey() (byte, error) {
 	return byte(t.key.rune), nil
 }
 
-func (t *Keyboard) TokenPressed(key Key) bool {
+func (t *Keyboard) IsKeySPressed(key Key) bool {
 	return t.key.key==key
 }
 
 func (t *Keyboard) IsKeyPressed(key rune) bool {
 	return t.key.rune == key
-}
-
-func (t *Keyboard) mappingKeySpecial(k keyboard.Key) Key {
-	return Key(k)
 }
