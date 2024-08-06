@@ -1,30 +1,36 @@
 package GTUI
 
 import (
-	C "GTUI/Core"
+	"GTUI/Core"
 	"GTUI/Core/Component"
 	"GTUI/Core/Utils/Color"
-	iTerminal "GTUI/Terminal"
-	implTerm "GTUI/Terminal/impl"
+	"GTUI/Terminal"
 	"strings"
 )
 
 type Gtui struct {
 	globalColor      Color.Color
-	term             iTerminal.ITerminal
-	buff             []C.IEntity
+	term             Terminal.ITerminal
+	buff             []Core.IEntity
 	componentManager *Component.ComponentM
+	xCursor          int
+	yCursor          int
+}
+
+func (c *Gtui) SetCur(x, y int) {
+	c.xCursor = x+1
+	c.yCursor = y+1
 }
 
 func NewGtui() (*Gtui, error) {
-	term := &implTerm.Terminal{}
+	term := &Terminal.Terminal{}
 	e := term.Start()
 	if e != nil {
 		return nil, e
 	}
 	xSize, ySize := term.Size()
 	componentManager := Component.Create(xSize, ySize, 5)
-	return &Gtui{term: term, buff: make([]C.IEntity, 0), componentManager: componentManager}, nil
+	return &Gtui{term: term, buff: make([]Core.IEntity, 0), componentManager: componentManager}, nil
 }
 
 func (c *Gtui) Close() {
@@ -33,7 +39,7 @@ func (c *Gtui) Close() {
 	c.term.Stop()
 }
 
-func (c *Gtui) InsertEntity(entity C.IEntity) {
+func (c *Gtui) InsertEntity(entity Core.IEntity) {
 	c.buff = append(c.buff, entity)
 }
 
@@ -42,27 +48,24 @@ func (c *Gtui) InsertComponent(component Component.IComponent) {
 	c.componentManager.Add(component)
 }
 
-func (c *Gtui) Interact(x, y int) error {
+func (c *Gtui) Interact(x, y int,event Component.Event) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
 		return e
 	}
-	for i:= range resultArray {
-		i=i///ahhhhh cazzi tuoi
+	switch event {
+	case Component.OnClick:
+		for i:= range resultArray {
+			resultArray[i].OnClick()
+		}
+	case Component.OnLeave:
+		for i:= range resultArray {
+			resultArray[i].OnLeave()
+		}
 	}
 	return nil
 }
 
-func (c *Gtui) Click(x, y int) error {
-	resultArray, e := c.componentManager.Search(x, y)
-	if e != nil {
-		return e
-	}
-	for i:= range resultArray {
-			resultArray[i].OnClick()
-	}
-	return nil
-}
 func (c *Gtui) IRefreshAll() {
 	var str strings.Builder
 	for _, b := range c.buff {
@@ -70,5 +73,6 @@ func (c *Gtui) IRefreshAll() {
 		str.WriteString(c.globalColor.GetAnsiColor())
 	}
 	c.term.PrintStr(str.String())
+	c.term.SetCursor(c.xCursor, c.yCursor)
 }
 

@@ -7,10 +7,9 @@ import (
 	Kd "GTUI/Keyboard"
 )
 
-var x, y = 0, 0
 var core *Core.Gtui 
 var keyb Kd.IKeyBoard = &Kd.Keyboard{}
-
+var x, y int
 func Creation(k Kd.IKeyBoard) Component.StreamCharacter {
 	stream := Component.StreamCharacter{}
 	stream.Get = func() chan string {
@@ -33,34 +32,33 @@ func main() {
 	core.InsertComponent(c)
 	core.InsertComponent(b)
 	core.IRefreshAll()
-	core.ISetCursor(x, y)
+	core.SetCur(x, y)
 	keyb.Start(loop)
 }
 
 func loop(keyb Kd.IKeyBoard) bool{
-	if keyb.TokenPressed(Kd.KeyArrowDown) {
+	if keyb.IsKeySPressed(Kd.KeyArrowDown) {
 		y++
 	}
-	if keyb.TokenPressed(Kd.KeyArrowUp) {
+	if keyb.IsKeySPressed(Kd.KeyArrowUp) {
 		y--
 	}
-	if keyb.TokenPressed(Kd.KeyArrowRight) {
+	if keyb.IsKeySPressed(Kd.KeyArrowRight) {
 		x++
 	}
-	if keyb.TokenPressed(Kd.KeyArrowLeft) {
+	if keyb.IsKeySPressed(Kd.KeyArrowLeft) {
 		x--
 	}
-	if keyb.TokenPressed(Kd.KeyEnter) {
+	if keyb.IsKeySPressed(Kd.KeyEnter) {
 		y++
 	}
+	core.SetCur(x, y)
 	if keyb.IsKeyPressed('c') {
-		core.Click(x, y)
+		core.Interact(x, y, Component.OnClick)
 	}
 	if keyb.IsKeyPressed('q') {
 		return false
 	}
-	core.ISetCursor(x, y)
 	core.IRefreshAll()
-	core.ISetCursor(x, y)
 	return true
 }

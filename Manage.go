@@ -21,10 +21,6 @@ func (c *Gtui) ILen() (int, int) {
 	return c.term.Size()
 }
 
-func (c *Gtui) ISetCursor(x, y int) {
-	c.term.SetCursor(x+1, y+1)
-}
-
 func (c *Gtui) IClear() {
 	c.term.Clear()
 }
