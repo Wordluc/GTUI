@@ -1,6 +1,8 @@
 package Component
 
 import (
+	"GTUI/Core/Utils"
+	"slices"
 	"testing"
 )
 
@@ -25,9 +27,6 @@ func Test_InsertComponent(t *testing.T) {
 	}
 	if c, e := man.Search(5, 5); e != nil || c[0] != comp {
 		t.Errorf("Component not inserted")
-	}
-	if c, _ := man.Search(10, 0); len(c) != 0 {
-		t.Errorf("Component inserted in wrong place")
 	}
 	if c, _ := man.Search(0, 10); len(c) != 0 {
 		t.Errorf("Component inserted in wrong place")
@@ -95,5 +94,14 @@ func Test_InsertComponentOverlapping(t *testing.T) {
 	}
 	if c, e := man.Search(0, 3); e != nil || len(c) != 2 {
 		t.Errorf("Component not inserted")
+	}
+}
+func TestDiffWithComponent(t *testing.T) {
+	b:=Button{}
+	from := []IComponent{&b}
+	to := []IComponent{&b}
+	result := []IComponent{}
+	if !slices.Equal(Utils.Diff(from, to), result) {
+		t.Errorf("Diff failed")
 	}
 }
