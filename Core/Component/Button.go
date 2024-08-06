@@ -47,7 +47,7 @@ func (b *Button) SetOnHover(onHover OnEvent) {
 
 func (b *Button) OnClick() {
 	if b.isClicked {
-		b.interactiveArea.SetColor(Color.GetDefaultColor())
+		b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
 		b.isClicked = false
 	} else {
 		if b.onClick != nil {
@@ -63,11 +63,13 @@ func (b *Button) OnRelease() {
 	}
 }
 func (b *Button) OnHover() {
+	b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
 	if b.onHover != nil {
 		b.onHover()
 	}
 }
 func (b *Button) OnLeave() {
+	b.interactiveArea.SetColor(Color.GetDefaultColor())
 	if b.onLeave != nil {
 		b.OnLeave()
 	}

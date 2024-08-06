@@ -45,19 +45,20 @@ func (b *TextField) OnClick() {
 		return
 	}
 	b.isTyping = true
-	b.interactiveArea.SetColor(Color.Get(Color.Red, Color.None))
+	b.interactiveArea.SetColor(Color.Get(Color.Green, Color.None))
 	go b.loopTyping()
 }
 
 func (b *TextField) OnLeave() {
 	b.isTyping = false
 	b.interactiveArea.SetColor(Color.GetDefaultColor())
+	b.streamText.Delete()
 }
 
 func (b *TextField) OnRelease() {}
 
 func (b *TextField) OnHover() {
-
+	b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 
 func (b *TextField) GetGraphics() Core.IEntity {

@@ -3,6 +3,7 @@ package GTUI
 import (
 	"GTUI/Core"
 	"GTUI/Core/Component"
+	"GTUI/Core/Utils"
 	"GTUI/Core/Utils/Color"
 	"GTUI/Terminal"
 	"strings"
@@ -18,6 +19,16 @@ type Gtui struct {
 }
 
 func (c *Gtui) SetCur(x, y int) {
+	compPreSet,_:=c.componentManager.Search(c.xCursor-1, c.yCursor-1)
+	compPostSet,_:=c.componentManager.Search(x, y)
+	inPreButNotInPost := Utils.Diff(compPostSet, compPreSet)
+	inPostButNotInPre := Utils.Diff(compPreSet, compPostSet)
+	for _, e := range inPreButNotInPost {
+		e.OnLeave()
+	}
+	for _, e := range inPostButNotInPre {
+		e.OnHover()
+	}
 	c.xCursor = x+1
 	c.yCursor = y+1
 }

@@ -11,6 +11,7 @@ const (//Foreground
 	Magenta
 	Cyan
 	White
+	Gray=90
 	Reset = 0
 	None=-1
 )

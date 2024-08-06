@@ -36,6 +36,10 @@ func (t *Keyboard) NewChannel() int {
 	return i
 }
 func (t *Keyboard) DeleteChannel(i int) {
+	if i <= 0 {
+		t.Channel = []chan string{}
+		return
+	}
 	t.Channel = append(t.Channel[:i], t.Channel[i+1:]...)
 }
 
