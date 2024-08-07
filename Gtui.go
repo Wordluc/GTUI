@@ -66,7 +66,7 @@ func (c *Gtui) Click(x, y int) error {
 		return e
 	}
 	for i := range resultArray {
-		resultArray[i].OnClick()
+		resultArray[i].OnClick()//dare la possibilita' di scegliere il timer
 		time.AfterFunc(time.Millisecond*1000, func() {
 			resultArray[i].OnRelease()
 			c.IRefreshAll()
