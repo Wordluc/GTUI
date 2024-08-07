@@ -5,27 +5,27 @@ import (
 )
 
 type Color struct {
-	foreground IColor
-	Background IColor
+	foreground ColorValue
+	Background ColorValue
 }
 
-func (c *Color) SetForeground(color IColor)  {
+func (c *Color) SetForeground(color ColorValue)  {
 	c.foreground=color
 }
 
-func (c *Color) SetBackground(color IColor)  {
+func (c *Color) SetBackground(color ColorValue)  {
 	c.Background=gBg(color)
 }
 
-func (c Color) isEqual(other Color) bool {
+func (c Color) IsEqual(other Color) bool {
 	return c.foreground == other.foreground && c.Background == other.Background
 }
 
-func Get(foreGround IColor, backGround IColor) Color {
+func Get(foreGround ColorValue, backGround ColorValue) Color {
 	return Color{foreground: foreGround, Background: gBg(backGround)}
 }
 
-func gBg(i IColor) IColor {
+func gBg(i ColorValue) ColorValue {
 	return i + 10
 }
 
@@ -38,7 +38,7 @@ func GetDefaultColor() Color {
 }
 
 func (c Color) GetMixedColor(defaultColor Color) Color {
-	if GetNoneColor().isEqual(c) {
+	if GetNoneColor().IsEqual(c) {
 		return GetNoneColor()
 	}
 	color:=c
@@ -52,7 +52,7 @@ func (c Color) GetMixedColor(defaultColor Color) Color {
 }
 
 func (c Color) GetAnsiColor() string {
-	if GetNoneColor().isEqual(c) {
+	if GetNoneColor().IsEqual(c) {
 		return ""
 	}
 	bg := "0"

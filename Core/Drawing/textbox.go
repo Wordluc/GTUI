@@ -16,6 +16,7 @@ type TextBox struct {
 	text      strings.Builder
 	visible   bool
 	line      int
+	cursorColor Color.Color
 }
 
 func CreateTextBox(x, y int) *TextBox {
@@ -24,6 +25,7 @@ func CreateTextBox(x, y int) *TextBox {
 		YPos:      y,
 		isChanged: true,
 		color:     Color.GetDefaultColor(),
+		cursorColor:     Color.GetNoneColor(),
 		visible:   true,
 		text:      strings.Builder{},
 	}
@@ -31,7 +33,7 @@ func CreateTextBox(x, y int) *TextBox {
 
 func (s *TextBox) Type(text string) {
 	if text == "\n" {
-		s.text.WriteString(Utils.GetAnsiMoveTo(s.XPos, s.YPos+s.line+1))
+		s.text.WriteString(" "+Utils.GetAnsiMoveTo(s.XPos, s.YPos+s.line+1))
 		s.line++
 	} else {
 		s.text.WriteString(text)
@@ -67,7 +69,10 @@ func (s *TextBox) SetColor(color Color.Color) {
 func (s *TextBox) SetVisibility(visible bool) {
 	s.visible = visible
 }
-
+func (s *TextBox) SetCursorColor(color Color.Color) {
+	s.cursorColor = color
+	s.Touch()
+}
 func (s *TextBox) GetVisibility() bool {
 	return s.visible
 }
@@ -77,7 +82,11 @@ func (s *TextBox) getAnsiTextBox(defaultColor Color.Color) string {
 	str.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
 	str.WriteString(s.color.GetMixedColor(defaultColor).GetAnsiColor())
 	str.WriteString(s.text.String())
+	if !s.cursorColor.IsEqual(Color.GetNoneColor()) {
+		str.WriteString(Color.Get(Color.Red,Color.None).GetMixedColor(defaultColor).GetAnsiColor()+"|")
+	}
 	str.WriteString(Color.GetResetColor())
+	s.Touch()
 	return str.String()
 }
 

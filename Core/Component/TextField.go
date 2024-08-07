@@ -19,6 +19,7 @@ func CreateTextField(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextFi
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
 	textBox := Drawing.CreateTextBox(1, 1)
+	textBox.SetCursorColor(Color.Get(Color.Red, Color.None))
 	cont.AddChild(rect)
 	cont.AddChild(textBox)
 	cont.SetPos(x, y)
