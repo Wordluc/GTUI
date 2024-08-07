@@ -50,9 +50,6 @@ func loop(keyb Kd.IKeyBoard) bool{
 	if keyb.IsKeySPressed(Kd.KeyArrowLeft) {
 		x--
 	}
-	if keyb.IsKeySPressed(Kd.KeyEnter) {
-		y++
-	}
 	core.SetCur(x, y)
 	if keyb.IsKeyPressed('c') {
 		core.Interact(x, y, Component.OnClick)
