@@ -54,7 +54,7 @@ func (b *Button) OnClick() {
 		}
 		b.isClicked = true
 	}
-	b.updateColor()
+	b.updateColorByClick()
 }
 func (b *Button) OnRelease() {
 	if b.onRelease != nil {
@@ -77,7 +77,7 @@ func (b *Button) OnLeave() {
 		b.OnLeave()
 	}
 }
-func (b *Button) updateColor() {
+func (b *Button) updateColorByClick() {
    if b.isClicked{
 			b.interactiveArea.SetColor(Color.Get(Color.Blue, Color.None))
 	 }else{
