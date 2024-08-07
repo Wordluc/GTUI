@@ -47,15 +47,14 @@ func (b *Button) SetOnHover(onHover OnEvent) {
 
 func (b *Button) OnClick() {
 	if b.isClicked {
-		b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
 		b.isClicked = false
 	} else {
 		if b.onClick != nil {
 			b.onClick()
 		}
-		b.interactiveArea.SetColor(Color.Get(Color.Blue, Color.None))
 		b.isClicked = true
 	}
+	b.updateColor()
 }
 func (b *Button) OnRelease() {
 	if b.onRelease != nil {
@@ -63,16 +62,27 @@ func (b *Button) OnRelease() {
 	}
 }
 func (b *Button) OnHover() {
-	b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
+	if !b.isClicked {
+		b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
+	}
 	if b.onHover != nil {
 		b.onHover()
 	}
 }
 func (b *Button) OnLeave() {
-	b.interactiveArea.SetColor(Color.GetDefaultColor())
+	if !b.isClicked {
+		b.interactiveArea.SetColor(Color.GetDefaultColor())
+	}
 	if b.onLeave != nil {
 		b.OnLeave()
 	}
+}
+func (b *Button) updateColor() {
+   if b.isClicked{
+			b.interactiveArea.SetColor(Color.Get(Color.Blue, Color.None))
+	 }else{
+			b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
+	 }
 }
 func (b *Button) GetGraphics() Core.IEntity {
 	return b.graphics
