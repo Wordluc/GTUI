@@ -37,6 +37,7 @@ func main() {
 }
 
 func loop(keyb Kd.IKeyBoard) bool{
+	core.IRefreshAll()
 	if keyb.IsKeySPressed(Kd.KeyArrowDown) {
 		y++
 	}
