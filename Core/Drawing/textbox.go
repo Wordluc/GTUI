@@ -1,8 +1,9 @@
 package Drawing
 
 import (
-	"GTUI/Core/Utils/Color"
+	"GTUI/Core/Utils"
 	U "GTUI/Core/Utils"
+	"GTUI/Core/Utils/Color"
 	"strings"
 )
 
@@ -14,6 +15,7 @@ type TextBox struct {
 	YPos      int
 	text      strings.Builder
 	visible   bool
+	line      int
 }
 
 func CreateTextBox(x, y int) *TextBox {
@@ -28,7 +30,12 @@ func CreateTextBox(x, y int) *TextBox {
 }
 
 func (s *TextBox) Type(text string) {
-	s.text.WriteString(text)
+	if text == "\n" {
+		s.text.WriteString(Utils.GetAnsiMoveTo(s.XPos, s.YPos+s.line+1))
+		s.line++
+	} else {
+		s.text.WriteString(text)
+	}
 	s.Touch()
 }
 
