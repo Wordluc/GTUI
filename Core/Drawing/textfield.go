@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type TextBox struct {
+type TextField struct {
 	isChanged bool
 	color     Color.Color
 	ansiCode  string
@@ -19,8 +19,8 @@ type TextBox struct {
 	cursorColor Color.Color
 }
 
-func CreateTextBox(x, y int) *TextBox {
-	return &TextBox{
+func CreateTextField(x, y int) *TextField {
+	return &TextField{
 		XPos:      x,
 		YPos:      y,
 		isChanged: true,
@@ -31,7 +31,7 @@ func CreateTextBox(x, y int) *TextBox {
 	}
 }
 
-func (s *TextBox) Type(text string) {
+func (s *TextField) Type(text string) {
 	if text == "\n" {
 		s.text.WriteString(" "+Utils.GetAnsiMoveTo(s.XPos, s.YPos+s.line+1))
 		s.line++
@@ -41,43 +41,47 @@ func (s *TextBox) Type(text string) {
 	s.Touch()
 }
 
-func (s *TextBox) GetAnsiCode(defaultColor Color.Color) string {
+func (s *TextField) GetAnsiCode(defaultColor Color.Color) string {
 	if !s.visible {
 		return ""
 	}
 	if s.isChanged {
 		s.isChanged = false
-		s.ansiCode = s.getAnsiTextBox(defaultColor)
+		s.ansiCode = s.getAnsiTextField(defaultColor)
 	}
 	return s.ansiCode
 }
 
-func (s *TextBox) SetPos(x, y int) {
+func (s *TextField) SetPos(x, y int) {
 	s.XPos = x
 	s.YPos = y
 }
 
-func (s *TextBox) GetPos() (int, int) {
+func (s *TextField) GetPos() (int, int) {
 	return s.XPos, s.YPos
 }
 
-func (s *TextBox) SetColor(color Color.Color) {
+func (s *TextField) SetColor(color Color.Color) {
 	s.color = color
 	s.Touch()
 }
-
-func (s *TextBox) SetVisibility(visible bool) {
+func (s *TextField) ClearText() {
+	s.text.Reset()
+	s.Touch()
+	s.line=0
+}
+func (s *TextField) SetVisibility(visible bool) {
 	s.visible = visible
 }
-func (s *TextBox) SetCursorColor(color Color.Color) {
+func (s *TextField) SetCursorColor(color Color.Color) {
 	s.cursorColor = color
 	s.Touch()
 }
-func (s *TextBox) GetVisibility() bool {
+func (s *TextField) GetVisibility() bool {
 	return s.visible
 }
 
-func (s *TextBox) getAnsiTextBox(defaultColor Color.Color) string {
+func (s *TextField) getAnsiTextField(defaultColor Color.Color) string {
 	var str strings.Builder
 	str.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
 	str.WriteString(s.color.GetMixedColor(defaultColor).GetAnsiColor())
@@ -90,6 +94,6 @@ func (s *TextBox) getAnsiTextBox(defaultColor Color.Color) string {
 	return str.String()
 }
 
-func (s *TextBox) Touch() {
+func (s *TextField) Touch() {
 	s.isChanged = true
 }

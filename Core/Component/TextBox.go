@@ -7,23 +7,23 @@ import (
 	"errors"
 )
 
-type TextField struct {
+type TextBox struct {
 	graphics        *Drawing.Container
 	interactiveArea *Drawing.Rectangle
-	textBox         *Drawing.TextBox
+	textBox         *Drawing.TextField
 	isTyping        bool
 	streamText      StreamCharacter
 }
 
-func CreateTextField(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextField {
+func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
-	textBox := Drawing.CreateTextBox(1, 1)
+	textBox := Drawing.CreateTextField(1, 1)
 	textBox.SetCursorColor(Color.Get(Color.Red, Color.None))
 	cont.AddChild(rect)
 	cont.AddChild(textBox)
 	cont.SetPos(x, y)
-	return &TextField{
+	return &TextBox{
 		graphics:        cont,
 		interactiveArea: rect,
 		isTyping:        false,
@@ -31,7 +31,8 @@ func CreateTextField(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextFi
 		textBox:         textBox,
 	}
 }
-func (b *TextField) loopTyping() {
+
+func (b *TextBox) loopTyping() {
 	channel := b.streamText.Get()
 	for str := range channel {
 		if !b.isTyping {
@@ -40,8 +41,11 @@ func (b *TextField) loopTyping() {
 		b.textBox.Type(string(str))
 	}
 }
+func (b *TextBox) Clear() {
+	b.textBox.ClearText()
+}
 
-func (b *TextField) OnClick() {
+func (b *TextBox) OnClick() {
 	if b.isTyping {
 		return
 	}
@@ -50,23 +54,23 @@ func (b *TextField) OnClick() {
 	go b.loopTyping()
 }
 
-func (b *TextField) OnLeave() {
+func (b *TextBox) OnLeave() {
 	b.isTyping = false
 	b.interactiveArea.SetColor(Color.GetDefaultColor())
 	b.streamText.Delete()
 }
 
-func (b *TextField) OnRelease() {}
+func (b *TextBox) OnRelease() {}
 
-func (b *TextField) OnHover() {
+func (b *TextBox) OnHover() {
 	b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 
-func (b *TextField) GetGraphics() Core.IEntity {
+func (b *TextBox) GetGraphics() Core.IEntity {
 	return b.graphics
 }
 
-func (b *TextField) getShape() (InteractiveShape, error) {
+func (b *TextBox) getShape() (InteractiveShape, error) {
 	if b.interactiveArea == nil {
 		return InteractiveShape{}, errors.New("interactive area is nil")
 	}
