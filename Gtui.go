@@ -7,6 +7,7 @@ import (
 	"GTUI/Core/Utils/Color"
 	"GTUI/Terminal"
 	"strings"
+	"time"
 )
 
 type Gtui struct {
@@ -19,8 +20,8 @@ type Gtui struct {
 }
 
 func (c *Gtui) SetCur(x, y int) {
-	compPreSet,_:=c.componentManager.Search(c.xCursor-1, c.yCursor-1)
-	compPostSet,_:=c.componentManager.Search(x, y)
+	compPreSet, _ := c.componentManager.Search(c.xCursor-1, c.yCursor-1)
+	compPostSet, _ := c.componentManager.Search(x, y)
 	inPreButNotInPost := Utils.Diff(compPostSet, compPreSet)
 	inPostButNotInPre := Utils.Diff(compPreSet, compPostSet)
 	for _, e := range inPreButNotInPost {
@@ -29,8 +30,8 @@ func (c *Gtui) SetCur(x, y int) {
 	for _, e := range inPostButNotInPre {
 		e.OnHover()
 	}
-	c.xCursor = x+1
-	c.yCursor = y+1
+	c.xCursor = x + 1
+	c.yCursor = y + 1
 }
 
 func NewGtui() (*Gtui, error) {
@@ -59,20 +60,17 @@ func (c *Gtui) InsertComponent(component Component.IComponent) {
 	c.componentManager.Add(component)
 }
 
-func (c *Gtui) Interact(x, y int,event Component.Event) error {
+func (c *Gtui) Click(x, y int) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
 		return e
 	}
-	switch event {
-	case Component.OnClick:
-		for i:= range resultArray {
-			resultArray[i].OnClick()
-		}
-	case Component.OnLeave:
-		for i:= range resultArray {
-			resultArray[i].OnLeave()
-		}
+	for i := range resultArray {
+		resultArray[i].OnClick()
+		time.AfterFunc(time.Millisecond*1000, func() {
+			resultArray[i].OnRelease()
+			c.IRefreshAll()
+		})
 	}
 	return nil
 }
@@ -86,4 +84,3 @@ func (c *Gtui) IRefreshAll() {
 	c.term.PrintStr(str.String())
 	c.term.SetCursor(c.xCursor, c.yCursor)
 }
-

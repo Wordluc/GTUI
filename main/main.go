@@ -28,7 +28,13 @@ func main() {
 	defer core.Close()
 	core.ISetGlobalColor(Color.GetDefaultColor())
 	b := Component.CreateButton(5, 5, 10, 3, "Press")
-	c := Component.CreateTextField(50, 5, 20, 10, Creation(keyb))
+	
+	c := Component.CreateTextBox(50, 5, 20, 10, Creation(keyb))
+	b.SetOnClick(func() {
+		c.Clear()
+	//	b.OnRelease()//gestire il tutto con un timer
+		core.IClear()
+	})
 	core.InsertComponent(c)
 	core.InsertComponent(b)
 	core.IRefreshAll()
@@ -52,7 +58,7 @@ func loop(keyb Kd.IKeyBoard) bool{
 	}
 	core.SetCur(x, y)
 	if keyb.IsKeyPressed('c') {
-		core.Interact(x, y, Component.OnClick)
+		core.Click(x, y)
 	}
 	if keyb.IsKeyPressed('q') {
 		return false

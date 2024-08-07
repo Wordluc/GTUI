@@ -21,7 +21,7 @@ type Button struct {
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
-	textD := Drawing.CreateTextBox(0, 0)
+	textD := Drawing.CreateTextField(0, 0)
 	textD.Type(text)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2
 	textD.SetPos(xC, yC)
@@ -46,20 +46,20 @@ func (b *Button) SetOnHover(onHover OnEvent) {
 }
 
 func (b *Button) OnClick() {
-	if b.isClicked {
-		b.isClicked = false
-	} else {
+	if !b.isClicked {
+		b.isClicked = true
 		if b.onClick != nil {
 			b.onClick()
 		}
-		b.isClicked = true
+		b.updateColorByClick()
 	}
-	b.updateColorByClick()
 }
 func (b *Button) OnRelease() {
 	if b.onRelease != nil {
 		b.onRelease()
 	}
+	b.isClicked=false
+	b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 func (b *Button) OnHover() {
 	if !b.isClicked {
