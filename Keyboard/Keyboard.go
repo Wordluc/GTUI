@@ -58,6 +58,9 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 			if e != nil {
 				continue
 			}
+			if (key == 0) {
+				break
+			}
 			b <- string(key)
 		}
 		if !t.Loop(t) {

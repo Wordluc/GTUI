@@ -13,13 +13,14 @@ type TextBox struct {
 	textBox         *Drawing.TextField
 	isTyping        bool
 	streamText      StreamCharacter
+	xTextPosition   int
+	nTextLine       int
 }
 
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
 	textBox := Drawing.CreateTextField(1, 1)
-	textBox.SetCursorColor(Color.Get(Color.Red, Color.None))
 	cont.AddChild(rect)
 	cont.AddChild(textBox)
 	cont.SetPos(x, y)
@@ -29,6 +30,8 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox 
 		isTyping:        false,
 		streamText:      streamText,
 		textBox:         textBox,
+		nTextLine:       0,
+		xTextPosition:   0,
 	}
 }
 
@@ -37,6 +40,12 @@ func (b *TextBox) loopTyping() {
 	for str := range channel {
 		if !b.isTyping {
 			return
+		}
+		if string(str) != "\n" {
+			b.xTextPosition++
+		} else {
+			b.nTextLine++
+			b.xTextPosition = 0
 		}
 		b.textBox.Type(string(str))
 	}
@@ -68,6 +77,29 @@ func (b *TextBox) OnHover() {
 
 func (b *TextBox) GetGraphics() Core.IEntity {
 	return b.graphics
+}
+
+func (b *TextBox) IsOn() bool {
+	return b.isTyping
+}
+
+func (b *TextBox) CanMoveXCursor(x int) int {
+	xP,_:=b.textBox.GetPos()
+	x =  x-xP
+	if x > b.xTextPosition {
+		return x - b.xTextPosition
+	}
+	return 0
+}
+
+func (b *TextBox) CanMoveYCursor(y int) int{
+	_,yP:=b.textBox.GetPos()
+	y =  y-yP
+	if y > b.nTextLine {
+	return y - b.nTextLine
+
+	}
+	return 0
 }
 
 func (b *TextBox) getShape() (InteractiveShape, error) {

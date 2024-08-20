@@ -16,7 +16,6 @@ type TextField struct {
 	text      strings.Builder
 	visible   bool
 	line      int
-	cursorColor Color.Color
 }
 
 func CreateTextField(x, y int) *TextField {
@@ -25,7 +24,6 @@ func CreateTextField(x, y int) *TextField {
 		YPos:      y,
 		isChanged: true,
 		color:     Color.GetDefaultColor(),
-		cursorColor:     Color.GetNoneColor(),
 		visible:   true,
 		text:      strings.Builder{},
 	}
@@ -73,10 +71,6 @@ func (s *TextField) ClearText() {
 func (s *TextField) SetVisibility(visible bool) {
 	s.visible = visible
 }
-func (s *TextField) SetCursorColor(color Color.Color) {
-	s.cursorColor = color
-	s.Touch()
-}
 func (s *TextField) GetVisibility() bool {
 	return s.visible
 }
@@ -86,9 +80,6 @@ func (s *TextField) getAnsiTextField(defaultColor Color.Color) string {
 	str.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
 	str.WriteString(s.color.GetMixedColor(defaultColor).GetAnsiColor())
 	str.WriteString(s.text.String())
-	if !s.cursorColor.IsEqual(Color.GetNoneColor()) {
-		str.WriteString(Color.Get(Color.Red,Color.None).GetMixedColor(defaultColor).GetAnsiColor()+"|")
-	}
 	str.WriteString(Color.GetResetColor())
 	s.Touch()
 	return str.String()

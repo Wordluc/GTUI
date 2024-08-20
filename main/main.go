@@ -32,7 +32,6 @@ func main() {
 	c := Component.CreateTextBox(50, 5, 20, 10, Creation(keyb))
 	b.SetOnClick(func() {
 		c.Clear()
-	//	b.OnRelease()//gestire il tutto con un timer
 		core.IClear()
 	})
 	core.InsertComponent(c)
@@ -44,6 +43,7 @@ func main() {
 
 func loop(keyb Kd.IKeyBoard) bool{
 	core.IRefreshAll()
+	x, y = core.GetCur()
 	if keyb.IsKeySPressed(Kd.KeyArrowDown) {
 		y++
 	}

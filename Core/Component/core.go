@@ -77,7 +77,7 @@ func (s *ComponentM) Search(x, y int) ([]IComponent, error) {
     if e!=nil{
 			return nil, e
 		}
-		if x>=shape.xPos && x<=shape.xPos+shape.Width && y>=shape.yPos && y<shape.yPos+shape.Height{
+		if x>shape.xPos && x<=shape.xPos+shape.Width && y>shape.yPos && y<=shape.yPos+shape.Height{
 			res = append(res, ele)
 		}
 	}
