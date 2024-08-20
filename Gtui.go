@@ -20,7 +20,7 @@ type Gtui struct {
 }
 
 func (c *Gtui) SetCur(x, y int) {
-	compPreSet, _ := c.componentManager.Search(c.xCursor-1, c.yCursor-1)
+	compPreSet, _ := c.componentManager.Search(c.xCursor, c.yCursor)
 	compPostSet, _ := c.componentManager.Search(x, y)
 	inPreButNotInPost := Utils.Diff(compPostSet, compPreSet)
 	inPostButNotInPre := Utils.Diff(compPreSet, compPostSet)
@@ -30,10 +30,38 @@ func (c *Gtui) SetCur(x, y int) {
 	for _, e := range inPostButNotInPre {
 		e.OnHover()
 	}
-	c.xCursor = x + 1
-	c.yCursor = y + 1
+	comps, _ := c.componentManager.Search(x, y)
+	if len(comps) == 0 {
+		c.xCursor = x
+		c.yCursor = y
+	}
+	prova :=false
+	for _, comp := range comps {
+		if ci, ok := comp.(Component.ICursorInteragibleComponent); ok {
+			if prova{
+				return
+			}
+			if ci.IsOn() {
+				deltax:=ci.CanMoveXCursor(x-1)
+				deltay:=ci.CanMoveYCursor(y-1)
+				c.xCursor = x  - deltax  
+				c.yCursor = y  - deltay
+				return
+			} else {
+				c.xCursor = x
+				c.yCursor = y
+				prova = true
+			}
+		}
+	}
+	if !prova{
+		c.xCursor = x
+		c.yCursor = y
+	}
 }
-
+func (c *Gtui) GetCur() (int, int) {
+	return c.xCursor, c.yCursor
+}
 func NewGtui() (*Gtui, error) {
 	term := &Terminal.Terminal{}
 	e := term.Start()
@@ -66,7 +94,7 @@ func (c *Gtui) Click(x, y int) error {
 		return e
 	}
 	for i := range resultArray {
-		resultArray[i].OnClick()//dare la possibilita' di scegliere il timer
+		resultArray[i].OnClick() //dare la possibilita' di scegliere il timer
 		time.AfterFunc(time.Millisecond*1000, func() {
 			resultArray[i].OnRelease()
 			c.IRefreshAll()
