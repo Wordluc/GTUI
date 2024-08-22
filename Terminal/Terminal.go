@@ -26,7 +26,7 @@ func (t *Terminal) Stop() {
 }
 
 func (t *Terminal) Clear() {
-	os.Stdout.Write([]byte("\033[H\033[2J"))
+	os.Stdout.Write([]byte("\033c"))
 }
 
 
