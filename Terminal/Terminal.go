@@ -26,7 +26,7 @@ func (t *Terminal) Stop() {
 }
 
 func (t *Terminal) Clear() {
-	os.Stdout.Write([]byte("\033c"))
+	t.Print([]byte("\033[0J"))
 }
 
 
@@ -46,7 +46,12 @@ func (t *Terminal) Size() (int,int) {
 	}
 	return x,y
 }
-
+func (t *Terminal) HideCursor() {
+	t.PrintStr("\033[?25l")
+}
+func (t *Terminal) ShowCursor() {
+	t.PrintStr("\033[?25h")
+}
 func (t *Terminal) SetCursor(x, y int) {
 	t.PrintStr("\033[" + strconv.Itoa(y) + ";" + strconv.Itoa(x) + "H")
 }
