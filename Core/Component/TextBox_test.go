@@ -5,10 +5,11 @@ import "testing"
 func Test_CanMoveFunctionStayStill(t *testing.T) { 
 	text := StreamCharacter{}
 	b := CreateTextBox(0, 0, 10, 10, text)//the interactable area is in x+1,y+1
-	if b.CanMoveXCursor(1) != 0 {
+	x,y:=b.DiffTotalToXY(1,1)
+	if x != 0 {
 		t.Errorf("CanMoveXCursor not working")
 	}
-	if b.CanMoveYCursor(1) != 0 {
+	if y != 0 {
 		t.Errorf("CanMoveYCursor not working")
 	}
 }
@@ -23,17 +24,20 @@ func Test_CanMoveFunctionWithCharacter(t *testing.T) {
 	b := CreateTextBox(0, 0, 10, 10, text)
 	b.OnClick()
 	stream<-"a"
-	if b.CanMoveXCursor(1) != 1 {
+	x,_:=b.DiffTotalToXY(1,1)
+	if x != 1 {
 		t.Errorf("CanMoveXCursor not working")
 	}
-	if b.CanMoveXCursor(2) != 0 {
+	x,_=b.DiffTotalToXY(2,1)
+	if x != 0 {
 		t.Errorf("CanMoveXCursor not working")
 	}
-	if b.CanMoveXCursor(3) != -1 {
+	x,_=b.DiffTotalToXY(3,1)
+	if x != -1 {
 		t.Errorf("CanMoveXCursor not working")
 	}
-	if b.CanMoveYCursor(1) != 0 {
+	_,y:=b.DiffTotalToXY(3,1)
+	if y != 0 {
 		t.Errorf("CanMoveYCursor not working")
 	}
-
 }

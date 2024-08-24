@@ -7,11 +7,11 @@ import (
 )
 
 type TextBox struct {
-	graphics        *Drawing.Container
-	visibleArea     *Drawing.Rectangle
-	textBlock       *Drawing.TextBlock
-	isTyping        bool
-	streamText      StreamCharacter
+	graphics    *Drawing.Container
+	visibleArea *Drawing.Rectangle
+	textBlock   *Drawing.TextBlock
+	isTyping    bool
+	streamText  StreamCharacter
 }
 
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
@@ -22,11 +22,11 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox 
 	cont.AddChild(textBox)
 	cont.SetPos(x, y)
 	return &TextBox{
-		graphics:        cont,
-		visibleArea:     rect,
-		isTyping:        false,
-		streamText:      streamText,
-		textBlock:       textBox,
+		graphics:    cont,
+		visibleArea: rect,
+		isTyping:    false,
+		streamText:  streamText,
+		textBlock:   textBox,
 	}
 }
 
@@ -72,43 +72,38 @@ func (b *TextBox) IsWritable() bool {
 	return b.isTyping
 }
 
-func (b *TextBox) CanMoveXCursor(x int) int {
-	xP, _ := b.textBlock.GetPos()
-	x = x - xP
-	diff:=b.textBlock.GetTotalChar() -x
-	return  diff
-}
-
-func (b *TextBox) CanMoveYCursor(y int) int {
-	_, yP := b.textBlock.GetPos()
-	y = y - yP
-	diff:=b.textBlock.GetLastLine() -y
-	return  diff
-}
-
-
-func (b *TextBox) DiffActualToTotal(x,y int) (int,int) {
+func (b *TextBox) DiffTotalToXY(x, y int) (int, int) {
 	xP, yP := b.textBlock.GetPos()
-	y = y - yP
 	x = x - xP
-	diffX,diffY:=b.textBlock.GetActualCursor()
-	diffX=diffX-x
-	diffY=diffY-y
-	return diffX,diffY
+	y = y - yP
+	diffX, diffY := b.textBlock.GetTotalCursor()
+	diffX = diffX - x
+	diffY = diffY - y
+	return diffX, diffY
 }
-func (b *TextBox) SetCurPos(x, y int) {
+
+func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 	xP, yP := b.textBlock.GetPos()
-	b.textBlock.SetCurrentLine(y-yP)
-	b.textBlock.SetCurrentChar(x-xP)
+	x = x - xP
+	y = y - yP
+	diffX, diffY := b.textBlock.GetCurrentCursor()
+	diffX = diffX - x
+	diffY = diffY - y
+	return diffX, diffY
+}
+func (b *TextBox) SetCurrentPos(x, y int) {
+	xP, yP := b.textBlock.GetPos()
+	b.textBlock.SetCurrent(x-xP, y-yP)
+	return
 }
 func (b *TextBox) getShape() (InteractiveShape, error) {
-	x,y:=b.visibleArea.GetPos()
-	xDim,yDim:=b.visibleArea.GetSize()
-	shape:=InteractiveShape{
-      xPos:x+1,
-		yPos:y+1,
-		Width:xDim-1,
-		Height:yDim-1,
+	x, y := b.visibleArea.GetPos()
+	xDim, yDim := b.visibleArea.GetSize()
+	shape := InteractiveShape{
+		xPos:   x + 1,
+		yPos:   y + 1,
+		Width:  xDim - 1,
+		Height: yDim - 1,
 	}
 	return shape, nil
 }

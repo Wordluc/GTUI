@@ -15,12 +15,9 @@ type IComponent interface {
 
 type ICursorInteragibleComponent interface {
 	IsWritable() bool
-	/// return offset between last character position and x, nLine-y
-	CanMoveXCursor(x int) int
-	/// return offset between numer of line and y, nCharacter-x
-	CanMoveYCursor(y int) int
-
-	SetCurPos(x, y int)
-   ///return offset between actual character and line to x,y,(AnCharacter-x,AnLine-y)
-   DiffActualToTotal(x,y int) (int,int) 
+	/// return offset between total character and line to x,y,(AnCharacter-x,AnLine-y)	
+	DiffTotalToXY(x,y int) (int,int)
+	SetCurrentPos(x, y int)
+  ///return offset between actual character and line to x,y,(AnCharacter-x,AnLine-y)
+  DiffCurrentToXY(x,y int) (int,int) 
 }

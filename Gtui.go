@@ -17,10 +17,15 @@ type Gtui struct {
 	componentManager *Component.ComponentM
 	xCursor          int
 	yCursor          int
+	xSize            int
+	ySize            int
 	cursorVisibility bool
 }
 
 func (c *Gtui) SetCur(x, y int) {
+	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
+		return
+	}
 	c.SetVisibilityCursor(true)
 	compPreSet, _ := c.componentManager.Search(c.xCursor, c.yCursor)
 	comps, _ := c.componentManager.Search(x, y)
@@ -39,8 +44,7 @@ func (c *Gtui) SetCur(x, y int) {
 	for _, comp := range comps {
 		if ci, ok := comp.(Component.ICursorInteragibleComponent); ok {
 			if ci.IsWritable() {
-				deltax := ci.CanMoveXCursor(x)
-				deltay := ci.CanMoveYCursor(y)
+				deltax,deltay := ci.DiffTotalToXY(x,y)
 				if deltax>0{
 					deltax=0
 				}
@@ -49,7 +53,7 @@ func (c *Gtui) SetCur(x, y int) {
 				}
 				c.yCursor = y + deltay
 				c.xCursor = x + deltax
-				ci.SetCurPos(c.xCursor, c.yCursor)
+				ci.SetCurrentPos(c.xCursor, c.yCursor)
 				break
 			}
 		}
@@ -67,7 +71,7 @@ func NewGtui() (*Gtui, error) {
 	}
 	xSize, ySize := term.Size()
 	componentManager := Component.Create(xSize, ySize, 5)
-	return &Gtui{term: term, buff: make([]Core.IEntity, 0), componentManager: componentManager}, nil
+	return &Gtui{term: term, buff: make([]Core.IEntity, 0), componentManager: componentManager, xCursor: 0, yCursor: 0, xSize: xSize, ySize: ySize}, nil
 }
 
 func (c *Gtui) Close() {
@@ -115,7 +119,7 @@ func (c *Gtui) IRefreshAll() {
 	for _, comp := range comps {
 		if ci, ok := comp.(Component.ICursorInteragibleComponent); ok {
 			if ci.IsWritable() {
-				deltax,deltay := ci.DiffActualToTotal(x,y)
+				deltax,deltay := ci.DiffCurrentToXY(x,y)
 				c.yCursor = y + deltay
 				c.xCursor = x + deltax
 				break
