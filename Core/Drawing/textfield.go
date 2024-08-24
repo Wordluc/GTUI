@@ -1,7 +1,6 @@
 package Drawing
 
 import (
-	"GTUI/Core/Utils"
 	U "GTUI/Core/Utils"
 	"GTUI/Core/Utils/Color"
 	"strings"
@@ -15,7 +14,6 @@ type TextField struct {
 	YPos      int
 	text      strings.Builder
 	visible   bool
-	line      int
 }
 
 func CreateTextField(x, y int) *TextField {
@@ -31,14 +29,17 @@ func CreateTextField(x, y int) *TextField {
 
 func (s *TextField) Type(text string) {
 	if text == "\n" {
-		s.text.WriteString(" "+Utils.GetAnsiMoveTo(s.XPos, s.YPos+s.line+1))
-		s.line++
 	} else {
 		s.text.WriteString(text)
 	}
 	s.Touch()
 }
 
+func (s *TextField) SetText(text string) {
+	s.text.Reset()
+	s.text.WriteString(text)
+	s.Touch()
+}
 func (s *TextField) GetAnsiCode(defaultColor Color.Color) string {
 	if !s.visible {
 		return ""
@@ -66,7 +67,6 @@ func (s *TextField) SetColor(color Color.Color) {
 func (s *TextField) ClearText() {
 	s.text.Reset()
 	s.Touch()
-	s.line=0
 }
 func (s *TextField) SetVisibility(visible bool) {
 	s.visible = visible
@@ -81,7 +81,6 @@ func (s *TextField) getAnsiTextField(defaultColor Color.Color) string {
 	str.WriteString(s.color.GetMixedColor(defaultColor).GetAnsiColor())
 	str.WriteString(s.text.String())
 	str.WriteString(Color.GetResetColor())
-	s.Touch()
 	return str.String()
 }
 

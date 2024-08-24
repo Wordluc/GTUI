@@ -4,13 +4,12 @@ import (
 	"GTUI/Core"
 	"GTUI/Core/Drawing"
 	"GTUI/Core/Utils/Color"
-	"errors"
 )
 
 type OnEvent func()
 type Button struct {
 	graphics        *Drawing.Container
-	interactiveArea *Drawing.Rectangle
+	visibleArea     *Drawing.Rectangle
 	onClick         OnEvent
 	onRelease       OnEvent
 	onHover         OnEvent
@@ -30,7 +29,7 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont.SetPos(x, y)
 	return &Button{
 		graphics:        cont,
-		interactiveArea: rect,
+		visibleArea:     rect,
 		isClicked:       false,
 	}
 }
@@ -59,11 +58,11 @@ func (b *Button) OnRelease() {
 		b.onRelease()
 	}
 	b.isClicked=false
-	b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
+	b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 func (b *Button) OnHover() {
 	if !b.isClicked {
-		b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
+		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 	}
 	if b.onHover != nil {
 		b.onHover()
@@ -71,7 +70,7 @@ func (b *Button) OnHover() {
 }
 func (b *Button) OnLeave() {
 	if !b.isClicked {
-		b.interactiveArea.SetColor(Color.GetDefaultColor())
+		b.visibleArea.SetColor(Color.GetDefaultColor())
 	}
 	if b.onLeave != nil {
 		b.OnLeave()
@@ -79,20 +78,22 @@ func (b *Button) OnLeave() {
 }
 func (b *Button) updateColorByClick() {
    if b.isClicked{
-			b.interactiveArea.SetColor(Color.Get(Color.Blue, Color.None))
+			b.visibleArea.SetColor(Color.Get(Color.Blue, Color.None))
 	 }else{
-			b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
+			b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 	 }
 }
 func (b *Button) GetGraphics() Core.IEntity {
 	return b.graphics
 }
 func (b *Button) getShape() (InteractiveShape,error) {
-	if b.interactiveArea == nil {
-		return InteractiveShape{}, errors.New("interactive area is nil")
+	x,y:=b.visibleArea.GetPos()
+	xDim,yDim:=b.visibleArea.GetSize()
+	shape:=InteractiveShape{
+      xPos:x+1,
+		yPos:y+1,
+		Width:xDim-1,
+		Height:yDim-1,
 	}
-	shape:=InteractiveShape{}
-	shape.xPos,shape.yPos= b.interactiveArea.GetPos()
-	shape.Width,shape.Height= b.interactiveArea.GetSize()
 	return shape,nil
 }
