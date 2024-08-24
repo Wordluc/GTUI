@@ -14,9 +14,13 @@ type IComponent interface {
 }
 
 type ICursorInteragibleComponent interface {
-	IsOn() bool
-	/// check if cursor can move y absolute position, otherwise return offset
+	IsWritable() bool
+	/// return offset between last character position and x, nLine-y
 	CanMoveXCursor(x int) int
-	/// check if cursor can move x absolute position, otherwise return offset
+	/// return offset between numer of line and y, nCharacter-x
 	CanMoveYCursor(y int) int
+
+	SetCurPos(x, y int)
+   ///return offset between actual character and line to x,y,(AnCharacter-x,AnLine-y)
+   DiffActualToTotal(x,y int) (int,int) 
 }

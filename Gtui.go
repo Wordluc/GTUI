@@ -17,47 +17,44 @@ type Gtui struct {
 	componentManager *Component.ComponentM
 	xCursor          int
 	yCursor          int
+	cursorVisibility bool
 }
 
 func (c *Gtui) SetCur(x, y int) {
+	c.SetVisibilityCursor(true)
 	compPreSet, _ := c.componentManager.Search(c.xCursor, c.yCursor)
-	compPostSet, _ := c.componentManager.Search(x, y)
-	inPreButNotInPost := Utils.Diff(compPostSet, compPreSet)
-	inPostButNotInPre := Utils.Diff(compPreSet, compPostSet)
+	comps, _ := c.componentManager.Search(x, y)
+	inPreButNotInPost := Utils.Diff(comps, compPreSet)
+	inPostButNotInPre := Utils.Diff(compPreSet, comps)
 	for _, e := range inPreButNotInPost {
 		e.OnLeave()
 	}
 	for _, e := range inPostButNotInPre {
 		e.OnHover()
 	}
-	comps, _ := c.componentManager.Search(x, y)
-	if len(comps) == 0 {
-		c.xCursor = x
-		c.yCursor = y
-	}
-	prova :=false
+
+	c.xCursor = x
+	c.yCursor = y
+   
 	for _, comp := range comps {
 		if ci, ok := comp.(Component.ICursorInteragibleComponent); ok {
-			if prova{
-				return
-			}
-			if ci.IsOn() {
-				deltax:=ci.CanMoveXCursor(x-1)
-				deltay:=ci.CanMoveYCursor(y-1)
-				c.xCursor = x  - deltax  
-				c.yCursor = y  - deltay
-				return
-			} else {
-				c.xCursor = x
-				c.yCursor = y
-				prova = true
+			if ci.IsWritable() {
+				deltax := ci.CanMoveXCursor(x)
+				deltay := ci.CanMoveYCursor(y)
+				if deltax>0{
+					deltax=0
+				}
+				if deltay>0{
+					deltay=0
+				}
+				c.yCursor = y + deltay
+				c.xCursor = x + deltax
+				ci.SetCurPos(c.xCursor, c.yCursor)
+				break
 			}
 		}
 	}
-	if !prova{
-		c.xCursor = x
-		c.yCursor = y
-	}
+	c.SetVisibilityCursor(false)
 }
 func (c *Gtui) GetCur() (int, int) {
 	return c.xCursor, c.yCursor
@@ -74,7 +71,6 @@ func NewGtui() (*Gtui, error) {
 }
 
 func (c *Gtui) Close() {
-	c.IResetGlobalColor()
 	c.term.Clear()
 	c.term.Stop()
 }
@@ -104,11 +100,28 @@ func (c *Gtui) Click(x, y int) error {
 }
 
 func (c *Gtui) IRefreshAll() {
+	c.SetVisibilityCursor(false)
 	var str strings.Builder
 	for _, b := range c.buff {
 		str.WriteString(b.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 	}
 	c.term.PrintStr(str.String())
-	c.term.SetCursor(c.xCursor, c.yCursor)
+	c.SetVisibilityCursor(true)
+	
+	x, y := c.GetCur()
+
+	comps, _ := c.componentManager.Search(x, y)
+	for _, comp := range comps {
+		if ci, ok := comp.(Component.ICursorInteragibleComponent); ok {
+			if ci.IsWritable() {
+				deltax,deltay := ci.DiffActualToTotal(x,y)
+				c.yCursor = y + deltay
+				c.xCursor = x + deltax
+				break
+			}
+		}
+	}
+	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
+	return
 }

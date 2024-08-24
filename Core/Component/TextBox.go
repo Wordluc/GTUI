@@ -4,34 +4,29 @@ import (
 	"GTUI/Core"
 	"GTUI/Core/Drawing"
 	"GTUI/Core/Utils/Color"
-	"errors"
 )
 
 type TextBox struct {
 	graphics        *Drawing.Container
-	interactiveArea *Drawing.Rectangle
-	textBox         *Drawing.TextField
+	visibleArea     *Drawing.Rectangle
+	textBlock       *Drawing.TextBlock
 	isTyping        bool
 	streamText      StreamCharacter
-	xTextPosition   int
-	nTextLine       int
 }
 
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
-	textBox := Drawing.CreateTextField(1, 1)
+	textBox := Drawing.CreateTextBlock(1, 1, 10, 100)
 	cont.AddChild(rect)
 	cont.AddChild(textBox)
 	cont.SetPos(x, y)
 	return &TextBox{
 		graphics:        cont,
-		interactiveArea: rect,
+		visibleArea:     rect,
 		isTyping:        false,
 		streamText:      streamText,
-		textBox:         textBox,
-		nTextLine:       0,
-		xTextPosition:   0,
+		textBlock:       textBox,
 	}
 }
 
@@ -41,17 +36,8 @@ func (b *TextBox) loopTyping() {
 		if !b.isTyping {
 			return
 		}
-		if string(str) != "\n" {
-			b.xTextPosition++
-		} else {
-			b.nTextLine++
-			b.xTextPosition = 0
-		}
-		b.textBox.Type(string(str))
+		b.textBlock.Type(rune(str[0]))
 	}
-}
-func (b *TextBox) Clear() {
-	b.textBox.ClearText()
 }
 
 func (b *TextBox) OnClick() {
@@ -59,55 +45,70 @@ func (b *TextBox) OnClick() {
 		return
 	}
 	b.isTyping = true
-	b.interactiveArea.SetColor(Color.Get(Color.Green, Color.None))
+	b.visibleArea.SetColor(Color.Get(Color.Green, Color.None))
 	go b.loopTyping()
 }
 
 func (b *TextBox) OnLeave() {
 	b.isTyping = false
-	b.interactiveArea.SetColor(Color.GetDefaultColor())
+	b.visibleArea.SetColor(Color.GetDefaultColor())
 	b.streamText.Delete()
 }
 
 func (b *TextBox) OnRelease() {}
 
 func (b *TextBox) OnHover() {
-	b.interactiveArea.SetColor(Color.Get(Color.Gray, Color.None))
+	if b.isTyping {
+		return
+	}
+	b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 
 func (b *TextBox) GetGraphics() Core.IEntity {
 	return b.graphics
 }
 
-func (b *TextBox) IsOn() bool {
+func (b *TextBox) IsWritable() bool {
 	return b.isTyping
 }
 
 func (b *TextBox) CanMoveXCursor(x int) int {
-	xP,_:=b.textBox.GetPos()
-	x =  x-xP
-	if x > b.xTextPosition {
-		return x - b.xTextPosition
-	}
-	return 0
+	xP, _ := b.textBlock.GetPos()
+	x = x - xP
+	diff:=b.textBlock.GetTotalChar() -x
+	return  diff
 }
 
-func (b *TextBox) CanMoveYCursor(y int) int{
-	_,yP:=b.textBox.GetPos()
-	y =  y-yP
-	if y > b.nTextLine {
-	return y - b.nTextLine
-
-	}
-	return 0
+func (b *TextBox) CanMoveYCursor(y int) int {
+	_, yP := b.textBlock.GetPos()
+	y = y - yP
+	diff:=b.textBlock.GetLastLine() -y
+	return  diff
 }
 
+
+func (b *TextBox) DiffActualToTotal(x,y int) (int,int) {
+	xP, yP := b.textBlock.GetPos()
+	y = y - yP
+	x = x - xP
+	diffX,diffY:=b.textBlock.GetActualCursor()
+	diffX=diffX-x
+	diffY=diffY-y
+	return diffX,diffY
+}
+func (b *TextBox) SetCurPos(x, y int) {
+	xP, yP := b.textBlock.GetPos()
+	b.textBlock.SetCurrentLine(y-yP)
+	b.textBlock.SetCurrentChar(x-xP)
+}
 func (b *TextBox) getShape() (InteractiveShape, error) {
-	if b.interactiveArea == nil {
-		return InteractiveShape{}, errors.New("interactive area is nil")
+	x,y:=b.visibleArea.GetPos()
+	xDim,yDim:=b.visibleArea.GetSize()
+	shape:=InteractiveShape{
+      xPos:x+1,
+		yPos:y+1,
+		Width:xDim-1,
+		Height:yDim-1,
 	}
-	shape := InteractiveShape{}
-	shape.xPos, shape.yPos = b.interactiveArea.GetPos()
-	shape.Width, shape.Height = b.interactiveArea.GetSize()
 	return shape, nil
 }

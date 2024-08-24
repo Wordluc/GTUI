@@ -26,18 +26,19 @@ func main() {
 	core,_=Core.NewGtui()
 	defer keyb.Stop()
 	defer core.Close()
+	x,y=core.GetCur()
 	core.ISetGlobalColor(Color.GetDefaultColor())
-	b := Component.CreateButton(5, 5, 10, 3, "Press")
+	b := Component.CreateButton(0, 0, 10, 5, "Press")
 	
 	c := Component.CreateTextBox(50, 5, 20, 10, Creation(keyb))
 	b.SetOnClick(func() {
-		c.Clear()
 		core.IClear()
 	})
 	core.InsertComponent(c)
 	core.InsertComponent(b)
-	core.IRefreshAll()
 	core.SetCur(x, y)
+	core.IRefreshAll()
+	
 	keyb.Start(loop)
 }
 

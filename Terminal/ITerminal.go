@@ -9,4 +9,6 @@ type ITerminal interface {
 	Size() (int, int)
 	SetCursor(x, y int)
 	GetSetCursor(x, y int) string
+	HideCursor()
+	ShowCursor()
 }
