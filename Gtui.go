@@ -106,6 +106,7 @@ func (c *Gtui) Click(x, y int) error {
 func (c *Gtui) IRefreshAll() {
 	c.SetVisibilityCursor(false)
 	var str strings.Builder
+	c.IClear()
 	for _, b := range c.buff {
 		str.WriteString(b.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
