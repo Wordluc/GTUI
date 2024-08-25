@@ -46,11 +46,14 @@ func (t *Keyboard) DeleteChannel(i int) {
 func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 	for {
 		v := <-eventKey
-		if v.Key == keyboard.KeySpace  {
+		if v.Key == keyboard.KeySpace {
 			v.Rune = ' '
 		}
-		if v.Key == keyboard.KeyEnter  {
+		if v.Key == keyboard.KeyEnter {
 			v.Rune = '\n'
+		}
+		if v.Key == keyboard.KeyBackspace {
+			v.Rune = '\b'
 		}
 		t.key = stateKey{key: Key(v.Key), rune: v.Rune}
 		for _, b := range t.GetChannels() {
@@ -58,7 +61,7 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 			if e != nil {
 				continue
 			}
-			if (key == 0) {
+			if key == 0 {
 				break
 			}
 			b <- string(v.Rune)
@@ -77,7 +80,7 @@ func (t *Keyboard) GetKey() (byte, error) {
 }
 
 func (t *Keyboard) IsKeySPressed(key Key) bool {
-	return t.key.key==key
+	return t.key.key == key
 }
 
 func (t *Keyboard) IsKeyPressed(key rune) bool {

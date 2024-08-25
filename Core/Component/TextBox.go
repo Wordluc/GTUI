@@ -32,11 +32,17 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox 
 
 func (b *TextBox) loopTyping() {
 	channel := b.streamText.Get()
+	var key rune
 	for str := range channel {
 		if !b.isTyping {
 			return
 		}
-		b.textBlock.Type(rune(str[0]))
+    key=rune(str[0])
+		if key=='\b'{
+			b.textBlock.Delete()
+			continue
+		} 
+		b.textBlock.Type(key)
 	}
 }
 
@@ -77,8 +83,8 @@ func (b *TextBox) DiffTotalToXY(x, y int) (int, int) {
 	x = x - xP
 	y = y - yP
 	diffX, diffY := b.textBlock.GetTotalCursor()
-	diffX = diffX - x
-	diffY = diffY - y
+	diffX = diffX - x 
+	diffY = diffY - y - 1
 	return diffX, diffY
 }
 
