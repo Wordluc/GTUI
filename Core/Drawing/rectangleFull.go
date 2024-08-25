@@ -1,7 +1,7 @@
 package Drawing
 
 import (
-	"GTUI/Core/Color"
+	"GTUI/Core/Utils/Color"
 	U "GTUI/Core/Utils"
 	"strings"
 )
@@ -52,7 +52,7 @@ func (r *RectangleFull) GetAnsiCode(defaultColor Color.Color) string {
 	return r.ansiCode
 }
 
-func (r *RectangleFull) SetInsideColor(color Color.IColor) {
+func (r *RectangleFull) SetInsideColor(color Color.ColorValue) {
 	r.insideColor = Color.Get(Color.None, color)
 	r.Touch()
 	r.border.Touch()

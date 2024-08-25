@@ -2,7 +2,7 @@ package Drawing
 
 import (
 	"GTUI/Core"
-	"GTUI/Core/Color"
+	"GTUI/Core/Utils/Color"
 	"strings"
 )
 

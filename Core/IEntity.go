@@ -1,6 +1,6 @@
 package Core
 
-import "GTUI/Core/Color"
+import "GTUI/Core/Utils/Color"
 
 type IEntity interface {
 	Touch()
