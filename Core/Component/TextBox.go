@@ -93,7 +93,7 @@ func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 }
 func (b *TextBox) SetCurrentPos(x, y int) {
 	xP, yP := b.textBlock.GetPos()
-	b.textBlock.SetCurrent(x-xP, y-yP)
+	b.textBlock.SetCurrentCursor(x-xP, y-yP)
 	return
 }
 func (b *TextBox) getShape() (InteractiveShape, error) {

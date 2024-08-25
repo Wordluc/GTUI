@@ -25,7 +25,6 @@ type lineText struct {
 	initialCapacity int
 	totalChar       int
 	isChanged       bool
-	getText         string
 }
 
 func CreateLineText(initialCapacity int) *lineText {
@@ -36,7 +35,7 @@ func CreateLineText(initialCapacity int) *lineText {
 		isChanged:       true, //da usare
 	}
 }
-func (t *lineText) getFullText() string {
+func (t *lineText) getText() string {
 	var str strings.Builder
 	for i := range t.totalChar {
 		str.WriteRune(t.line[i])
@@ -44,9 +43,14 @@ func (t *lineText) getFullText() string {
 	return str.String()
 }
 
-func (t *lineText) digit(char rune) {
-	t.line[t.totalChar] = char
-	t.totalChar++
+func (t *lineText) digit(char rune, i int) {
+	if i>t.totalChar {
+		t.line[i] = char
+		t.totalChar=i
+	}else{
+		t.line = slices.Concat(t.line[:i],[]rune{char}, t.line[i:])
+		t.totalChar++
+	}
 	if t.totalChar >= len(t.line) {
 		t.line = slices.Concat(t.line, make([]rune, t.initialCapacity))
 	}
@@ -83,7 +87,7 @@ func (t *TextBlock) SetPos(x, y int) {
 	t.Touch()
 }
 
-func (t *TextBlock) SetCurrentLine(line int) {
+func (t *TextBlock) ForceSetCurrentLine(line int) {
 	if line >= len(t.lines) {
 		return
 	}
@@ -93,29 +97,32 @@ func (t *TextBlock) SetCurrentLine(line int) {
 	}
 }
 
-func (t *TextBlock) SetCurrentChar(ichar int) {
+func (t *TextBlock) ForceSetCurrentChar(ichar int) {
 	t.currentCharacter = ichar
 }
-func (t *TextBlock) SetCurrent(ichar int, line int) {
+
+func (t *TextBlock) SetCurrentCursor(ichar int, line int) {
 	isYChanged := line != t.currentLine
 	isXChanged := line == t.currentLine && ichar != t.currentCharacter
-	if !isYChanged && !isXChanged {
-		t.preLenght= ichar
-	}
 	if isXChanged {
-		t.preLenght = t.currentCharacter
-		t.SetCurrentChar(ichar)
+		if ichar > t.currentCharacter{
+			t.preLenght = t.currentCharacter+1
+		}else{
+			t.preLenght = t.currentCharacter-1
+		}
+		t.ForceSetCurrentChar(ichar)
 	}		
 	if isYChanged {
-		t.SetCurrentLine(line)
+		t.ForceSetCurrentLine(line)
 		maxX, _ := t.GetTotalCursor()
 		if t.preLenght > maxX {
-			t.SetCurrentChar(maxX)
+			t.ForceSetCurrentChar(maxX)
 		} else {
-			t.SetCurrentChar(t.preLenght)
+			t.ForceSetCurrentChar(t.preLenght)
 		}
 	}
 }
+
 func (t *TextBlock) GetTotalCursor() (int, int) {
 	return t.lines[t.currentLine].totalChar, t.totalLine
 }
@@ -134,8 +141,9 @@ func (t *TextBlock) Type(char rune) {
 			t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
 		}
 	} else {
-		t.lines[t.currentLine].digit(char)
+		t.lines[t.currentLine].digit(char,t.currentCharacter)
 		t.currentCharacter++
+		t.preLenght= t.currentCharacter
 	}
 	t.Touch()
 }
@@ -157,7 +165,7 @@ func (t *TextBlock) getFullText() string {
 		if line == nil {
 			break
 		}
-		full.WriteString(line.getFullText())
+		full.WriteString(line.getText())
 	}
 	return full.String()
 }
