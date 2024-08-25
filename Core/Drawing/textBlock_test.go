@@ -138,3 +138,56 @@ func TestComeBackTyping(t *testing.T) {
 		t.Errorf("expected %v, got %v", "ciao luca", string(textBlock.lines[0].getText()))
 	}
 }
+
+func TestDeleteTextline(t *testing.T) {
+	textLine:= CreateLineText(10)
+	textLine.digit('1', 0)
+	textLine.digit('t', 1)
+	textLine.digit('2', 2)
+	textLine.digit('3', 3)
+	textLine.digit('4', 4) 
+	textLine.digit('f', 5) 
+	textLine.delete(2)
+	if textLine.getText() != "1234f" {
+		t.Errorf("expected %v, got %v", "1234", textLine.getText())
+	}	
+	textLine.delete(5)
+	if textLine.getText() != "1234" {
+		t.Errorf("expected %v, got %v", "1234", textLine.getText())
+	}	
+}
+func TestDeleteLine(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock.Type('u')
+	textBlock.Type('\n')
+	textBlock.Type('a')
+	textBlock.Delete()
+	if textBlock.totalLine!=1{
+		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
+	}
+	textBlock.Delete()
+	if textBlock.totalLine!=1{
+		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
+	}
+	textBlock.Type('c')
+	if textBlock.lines[0].totalChar!=1{
+		t.Errorf("expected %v, got %v", 1, textBlock.lines[0].totalChar)
+	}
+	textBlock.Delete()
+	if textBlock.totalLine!=1{
+		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
+	}
+	textBlock.Delete()
+	if textBlock.totalLine!=1{
+		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
+	}
+	textBlock.Delete()
+	textBlock.Delete()
+	textBlock.Delete()
+	if textBlock.totalLine!=1{
+		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
+	}
+	if textBlock.lines[0].totalChar!=0{
+		t.Errorf("expected no characters")
+	}
+}

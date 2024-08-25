@@ -8,12 +8,12 @@ import (
 func GetAnsiMoveTo(x, y int) string {
 	return "\033[" + strconv.Itoa(y+1) + ";" + strconv.Itoa(x+1) + "H"
 }
-func GetAnsiClear(x, y,xpos, ypos int)string {
+func GetAnsiClear(x,y,sizeX,sizeY int)string {
 	var str strings.Builder
 	str.WriteString(SaveCursor)
-	for ix := 0; ix < x; ix++ {
-		for iy := 0; iy < y; iy++ {
-      str.WriteString(GetAnsiMoveTo(ix+xpos, iy+ypos))
+	for iy :=range sizeY {
+		for ix := range sizeX {
+      str.WriteString(GetAnsiMoveTo(ix+x, iy+y))
 			str.WriteString(" ")
 		}
 	}
