@@ -1,7 +1,13 @@
 package Utils
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
+func GetAnsiMoveTo(x, y int) string {
+	return "\033[" + strconv.Itoa(y+1) + ";" + strconv.Itoa(x+1) + "H"
+}
 func GetAnsiClear(x, y,xpos, ypos int)string {
 	var str strings.Builder
 	str.WriteString(SaveCursor)
