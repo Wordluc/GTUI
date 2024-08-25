@@ -5,6 +5,7 @@ import (
 	"GTUI/Core/Utils/Color"
 	"slices"
 	"strings"
+
 )
 
 type TextBlock struct {
@@ -32,7 +33,6 @@ func CreateLineText(initialCapacity int) *lineText {
 		line:            make([]rune, initialCapacity),
 		initialCapacity: initialCapacity,
 		totalChar:       0,
-		isChanged:       true, //da usare
 	}
 }
 func (t *lineText) getText() string {
@@ -44,16 +44,35 @@ func (t *lineText) getText() string {
 }
 
 func (t *lineText) digit(char rune, i int) {
-	if i>t.totalChar {
+	if i > t.totalChar {
 		t.line[i] = char
-		t.totalChar=i
-	}else{
-		t.line = slices.Concat(t.line[:i],[]rune{char}, t.line[i:])
+		t.totalChar = i
+	} else {
+		t.line = slices.Concat(t.line[:i], []rune{char}, t.line[i:])
 		t.totalChar++
 	}
 	if t.totalChar >= len(t.line) {
 		t.line = slices.Concat(t.line, make([]rune, t.initialCapacity))
 	}
+}
+
+// /delete the character i, if the line is empty return true
+func (t *lineText) delete(i int) bool {
+	t.totalChar--
+	if  t.totalChar<=0 {
+		return true
+	}
+	if i <= 0 {
+		return false
+	}
+	if i > t.totalChar {
+		return false
+	}
+	t.line = slices.Concat(t.line[:i-1], t.line[i:])
+	if t.totalChar <= 0 {
+		t.totalChar = 0
+	}
+	return false
 }
 func CreateTextBlock(x, y int, initialLine int, initialCapacity int) *TextBlock {
 	lines := make([]*lineText, initialLine)
@@ -67,7 +86,7 @@ func CreateTextBlock(x, y int, initialLine int, initialCapacity int) *TextBlock 
 		yPos:            y,
 		currentLine:     0,
 		initialCapacity: initialCapacity,
-		totalLine:       0,
+		totalLine:       1,
 	}
 }
 
@@ -105,13 +124,13 @@ func (t *TextBlock) SetCurrentCursor(ichar int, line int) {
 	isYChanged := line != t.currentLine
 	isXChanged := line == t.currentLine && ichar != t.currentCharacter
 	if isXChanged {
-		if ichar > t.currentCharacter{
-			t.preLenght = t.currentCharacter+1
-		}else{
-			t.preLenght = t.currentCharacter-1
+		if ichar > t.currentCharacter {
+			t.preLenght = t.currentCharacter + 1
+		} else {
+			t.preLenght = t.currentCharacter - 1
 		}
 		t.ForceSetCurrentChar(ichar)
-	}		
+	}
 	if isYChanged {
 		t.ForceSetCurrentLine(line)
 		maxX, _ := t.GetTotalCursor()
@@ -141,11 +160,32 @@ func (t *TextBlock) Type(char rune) {
 			t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
 		}
 	} else {
-		t.lines[t.currentLine].digit(char,t.currentCharacter)
+		t.lines[t.currentLine].digit(char, t.currentCharacter)
 		t.currentCharacter++
-		t.preLenght= t.currentCharacter
+		t.preLenght = t.currentCharacter
 	}
 	t.Touch()
+}
+func (t *TextBlock) Delete() {
+	if t.currentCharacter == 0 && t.currentLine == 0 {
+		return
+	}
+	deleteLine := t.lines[t.currentLine].delete(t.currentCharacter)
+	defer t.Touch()
+	t.preLenght = t.currentCharacter - 1
+	t.currentCharacter--
+	if deleteLine || t.currentCharacter < 0 {
+		t.totalLine--
+		t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
+		t.currentLine--
+		if t.totalLine==0{
+      t.lines = []*lineText{CreateLineText(t.initialCapacity)}
+			t.currentLine = 0
+			t.totalLine = 1
+			return
+		}
+		t.currentCharacter = t.lines[t.currentLine].totalChar
+	}
 }
 func (t *TextBlock) GetPos() (int, int) {
 	return t.xPos, t.yPos
@@ -161,10 +201,10 @@ func (t *TextBlock) GetVisibility() bool {
 func (t *TextBlock) getFullText() string {
 	full := strings.Builder{}
 	for i, line := range t.lines {
-		full.WriteString(U.GetAnsiMoveTo(t.xPos, t.yPos+i))
 		if line == nil {
 			break
 		}
+		full.WriteString(U.GetAnsiMoveTo(t.xPos, t.yPos+i))
 		full.WriteString(line.getText())
 	}
 	return full.String()
