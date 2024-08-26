@@ -35,10 +35,9 @@ func main() {
 		core.IClear()
 	})
 	core.InsertComponent(c)
-	core.InsertComponent(b)
+	//core.InsertComponent(b)
 	core.SetCur(x, y)
 	core.IRefreshAll()
-	
 	keyb.Start(loop)
 }
 
@@ -64,6 +63,7 @@ func loop(keyb Kd.IKeyBoard) bool{
 	if keyb.IsKeyPressed('q') {
 		return false
 	}
+	core.IClear()
 	core.IRefreshAll()
 	return true
 }

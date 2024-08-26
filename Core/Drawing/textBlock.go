@@ -5,7 +5,6 @@ import (
 	"GTUI/Core/Utils/Color"
 	"slices"
 	"strings"
-
 )
 
 type TextBlock struct {
@@ -25,7 +24,7 @@ type lineText struct {
 	line            []rune
 	initialCapacity int
 	totalChar       int
-	isChanged       bool
+	deletedEdgeChar  bool
 }
 
 func CreateLineText(initialCapacity int) *lineText {
@@ -35,14 +34,18 @@ func CreateLineText(initialCapacity int) *lineText {
 		totalChar:       0,
 	}
 }
+
 func (t *lineText) getText() string {
 	var str strings.Builder
 	for i := range t.totalChar {
 		str.WriteRune(t.line[i])
 	}
+	if t.deletedEdgeChar {
+		str.WriteRune(' ')
+		t.deletedEdgeChar = false
+	}
 	return str.String()
 }
-
 func (t *lineText) digit(char rune, i int) {
 	if i > t.totalChar {
 		t.line[i] = char
@@ -55,16 +58,16 @@ func (t *lineText) digit(char rune, i int) {
 		t.line = slices.Concat(t.line, make([]rune, t.initialCapacity))
 	}
 }
-
-// /delete the character i, if the line is empty return true
+///delete the character i, if the line is empty return true
 func (t *lineText) delete(i int) bool {
-	t.totalChar--
-	if  t.totalChar<=0 {
+	t.deletedEdgeChar = true
+	if t.totalChar <= 0 {
 		return true
 	}
 	if i <= 0 {
 		return false
 	}
+	t.totalChar--
 	if i > t.totalChar {
 		return false
 	}
@@ -74,6 +77,13 @@ func (t *lineText) delete(i int) bool {
 	}
 	return false
 }
+
+func (t *lineText) merge (add *lineText){
+	t.line = slices.Concat(t.line[:t.totalChar], add.line)
+	t.deletedEdgeChar=false
+	t.totalChar += add.totalChar
+}
+
 func CreateTextBlock(x, y int, initialLine int, initialCapacity int) *TextBlock {
 	lines := make([]*lineText, initialLine)
 	lines[0] = CreateLineText(initialCapacity)
@@ -166,22 +176,39 @@ func (t *TextBlock) Type(char rune) {
 	}
 	t.Touch()
 }
+func printArray(array []rune) {
+	for i, v := range array {
+		println(i, ":", string(v))
+	}
+}
 func (t *TextBlock) Delete() {
-	if t.currentCharacter == 0 && t.currentLine == 0 {
+	if t.totalLine == 1 && t.currentCharacter == 0 {
+		return
+	}
+	defer t.Touch()
+	if t.currentCharacter==0 {
+		if t.currentLine-1>=0{
+			t.currentCharacter = t.lines[t.currentLine-1].totalChar
+			t.preLenght = t.currentCharacter
+			t.lines[t.currentLine-1].merge(t.lines[t.currentLine])
+		  t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
+			t.currentLine--
+			t.totalLine--
+		}
 		return
 	}
 	deleteLine := t.lines[t.currentLine].delete(t.currentCharacter)
-	defer t.Touch()
 	t.preLenght = t.currentCharacter - 1
 	t.currentCharacter--
-	if deleteLine || t.currentCharacter < 0 {
+	if deleteLine {
 		t.totalLine--
 		t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
 		t.currentLine--
-		if t.totalLine==0{
-      t.lines = []*lineText{CreateLineText(t.initialCapacity)}
+		if t.totalLine == 0 {
+			t.lines = []*lineText{CreateLineText(t.initialCapacity)}
 			t.currentLine = 0
 			t.totalLine = 1
+			t.currentCharacter = 0
 			return
 		}
 		t.currentCharacter = t.lines[t.currentLine].totalChar
