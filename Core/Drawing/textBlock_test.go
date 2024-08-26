@@ -148,11 +148,11 @@ func TestDeleteTextline(t *testing.T) {
 	textLine.digit('4', 4) 
 	textLine.digit('f', 5) 
 	textLine.delete(2)
-	if textLine.getText() != "1234f" {
-		t.Errorf("expected %v, got %v", "1234", textLine.getText())
+	if textLine.getText() != "1234f " {
+		t.Errorf("expected %v, got %v", "1234f", textLine.getText())
 	}	
 	textLine.delete(5)
-	if textLine.getText() != "1234" {
+	if textLine.getText() != "1234 " {
 		t.Errorf("expected %v, got %v", "1234", textLine.getText())
 	}	
 }
@@ -162,15 +162,15 @@ func TestDeleteLine(t *testing.T) {
 	textBlock.Type('\n')
 	textBlock.Type('a')
 	textBlock.Delete()
-	if textBlock.totalLine!=1{
-		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
+	if textBlock.totalLine!=2{
+		t.Errorf("expected %v, got %v", 2, textBlock.totalLine)
 	}
 	textBlock.Delete()
 	if textBlock.totalLine!=1{
 		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
 	}
 	textBlock.Type('c')
-	if textBlock.lines[0].totalChar!=1{
+	if textBlock.lines[0].totalChar!=2{
 		t.Errorf("expected %v, got %v", 1, textBlock.lines[0].totalChar)
 	}
 	textBlock.Delete()
@@ -189,5 +189,23 @@ func TestDeleteLine(t *testing.T) {
 	}
 	if textBlock.lines[0].totalChar!=0{
 		t.Errorf("expected no characters")
+	}
+}
+func TestFromTwoLinesDoesOnelIne(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock.Type('c')
+	textBlock.Type('\n')
+	textBlock.Type('a')
+	textBlock.SetCurrentCursor(0, 1)
+	textBlock.Delete()
+	println(textBlock.lines[0].getText())
+	if textBlock.totalLine!=1{
+		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
+	}
+	if textBlock.lines[0].totalChar!=2{
+		t.Errorf("expected %v, got %v", 1, textBlock.lines[0].totalChar)
+	}
+	if textBlock.lines[0].getText()!="ca"{
+		t.Errorf("expected %v, got %v", "ca", textBlock.lines[0].getText())
 	}
 }
