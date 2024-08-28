@@ -17,7 +17,7 @@ func (c *Gtui) IResetGlobalColor() {
 	c.ISetGlobalColor(Color.GetDefaultColor())
 }
 
-func (c *Gtui) ILen() (int, int) {
+func (c *Gtui) Size() (int, int) {
 	return c.term.Size()
 }
 func (c *Gtui) SetVisibilityCursor(visibility bool) {
