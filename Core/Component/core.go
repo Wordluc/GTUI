@@ -24,8 +24,8 @@ type ComponentM struct {
 }
 
 func Create(xSize, ySize, chunkSize int) *ComponentM {
-	xChunk := xSize / chunkSize
-	yChunk := ySize / chunkSize
+	xChunk := xSize / chunkSize+1
+	yChunk := ySize / chunkSize+1
 	matrix := make([][]*[]IComponent, xChunk)
 	for i := range xChunk {
 		matrix[i] = make([]*[]IComponent, yChunk)

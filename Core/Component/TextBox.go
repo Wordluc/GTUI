@@ -109,7 +109,7 @@ func (b *TextBox) getShape() (InteractiveShape, error) {
 		xPos:   x + 1,
 		yPos:   y + 1,
 		Width:  xDim - 1,
-		Height: yDim - 1,
+		Height: yDim - 2,
 	}
 	return shape, nil
 }
