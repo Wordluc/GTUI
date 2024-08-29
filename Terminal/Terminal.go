@@ -27,6 +27,7 @@ func (t *Terminal) Stop() {
 
 func (t *Terminal) Clear() {
 	t.Print([]byte("\033[0J"))
+	t.Print([]byte("\033[1J"))
 }
 
 
