@@ -11,7 +11,6 @@ import (
 var core *Core.Gtui 
 func main() {
 	core,_=Core.NewGtui(loop,&Keyboard.Keyboard{},&Terminal.Terminal{})
-	defer core.Start()
 	b := Component.CreateButton(0, 0, 10, 5, "Press")
 	xS,yS:=core.Size()
 	c := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
@@ -19,6 +18,7 @@ func main() {
 		core.IClear()
 	})
 	core.InsertComponent(c)
+	core.Start()
 }
 
 func loop(keyb Kd.IKeyBoard) bool{

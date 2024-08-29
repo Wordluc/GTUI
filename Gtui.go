@@ -88,6 +88,7 @@ func (c *Gtui) CreateStreamingCharacter() Component.StreamCharacter {
 
 func (c *Gtui) Start(){
 	c.term.Start()
+	c.term.Clear()
 	c.IRefreshAll()
 	c.keyb.Start(c.innerLoop)
 	c.term.Clear()
