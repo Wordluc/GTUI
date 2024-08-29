@@ -102,19 +102,8 @@ func (c *Gtui) Click(x, y int) error {
 	}
 	return nil
 }
-
-func (c *Gtui) IRefreshAll() {
-	c.SetVisibilityCursor(false)
-	var str strings.Builder
-	for _, b := range c.buff {
-		str.WriteString(b.GetAnsiCode(c.globalColor))
-		str.WriteString(c.globalColor.GetAnsiColor())
-	}
-	c.term.PrintStr(str.String())
-	c.SetVisibilityCursor(true)
-	
+func (c *Gtui) AllineCursor() {
 	x, y := c.GetCur()
-
 	comps, _ := c.componentManager.Search(x, y)
 	for _, comp := range comps {
 		if ci, ok := comp.(Component.ICursorInteragibleComponent); ok {
@@ -126,6 +115,19 @@ func (c *Gtui) IRefreshAll() {
 			}
 		}
 	}
+	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
+}
+
+func (c *Gtui) IRefreshAll() {
+	c.SetVisibilityCursor(false)
+	var str strings.Builder
+	for _, b := range c.buff {
+		str.WriteString(b.GetAnsiCode(c.globalColor))
+		str.WriteString(c.globalColor.GetAnsiColor())
+	}
+	c.term.PrintStr(str.String())
+	c.SetVisibilityCursor(true)
+	
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	return
 }
