@@ -47,8 +47,8 @@ func (s *ComponentM) Add(comp IComponent) error {
 		return e
 	}
 	finalX, finalY := shape.xPos+shape.Width, shape.yPos+shape.Height
-	for i := shape.xPos; i <= finalX; i += 1 {
-		for j := shape.yPos; j <= finalY; j += 1 {
+	for i := shape.xPos; i < finalX; i++ {
+		for j := shape.yPos; j < finalY; j++ {
 			xC, yC := i/s.ChunkSize, j/s.ChunkSize
 			ele := (*s.Map)[xC][yC]
 			if ele == nil {

@@ -30,7 +30,7 @@ func main() {
 	core.ISetGlobalColor(Color.GetDefaultColor())
 	b := Component.CreateButton(0, 0, 10, 5, "Press")
 	xS,yS:=core.Size()
-	c := Component.CreateTextBox(0, 0, xS-1, yS, Creation(keyb))
+	c := Component.CreateTextBox(0, 0, xS, yS, Creation(keyb))
 	b.SetOnClick(func() {
 		core.IClear()
 	})
