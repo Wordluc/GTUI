@@ -78,7 +78,7 @@ func (t *lineText) merge (add *lineText){
 }
 func (t *lineText) split(i int) *lineText {
 	if i >= t.totalChar {
-		return nil
+		return CreateLineText(t.initialCapacity)
 	}
 	splited:=t.line[i:t.totalChar]
 	t.line=t.line[:i]
@@ -169,13 +169,13 @@ func (t *TextBlock) Type(char rune) {
 		if t.currentLine >= len(t.lines) {
 			t.lines = append(t.lines, CreateLineText(t.initialCapacity))
 		}
-		if t.currentCharacter<t.lines[t.currentLine-1].totalChar {
+		if t.lines[t.currentLine] == nil {
+			t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
+		}
+		if t.currentCharacter<=t.lines[t.currentLine-1].totalChar {
 			newLine:=t.lines[t.currentLine-1].split(t.currentCharacter)
 			t.currentCharacter=newLine.totalChar
 			t.lines=slices.Concat(t.lines[:t.currentLine],[]*lineText{newLine}, t.lines[t.currentLine:])
-		}
-		if t.lines[t.currentLine] == nil {
-			t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
 		}
 		t.currentCharacter=t.lines[t.currentLine].totalChar
 	} else {

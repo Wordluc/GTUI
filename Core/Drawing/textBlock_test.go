@@ -237,3 +237,14 @@ func TestNewLineInTheMiddleOfText2(t *testing.T) {
 		t.Errorf("expected %v, got %v", "ggg", textBlock.lines[4].getText())
 	}
 }
+func TestNewLineFromWhiteLine(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock.Type('\n')
+	textBlock.Type('c')
+	if textBlock.lines[0].getText() != "" {
+		t.Errorf("expected %v, got %v", "", textBlock.lines[0].getText())
+	}
+	if textBlock.lines[1].getText() != "c" {
+		t.Errorf("expected %v, got %v", "c", textBlock.lines[1].getText())
+	}
+}
