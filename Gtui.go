@@ -5,6 +5,7 @@ import (
 	"GTUI/Core/Component"
 	"GTUI/Core/Utils"
 	"GTUI/Core/Utils/Color"
+	"GTUI/Keyboard"
 	"GTUI/Terminal"
 	"strings"
 	"time"
@@ -13,6 +14,7 @@ import (
 type Gtui struct {
 	globalColor      Color.Color
 	term             Terminal.ITerminal
+	keyb             Keyboard.IKeyBoard
 	buff             []Core.IEntity
 	componentManager *Component.ComponentM
 	xCursor          int
@@ -20,6 +22,7 @@ type Gtui struct {
 	xSize            int
 	ySize            int
 	cursorVisibility bool
+	loop             Keyboard.Loop
 }
 
 func (c *Gtui) SetCur(x, y int) {
@@ -40,16 +43,16 @@ func (c *Gtui) SetCur(x, y int) {
 
 	c.xCursor = x
 	c.yCursor = y
-   
+
 	for _, comp := range comps {
 		if ci, ok := comp.(Component.ICursorInteragibleComponent); ok {
 			if ci.IsWritable() {
-				deltax,deltay := ci.DiffTotalToXY(x,y)
-				if deltax>0{
-					deltax=0
+				deltax, deltay := ci.DiffTotalToXY(x, y)
+				if deltax > 0 {
+					deltax = 0
 				}
-				if deltay>0{
-					deltay=0
+				if deltay > 0 {
+					deltay = 0
 				}
 				c.yCursor = y + deltay
 				c.xCursor = x + deltax
@@ -58,23 +61,35 @@ func (c *Gtui) SetCur(x, y int) {
 			}
 		}
 	}
+	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	c.SetVisibilityCursor(false)
 }
 func (c *Gtui) GetCur() (int, int) {
 	return c.xCursor, c.yCursor
 }
-func NewGtui() (*Gtui, error) {
-	term := &Terminal.Terminal{}
-	e := term.Start()
-	if e != nil {
-		return nil, e
-	}
+func NewGtui(loop Keyboard.Loop,keyb Keyboard.IKeyBoard,term Terminal.ITerminal) (*Gtui, error) {
 	xSize, ySize := term.Size()
 	componentManager := Component.Create(xSize, ySize, 5)
-	return &Gtui{term: term, buff: make([]Core.IEntity, 0), componentManager: componentManager, xCursor: 0, yCursor: 0, xSize: xSize, ySize: ySize}, nil
+	return &Gtui{globalColor: Color.GetDefaultColor(), cursorVisibility: true, loop: loop, term: term,keyb: keyb, buff: make([]Core.IEntity, 0), componentManager: componentManager, xCursor: 0, yCursor: 0, xSize: xSize, ySize: ySize}, nil
 }
 
-func (c *Gtui) Close() {
+func (c *Gtui) CreateStreamingCharacter() Component.StreamCharacter {
+	stream := Component.StreamCharacter{}
+	stream.Get = func() chan string {
+		i := c.keyb.NewChannel()
+		stream.IChannel = i
+		return c.keyb.GetChannels()[i]
+	}
+	stream.Delete = func() {
+		 c.keyb.DeleteChannel(stream.IChannel) 
+	}
+	return stream
+}
+
+func (c *Gtui) Start(){
+	c.term.Start()
+	c.IRefreshAll()
+	c.keyb.Start(c.innerLoop)
 	c.term.Clear()
 	c.term.Stop()
 }
@@ -108,7 +123,7 @@ func (c *Gtui) AllineCursor() {
 	for _, comp := range comps {
 		if ci, ok := comp.(Component.ICursorInteragibleComponent); ok {
 			if ci.IsWritable() {
-				deltax,deltay := ci.DiffCurrentToXY(x,y)
+				deltax, deltay := ci.DiffCurrentToXY(x, y)
 				c.yCursor = y + deltay
 				c.xCursor = x + deltax
 				break
@@ -127,7 +142,18 @@ func (c *Gtui) IRefreshAll() {
 	}
 	c.term.PrintStr(str.String())
 	c.SetVisibilityCursor(true)
-	
+
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	return
+}
+
+func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
+	c.IRefreshAll()
+	c.AllineCursor()
+   if !c.loop(c.keyb){
+	  return false
+	}
+	c.IClear()
+	c.IRefreshAll()
+	return true
 }
