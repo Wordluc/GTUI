@@ -43,6 +43,7 @@ func main() {
 
 func loop(keyb Kd.IKeyBoard) bool{
 	core.IRefreshAll()
+	core.AllineCursor()
 	x, y = core.GetCur()
 	if keyb.IsKeySPressed(Kd.KeyArrowDown) {
 		y++
