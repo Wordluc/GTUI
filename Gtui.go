@@ -156,5 +156,6 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	}
 	c.IClear()
 	c.IRefreshAll()
+	c.AllineCursor()
 	return true
 }

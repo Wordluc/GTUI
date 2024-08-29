@@ -24,7 +24,6 @@ type lineText struct {
 	line            []rune
 	initialCapacity int
 	totalChar       int
-	deletedEdgeChar  bool
 }
 
 func CreateLineText(initialCapacity int) *lineText {
@@ -39,10 +38,6 @@ func (t *lineText) getText() string {
 	var str strings.Builder
 	for i := range t.totalChar {
 		str.WriteRune(t.line[i])
-	}
-	if t.deletedEdgeChar {
-		str.WriteRune(' ')
-		t.deletedEdgeChar = false
 	}
 	return str.String()
 }
@@ -60,7 +55,6 @@ func (t *lineText) digit(char rune, i int) {
 }
 ///delete the character i, if the line is empty return true
 func (t *lineText) delete(i int) bool {
-	t.deletedEdgeChar = true
 	if t.totalChar <= 0 {
 		return true
 	}
@@ -80,10 +74,20 @@ func (t *lineText) delete(i int) bool {
 
 func (t *lineText) merge (add *lineText){
 	t.line = slices.Concat(t.line[:t.totalChar], add.line)
-	t.deletedEdgeChar=false
 	t.totalChar += add.totalChar
 }
-
+func (t *lineText) split(i int) *lineText {
+	if i >= t.totalChar {
+		return nil
+	}
+	splited:=t.line[i:t.totalChar]
+	t.line=t.line[:i]
+	newLine:= CreateLineText(t.initialCapacity)
+	newLine.totalChar=t.totalChar-i
+	newLine.line=splited
+	t.totalChar=i
+	return newLine
+}
 func CreateTextBlock(x, y int, initialLine int, initialCapacity int) *TextBlock {
 	lines := make([]*lineText, initialLine)
 	lines[0] = CreateLineText(initialCapacity)
@@ -129,7 +133,7 @@ func (t *TextBlock) ForceSetCurrentLine(line int) {
 func (t *TextBlock) ForceSetCurrentChar(ichar int) {
 	t.currentCharacter = ichar
 }
-
+//is necessary to move one coordinate at time
 func (t *TextBlock) SetCurrentCursor(ichar int, line int) {
 	isYChanged := line != t.currentLine
 	isXChanged := line == t.currentLine && ichar != t.currentCharacter
@@ -162,13 +166,18 @@ func (t *TextBlock) Type(char rune) {
 	if char == '\n' {
 		t.totalLine++
 		t.currentLine++
-		t.currentCharacter = 0
 		if t.currentLine >= len(t.lines) {
 			t.lines = append(t.lines, CreateLineText(t.initialCapacity))
+		}
+		if t.currentCharacter<t.lines[t.currentLine-1].totalChar {
+			newLine:=t.lines[t.currentLine-1].split(t.currentCharacter)
+			t.currentCharacter=newLine.totalChar
+			t.lines=slices.Concat(t.lines[:t.currentLine],[]*lineText{newLine}, t.lines[t.currentLine:])
 		}
 		if t.lines[t.currentLine] == nil {
 			t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
 		}
+		t.currentCharacter=t.lines[t.currentLine].totalChar
 	} else {
 		t.lines[t.currentLine].digit(char, t.currentCharacter)
 		t.currentCharacter++

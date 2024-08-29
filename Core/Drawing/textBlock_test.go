@@ -2,6 +2,11 @@ package Drawing
 
 import "testing"
 
+func types(textBlock *TextBlock, text string) {
+	for _, char := range text {
+		textBlock.Type(char)
+	}
+}
 func TestTypingInTextBlock(t *testing.T) {
 	textBlock := CreateTextBlock(0, 0, 10, 100)
 	textBlock.Type('a')
@@ -28,6 +33,7 @@ func TestTypingInTextBlock(t *testing.T) {
 		if i >= len(expLine1) {
 			break
 		}
+		println(char)
 		if char != expLine1[i] {
 			t.Errorf("expected %v, got %v", string(expLine1[i]), string(char))
 		}
@@ -60,20 +66,7 @@ func TestComeBackTypingAfterNewLine(t *testing.T) {
 func TestSetCurrentTextBlock(t *testing.T) {
 	x, y := 0, 0
 	textBlock := CreateTextBlock(70, 0, 10, 100)
-	textBlock.Type('a')
-	textBlock.Type('2')
-	textBlock.Type('3')
-	textBlock.Type('1')
-	textBlock.Type('1')
-	textBlock.Type('\n')
-	textBlock.Type('n')
-	textBlock.Type('n')
-	textBlock.Type('n')
-	textBlock.Type('\n')
-	textBlock.Type('r')
-	textBlock.Type('r')
-	textBlock.Type('r')
-	textBlock.Type('r')
+	types(textBlock, "a2311\nnnn\nrrrr")
 	x, y = textBlock.GetCurrentCursor()
 	y--
 	textBlock.SetCurrentCursor(x, y)
@@ -140,21 +133,21 @@ func TestComeBackTyping(t *testing.T) {
 }
 
 func TestDeleteTextline(t *testing.T) {
-	textLine:= CreateLineText(10)
+	textLine := CreateLineText(10)
 	textLine.digit('1', 0)
 	textLine.digit('t', 1)
 	textLine.digit('2', 2)
 	textLine.digit('3', 3)
-	textLine.digit('4', 4) 
-	textLine.digit('f', 5) 
+	textLine.digit('4', 4)
+	textLine.digit('f', 5)
 	textLine.delete(2)
-	if textLine.getText() != "1234f " {
+	if textLine.getText() != "1234f" {
 		t.Errorf("expected %v, got %v", "1234f", textLine.getText())
-	}	
+	}
 	textLine.delete(5)
-	if textLine.getText() != "1234 " {
+	if textLine.getText() != "1234" {
 		t.Errorf("expected %v, got %v", "1234", textLine.getText())
-	}	
+	}
 }
 func TestDeleteLine(t *testing.T) {
 	textBlock := CreateTextBlock(0, 0, 10, 100)
@@ -162,32 +155,32 @@ func TestDeleteLine(t *testing.T) {
 	textBlock.Type('\n')
 	textBlock.Type('a')
 	textBlock.Delete()
-	if textBlock.totalLine!=2{
+	if textBlock.totalLine != 2 {
 		t.Errorf("expected %v, got %v", 2, textBlock.totalLine)
 	}
 	textBlock.Delete()
-	if textBlock.totalLine!=1{
+	if textBlock.totalLine != 1 {
 		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
 	}
 	textBlock.Type('c')
-	if textBlock.lines[0].totalChar!=2{
+	if textBlock.lines[0].totalChar != 2 {
 		t.Errorf("expected %v, got %v", 1, textBlock.lines[0].totalChar)
 	}
 	textBlock.Delete()
-	if textBlock.totalLine!=1{
+	if textBlock.totalLine != 1 {
 		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
 	}
 	textBlock.Delete()
-	if textBlock.totalLine!=1{
+	if textBlock.totalLine != 1 {
 		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
 	}
 	textBlock.Delete()
 	textBlock.Delete()
 	textBlock.Delete()
-	if textBlock.totalLine!=1{
+	if textBlock.totalLine != 1 {
 		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
 	}
-	if textBlock.lines[0].totalChar!=0{
+	if textBlock.lines[0].totalChar != 0 {
 		t.Errorf("expected no characters")
 	}
 }
@@ -198,14 +191,49 @@ func TestFromTwoLinesDoesOnelIne(t *testing.T) {
 	textBlock.Type('a')
 	textBlock.SetCurrentCursor(0, 1)
 	textBlock.Delete()
-	println(textBlock.lines[0].getText())
-	if textBlock.totalLine!=1{
+	if textBlock.totalLine != 1 {
 		t.Errorf("expected %v, got %v", 1, textBlock.totalLine)
 	}
-	if textBlock.lines[0].totalChar!=2{
+	if textBlock.lines[0].totalChar != 2 {
 		t.Errorf("expected %v, got %v", 1, textBlock.lines[0].totalChar)
 	}
-	if textBlock.lines[0].getText()!="ca"{
+	if textBlock.lines[0].getText() != "ca" {
 		t.Errorf("expected %v, got %v", "ca", textBlock.lines[0].getText())
+	}
+}
+func TestNewLineInTheMiddleOfText1(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 10, 100)
+	types(textBlock, "123a1")
+	textBlock.SetCurrentCursor(3, 0)
+	textBlock.Type('\n')
+	if textBlock.lines[0].getText() != "123" {
+		t.Errorf("expected %v, got %v", "123", textBlock.lines[0].getText())
+	}
+	if textBlock.lines[1].getText() != "a1" {
+		t.Errorf("expected %v, got %v", "a1", textBlock.lines[1].getText())
+	}
+}
+func TestNewLineInTheMiddleOfText2(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 10, 100)
+	types(textBlock, "123a1\nciao2 prova\ngggg")
+	textBlock.SetCurrentCursor(3, 1)
+	textBlock.Type('\n')
+	if textBlock.lines[1].getText() != "ciao" {
+		t.Errorf("expected %v, got %v", "ciao", textBlock.lines[1].getText())
+	}
+	if textBlock.lines[2].getText() != "2 prova" {
+		t.Errorf("expected %v, got %v", "2 prova", textBlock.lines[2].getText())
+	}
+	if textBlock.lines[3].getText() != "gggg" {
+		t.Errorf("expected %v, got %v", "gggg", textBlock.lines[3].getText())
+	}
+	textBlock.SetCurrentCursor(0, 3)
+	textBlock.SetCurrentCursor(1, 3)
+	textBlock.Type('\n')
+	if textBlock.lines[3].getText() != "g" {
+		t.Errorf("expected %v, got %v", "g", textBlock.lines[3].getText())
+	}
+	if textBlock.lines[4].getText() != "ggg" {
+		t.Errorf("expected %v, got %v", "ggg", textBlock.lines[4].getText())
 	}
 }
