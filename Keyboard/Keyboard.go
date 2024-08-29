@@ -7,18 +7,19 @@ import (
 type Keyboard struct {
 	key       stateKey
 	IsRunning bool
-	Channel   []chan string
-	Loop      func(IKeyBoard) bool
+	channel   []chan string
+	loop      Loop
 }
 type stateKey struct {
 	key  Key
 	rune rune
 }
-
+func NewKeyboard() *Keyboard {
+	return &Keyboard{ channel: make([]chan string, 0), IsRunning: false}
+}
 func (t *Keyboard) Start(Loop Loop) error {
-	t.Channel = make([]chan string, 0)
 	t.IsRunning = true
-	t.Loop = Loop
+	t.loop = Loop
 	eventKey, e := keyboard.GetKeys(1)
 	if e != nil {
 		return e
@@ -27,20 +28,20 @@ func (t *Keyboard) Start(Loop Loop) error {
 	return nil
 }
 func (t *Keyboard) GetChannels() []chan string {
-	return t.Channel
+	return t.channel
 }
 func (t *Keyboard) NewChannel() int {
 	channel := make(chan string)
-	t.Channel = append(t.Channel, channel)
-	i := len(t.Channel) - 1
+	t.channel = append(t.channel, channel)
+	i := len(t.channel) - 1
 	return i
 }
 func (t *Keyboard) DeleteChannel(i int) {
 	if i <= 0 {
-		t.Channel = []chan string{}
+		t.channel = []chan string{}
 		return
 	}
-	t.Channel = append(t.Channel[:i], t.Channel[i+1:]...)
+	t.channel = append(t.channel[:i], t.channel[i+1:]...)
 }
 
 func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
@@ -66,7 +67,7 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 			}
 			b <- string(v.Rune)
 		}
-		if !t.Loop(t) {
+		if !t.loop(t) {
 			break
 		}
 	}

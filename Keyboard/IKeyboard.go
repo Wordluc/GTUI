@@ -1,9 +1,9 @@
 package Keyboard
 
 type Token struct{}
-type Loop func(IKeyBoard)bool
+type Loop func(IKeyBoard) bool
 type IKeyBoard interface {
-	Start(Loop) error
+	Start(Loop Loop) error
 	Stop()
 	GetKey() (byte, error)
 	IsKeyPressed(key rune) bool
@@ -12,4 +12,3 @@ type IKeyBoard interface {
 	NewChannel() int
 	DeleteChannel(int)
 }
-

@@ -20,9 +20,10 @@ func Test_CanMoveFunctionWithCharacter(t *testing.T) {
 		Get: func() chan string {
 			return stream
 		},
+		Delete: func() {},
 	}
 	b := CreateTextBox(0, 0, 10, 10, text)
-	b.OnClick()
+	b.StartTyping()
 	stream<-"a"
 	x,_:=b.DiffTotalToXY(1,1)
 	if x != 1 {

@@ -10,14 +10,13 @@ import (
 
 var core *Core.Gtui 
 func main() {
-	core,_=Core.NewGtui(loop,&Keyboard.Keyboard{},&Terminal.Terminal{})
-	b := Component.CreateButton(0, 0, 10, 5, "Press")
+	kbr:=Keyboard.NewKeyboard()
+  core,_=Core.NewGtui(loop,kbr,&Terminal.Terminal{})
 	xS,yS:=core.Size()
 	c := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
-	b.SetOnClick(func() {
-		core.IClear()
-	})
+	c.StartTyping()
 	core.InsertComponent(c)
+	core.SetCur(1, 1)
 	core.Start()
 }
 

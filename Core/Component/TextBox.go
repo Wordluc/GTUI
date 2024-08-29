@@ -12,6 +12,8 @@ type TextBox struct {
 	textBlock   *Drawing.TextBlock
 	isTyping    bool
 	streamText  StreamCharacter
+	onClick     func()
+	onLeave     func()
 }
 
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
@@ -46,21 +48,34 @@ func (b *TextBox) loopTyping() {
 	}
 }
 
+func (b *TextBox) StartTyping() {
+	b.isTyping = true
+	go b.loopTyping()
+	b.streamText.Delete()
+}
+func (b *TextBox) StopTyping() {
+	b.streamText.Delete()
+	b.isTyping = false
+}
 func (b *TextBox) OnClick() {
-	if b.isTyping {
+	if b.onClick == nil {
 		return
 	}
-	b.isTyping = true
-	b.visibleArea.SetColor(Color.Get(Color.Green, Color.None))
-	go b.loopTyping()
+	b.onClick()
 }
 
 func (b *TextBox) OnLeave() {
-	b.isTyping = false
-	b.visibleArea.SetColor(Color.GetDefaultColor())
-	b.streamText.Delete()
+	if b.onLeave == nil {
+		return
+	}
+	b.onLeave()
 }
-
+func (b *TextBox) SetOnClick(onClick func()) {
+	b.onClick = onClick
+}
+func (b *TextBox) SetOnLeave(onLeave func()) {
+	b.onLeave = onLeave
+}
 func (b *TextBox) OnRelease() {}
 
 func (b *TextBox) OnHover() {
