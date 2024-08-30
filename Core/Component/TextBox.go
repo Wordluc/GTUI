@@ -19,7 +19,7 @@ type TextBox struct {
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
-	textBox := Drawing.CreateTextBlock(1, 1, 10, 100)
+	textBox := Drawing.CreateTextBlock(1, 1, sizeX-1, sizeY-1,  10)
 	cont.AddChild(rect)
 	cont.AddChild(textBox)
 	cont.SetPos(x, y)
@@ -89,7 +89,7 @@ func (b *TextBox) GetGraphics() Core.IEntity {
 	return b.graphics
 }
 
-func (b *TextBox) IsWritable() bool {
+func (b *TextBox) IsTyping() bool {
 	return b.isTyping
 }
 
@@ -112,19 +112,19 @@ func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 	diffY = diffY - y
 	return diffX, diffY
 }
-func (b *TextBox) SetCurrentPos(x, y int) {
+func (b *TextBox) SetCurrentPosCursor(x, y int) {
 	xP, yP := b.textBlock.GetPos()
 	b.textBlock.SetCurrentCursor(x-xP, y-yP)
 	return
 }
 func (b *TextBox) getShape() (InteractiveShape, error) {
-	x, y := b.visibleArea.GetPos()
-	xDim, yDim := b.visibleArea.GetSize()
+	x, y := b.textBlock.GetPos()
+	xDim, yDim := b.textBlock.GetSize()
 	shape := InteractiveShape{
-		xPos:   x + 1,
-		yPos:   y + 1,
-		Width:  xDim - 2,
-		Height: yDim - 2,
+		xPos:   x,
+		yPos:   y,
+		Width:  xDim,
+		Height: yDim,
 	}
 	return shape, nil
 }

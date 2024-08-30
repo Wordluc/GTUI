@@ -14,6 +14,8 @@ type TextBlock struct {
 	lines            []*lineText
 	xPos             int
 	yPos             int
+	xSize            int
+	ySize            int
 	currentCharacter int
 	currentLine      int
 	initialCapacity  int
@@ -53,6 +55,7 @@ func (t *lineText) digit(char rune, i int) {
 		t.line = slices.Concat(t.line, make([]rune, t.initialCapacity))
 	}
 }
+
 ///delete the character i, if the line is empty return true
 func (t *lineText) delete(i int) bool {
 	if t.totalChar <= 0 {
@@ -88,8 +91,8 @@ func (t *lineText) split(i int) *lineText {
 	t.totalChar=i
 	return newLine
 }
-func CreateTextBlock(x, y int, initialLine int, initialCapacity int) *TextBlock {
-	lines := make([]*lineText, initialLine)
+func CreateTextBlock(x, y int,xSize,ySize int, initialCapacity int) *TextBlock {
+	lines := make([]*lineText, 1)
 	lines[0] = CreateLineText(initialCapacity)
 	return &TextBlock{
 		visible:         true,
@@ -98,6 +101,8 @@ func CreateTextBlock(x, y int, initialLine int, initialCapacity int) *TextBlock 
 		lines:           lines,
 		xPos:            x,
 		yPos:            y,
+		xSize:           xSize,
+		ySize:           ySize,
 		currentLine:     0,
 		initialCapacity: initialCapacity,
 		totalLine:       1,
@@ -118,6 +123,10 @@ func (t *TextBlock) SetPos(x, y int) {
 	t.xPos = x
 	t.yPos = y
 	t.Touch()
+}
+
+func (t *TextBlock) GetSize() (int, int) {
+	return t.xSize, t.ySize
 }
 
 func (t *TextBlock) ForceSetCurrentLine(line int) {
@@ -174,10 +183,9 @@ func (t *TextBlock) Type(char rune) {
 		}
 		if t.currentCharacter<=t.lines[t.currentLine-1].totalChar {
 			newLine:=t.lines[t.currentLine-1].split(t.currentCharacter)
-			t.currentCharacter=newLine.totalChar
 			t.lines=slices.Concat(t.lines[:t.currentLine],[]*lineText{newLine}, t.lines[t.currentLine:])
 		}
-		t.currentCharacter=t.lines[t.currentLine].totalChar
+		t.currentCharacter=0
 	} else {
 		t.lines[t.currentLine].digit(char, t.currentCharacter)
 		t.currentCharacter++

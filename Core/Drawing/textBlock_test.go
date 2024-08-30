@@ -8,7 +8,7 @@ func types(textBlock *TextBlock, text string) {
 	}
 }
 func TestTypingInTextBlock(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock := CreateTextBlock(0, 0, 10, 100,1)
 	textBlock.Type('a')
 	textBlock.Type('2')
 	textBlock.Type('3')
@@ -40,7 +40,7 @@ func TestTypingInTextBlock(t *testing.T) {
 	}
 }
 func TestComeBackTypingAfterNewLine(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock := CreateTextBlock(0, 0, 10, 100,1)
 	textBlock.Type('a')
 	if textBlock.currentLine != 0 {
 		t.Errorf("expected %v, got %v", 0, textBlock.currentLine)
@@ -65,7 +65,7 @@ func TestComeBackTypingAfterNewLine(t *testing.T) {
 }
 func TestSetCurrentTextBlock(t *testing.T) {
 	x, y := 0, 0
-	textBlock := CreateTextBlock(70, 0, 10, 100)
+	textBlock := CreateTextBlock(70, 0, 10, 100,1)
 	types(textBlock, "a2311\nnnn\nrrrr")
 	x, y = textBlock.GetCurrentCursor()
 	y--
@@ -110,7 +110,7 @@ func TestSetCurrentTextBlock(t *testing.T) {
 	}
 }
 func TestComeBackTyping(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock := CreateTextBlock(0, 0, 10, 100,1)
 	textBlock.Type('u')
 	textBlock.Type('c')
 	textBlock.Type('a')
@@ -150,7 +150,7 @@ func TestDeleteTextline(t *testing.T) {
 	}
 }
 func TestDeleteLine(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock := CreateTextBlock(0, 0, 10, 100,1)
 	textBlock.Type('u')
 	textBlock.Type('\n')
 	textBlock.Type('a')
@@ -185,7 +185,7 @@ func TestDeleteLine(t *testing.T) {
 	}
 }
 func TestFromTwoLinesDoesOnelIne(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock := CreateTextBlock(0, 0, 10, 100,1)
 	textBlock.Type('c')
 	textBlock.Type('\n')
 	textBlock.Type('a')
@@ -202,7 +202,7 @@ func TestFromTwoLinesDoesOnelIne(t *testing.T) {
 	}
 }
 func TestNewLineInTheMiddleOfText1(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock := CreateTextBlock(0, 0, 10, 100,1)
 	types(textBlock, "123a1")
 	textBlock.SetCurrentCursor(3, 0)
 	textBlock.Type('\n')
@@ -214,7 +214,7 @@ func TestNewLineInTheMiddleOfText1(t *testing.T) {
 	}
 }
 func TestNewLineInTheMiddleOfText2(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock := CreateTextBlock(0, 0, 10, 100,1)
 	types(textBlock, "123a1\nciao2 prova\ngggg")
 	textBlock.SetCurrentCursor(3, 1)
 	textBlock.Type('\n')
@@ -238,7 +238,7 @@ func TestNewLineInTheMiddleOfText2(t *testing.T) {
 	}
 }
 func TestNewLineFromWhiteLine(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100)
+	textBlock := CreateTextBlock(0, 0, 10, 100,1)
 	textBlock.Type('\n')
 	textBlock.Type('c')
 	if textBlock.lines[0].getText() != "" {
@@ -246,5 +246,13 @@ func TestNewLineFromWhiteLine(t *testing.T) {
 	}
 	if textBlock.lines[1].getText() != "c" {
 		t.Errorf("expected %v, got %v", "c", textBlock.lines[1].getText())
+	}
+}
+
+func TestGoOutCharacter (t *testing.T){
+  TextBlock:=CreateTextBlock(0,0,5,100,1)
+  types(TextBlock,"ciao3")
+	if TextBlock.getFullText()[6:] != "ciao3" {
+		t.Errorf("expected %v, got %v", "ciao3", TextBlock.getFullText()[6:])
 	}
 }
