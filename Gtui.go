@@ -69,25 +69,25 @@ func (c *Gtui) SetCur(x, y int) {
 	  }
   }
 	if canExit{
-		c.xCursor = x
-		c.yCursor = y
+//		c.xCursor = x
+//		c.yCursor = y
 	}else{
-		return
+	//	return
 	}
 
 	for _, comp := range compsPostSet {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
-			if ci.IsTyping() {
-				deltax, deltay := ci.DiffTotalToXY(x, y)
-				if deltax > 0 {
-					deltax = 0
-				}
-				if deltay > 0 {
-					deltay = 0
-				}
-				c.yCursor = y + deltay
-				c.xCursor = x + deltax
-				ci.SetCurrentPosCursor(c.xCursor, c.yCursor)
+			if ci.IsTyping() {//redo
+			//	deltax, deltay := ci.DiffTotalToXY(x, y)
+			//	if deltax > 0 {
+			//		deltax = 0
+			//	}
+			//	if deltay > 0 {
+			//		deltay = 0
+			//	}
+			//	c.yCursor = y + deltay
+			//	c.xCursor = x + deltax
+				c.xCursor, c.yCursor = ci.SetCurrentPosCursor(x,y)
 				break
 			}
 		}

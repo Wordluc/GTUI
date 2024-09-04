@@ -8,19 +8,21 @@ import (
 )
 
 type TextBlock struct {
-	visible          bool
-	ansiCode         string
-	isChanged        bool
-	lines            []*lineText
-	xPos             int
-	yPos             int
-	xSize            int
-	ySize            int
-	currentCharacter int
-	currentLine      int
-	initialCapacity  int
-	totalLine        int
-	preLenght        int
+	visible           bool
+	ansiCode          string
+	isChanged         bool
+	lines             []*lineText
+	xPos              int
+	yPos              int
+	xSize             int
+	ySize             int
+	currentCharacter  int
+	xPositionRelative int
+	relativeCharacter int
+	currentLine       int
+	initialCapacity   int
+	totalLine         int
+	preLenght         int
 }
 type lineText struct {
 	line            []rune
@@ -56,7 +58,7 @@ func (t *lineText) digit(char rune, i int) {
 	}
 }
 
-///delete the character i, if the line is empty return true
+// /delete the character i, if the line is empty return true
 func (t *lineText) delete(i int) bool {
 	if t.totalChar <= 0 {
 		return true
@@ -75,7 +77,7 @@ func (t *lineText) delete(i int) bool {
 	return false
 }
 
-func (t *lineText) merge (add *lineText){
+func (t *lineText) merge(add *lineText) {
 	t.line = slices.Concat(t.line[:t.totalChar], add.line)
 	t.totalChar += add.totalChar
 }
@@ -83,15 +85,15 @@ func (t *lineText) split(i int) *lineText {
 	if i >= t.totalChar {
 		return CreateLineText(t.initialCapacity)
 	}
-	splited:=t.line[i:t.totalChar]
-	t.line=t.line[:i]
-	newLine:= CreateLineText(t.initialCapacity)
-	newLine.totalChar=t.totalChar-i
-	newLine.line=splited
-	t.totalChar=i
+	splited := t.line[i:t.totalChar]
+	t.line = t.line[:i]
+	newLine := CreateLineText(t.initialCapacity)
+	newLine.totalChar = t.totalChar - i
+	newLine.line = splited
+	t.totalChar = i
 	return newLine
 }
-func CreateTextBlock(x, y int,xSize,ySize int, initialCapacity int) *TextBlock {
+func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock {
 	lines := make([]*lineText, 1)
 	lines[0] = CreateLineText(initialCapacity)
 	return &TextBlock{
@@ -139,30 +141,79 @@ func (t *TextBlock) ForceSetCurrentLine(line int) {
 	}
 }
 
-func (t *TextBlock) ForceSetCurrentChar(ichar int) {
-	t.currentCharacter = ichar
-}
 //is necessary to move one coordinate at time
-func (t *TextBlock) SetCurrentCursor(ichar int, line int) {
-	isYChanged := line != t.currentLine
-	isXChanged := line == t.currentLine && ichar != t.currentCharacter
+//func (t *TextBlock) SetCurrentCursor(ichar int, line int) {
+//	isYChanged := line != t.currentLine
+//	isXChanged := line == t.currentLine && ichar != t.currentCharacter
+//	if isXChanged {
+//		if ichar > t.currentCharacter {
+//			t.preLenght = t.currentCharacter + 1
+//		} else {
+//			t.preLenght = t.currentCharacter - 1
+//		}
+//		t.ForceSetCurrentChar(ichar)
+//	}
+//	if isYChanged {
+//		t.ForceSetCurrentLine(line)
+//		maxX, _ := t.GetTotalCursor()
+//		if t.preLenght > maxX {
+//			t.ForceSetCurrentChar(maxX)
+//		} else {
+//			t.ForceSetCurrentChar(t.preLenght)
+//		}
+//	}
+//}
+/*
+It gets where i want the cursor go, and i return the new position
+In this way i can manage the relative position with long text
+func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
+	...
+}
+*/
+func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
+	xRelative := x - t.xPos
+	yRelative := y - t.yPos
+
+	if xRelative < 0 {
+		xRelative = 0
+	}
+	if yRelative < 0 {
+		yRelative = 0
+	}
+
+	if xRelative >= t.xSize {
+		return t.xSize, y //gestire lo scrolling del testo
+	}
+	if yRelative >= t.ySize {
+		return x, t.ySize
+	}
+
+	isYChanged := yRelative != t.currentLine
+	isXChanged := xRelative != t.currentCharacter
+	if yRelative >= len(t.lines) {
+		yRelative = len(t.lines) - 1
+	}
+	if xRelative >= t.lines[yRelative].totalChar {
+		xRelative = t.lines[yRelative].totalChar
+	}
 	if isXChanged {
-		if ichar > t.currentCharacter {
+		if xRelative > t.currentCharacter {
 			t.preLenght = t.currentCharacter + 1
 		} else {
 			t.preLenght = t.currentCharacter - 1
 		}
-		t.ForceSetCurrentChar(ichar)
+		t.currentCharacter = xRelative
 	}
 	if isYChanged {
-		t.ForceSetCurrentLine(line)
-		maxX, _ := t.GetTotalCursor()
-		if t.preLenght > maxX {
-			t.ForceSetCurrentChar(maxX)
+		if t.lines[yRelative].totalChar > t.preLenght {
+			t.currentCharacter = t.preLenght
 		} else {
-			t.ForceSetCurrentChar(t.preLenght)
+			t.currentCharacter = t.lines[yRelative].totalChar
 		}
+		t.ForceSetCurrentLine(yRelative)
 	}
+	return xRelative + t.xPos, yRelative + t.yPos
+
 }
 
 func (t *TextBlock) GetTotalCursor() (int, int) {
@@ -181,11 +232,11 @@ func (t *TextBlock) Type(char rune) {
 		if t.lines[t.currentLine] == nil {
 			t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
 		}
-		if t.currentCharacter<=t.lines[t.currentLine-1].totalChar {
-			newLine:=t.lines[t.currentLine-1].split(t.currentCharacter)
-			t.lines=slices.Concat(t.lines[:t.currentLine],[]*lineText{newLine}, t.lines[t.currentLine:])
+		if t.currentCharacter <= t.lines[t.currentLine-1].totalChar {
+			newLine := t.lines[t.currentLine-1].split(t.currentCharacter)
+			t.lines = slices.Concat(t.lines[:t.currentLine], []*lineText{newLine}, t.lines[t.currentLine:])
 		}
-		t.currentCharacter=0
+		t.currentCharacter = 0
 	} else {
 		t.lines[t.currentLine].digit(char, t.currentCharacter)
 		t.currentCharacter++
@@ -203,12 +254,12 @@ func (t *TextBlock) Delete() {
 		return
 	}
 	defer t.Touch()
-	if t.currentCharacter==0 {
-		if t.currentLine-1>=0{
+	if t.currentCharacter == 0 {
+		if t.currentLine-1 >= 0 {
 			t.currentCharacter = t.lines[t.currentLine-1].totalChar
 			t.preLenght = t.currentCharacter
 			t.lines[t.currentLine-1].merge(t.lines[t.currentLine])
-		  t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
+			t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
 			t.currentLine--
 			t.totalLine--
 		}
