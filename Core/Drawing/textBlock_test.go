@@ -63,6 +63,11 @@ func TestComeBackTypingAfterNewLine(t *testing.T) {
 		t.Errorf("expected %v, got %v", 1, textBlock.lines[textBlock.currentLine].totalChar)
 	}
 }
+/*
+A2311
+NNN
+RRRR
+*/
 func TestSetCurrentTextBlock(t *testing.T) {
 	textBlock := CreateTextBlock(70, 0, 10, 100,1)
 	types(textBlock, "a2311\nnnn\nrrrr")
@@ -90,20 +95,14 @@ func TestSetCurrentTextBlock(t *testing.T) {
 	if textBlock.currentCharacter != 3 || textBlock.currentLine != y {
 		t.Errorf("expected %v, %v, got %v, %v", 3, y, textBlock.currentCharacter, textBlock.currentLine)
 	}
-	if textBlock.preLenght != 3 {
-		t.Errorf("expected %v, got %v", 3, textBlock.preLenght)
-	}
-	if textBlock.currentCharacter != 3 || textBlock.currentLine != y {
-		t.Errorf("expected %v, %v, got %v, %v", 3, y, textBlock.currentCharacter, textBlock.currentLine)
-	}
-	x,y=textBlock.SetCurrentCursor(x, y-2)
+	x,y=textBlock.SetCurrentCursor(x, y-1)
 	x,y=textBlock.SetCurrentCursor(x+2, y)
 	x,y=textBlock.SetCurrentCursor(x, y+1)
 	if textBlock.currentCharacter != 3 || textBlock.currentLine != y {
 		t.Errorf("expected %v, %v, got %v, %v", 4, y, textBlock.currentCharacter, textBlock.currentLine)
 	}
-	if textBlock.preLenght != 4 {
-		t.Errorf("expected %v, got %v", 4, textBlock.preLenght)
+	if textBlock.preLenght != 5 {
+		t.Errorf("expected %v, got %v", 5, textBlock.preLenght)
 	}
 }
 func TestComeBackTyping(t *testing.T) {

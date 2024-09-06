@@ -180,14 +180,12 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
 	if isYChanged {
 		if t.lines[yRelative].totalChar > t.preLenght {
 			t.ForceSetCurrentCharacter(t.preLenght)
-			xRelative = t.preLenght
 		} else {
 			t.ForceSetCurrentCharacter(t.lines[yRelative].totalChar)
-			xRelative = t.lines[yRelative].totalChar
 		}
 		t.ForceSetCurrentLine(yRelative)
 	}
-	return xRelative + t.xPos , yRelative + t.yPos
+	return t.currentCharacter + t.xPos , yRelative + t.yPos
 
 }
 
