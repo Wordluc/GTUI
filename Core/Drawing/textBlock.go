@@ -17,8 +17,7 @@ type TextBlock struct {
 	xSize             int
 	ySize             int
 	currentCharacter  int
-	xPositionRelative int
-	relativeCharacter int
+	currentOffsetChar int
 	currentLine       int
 	initialCapacity   int
 	totalLine         int
@@ -116,7 +115,7 @@ func (t *TextBlock) Touch() {
 }
 func (t *TextBlock) GetAnsiCode(defaultColor Color.Color) string {
 	if t.isChanged {
-		t.ansiCode = t.getFullText()
+		t.ansiCode = t.getTextWithAnsi()
 		t.isChanged = false
 	}
 	return t.ansiCode
@@ -129,6 +128,13 @@ func (t *TextBlock) SetPos(x, y int) {
 
 func (t *TextBlock) GetSize() (int, int) {
 	return t.xSize, t.ySize
+}
+func (t *TextBlock) ForceSetCurrentCharacter(character int) {
+	t.currentOffsetChar = 0
+	if character >= t.xSize {
+		t.currentOffsetChar = character - t.xSize
+	}	
+	t.currentCharacter = character
 }
 
 func (t *TextBlock) ForceSetCurrentLine(line int) {
@@ -168,24 +174,20 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
 		xRelative = t.lines[yRelative].totalChar
 	}
 	if isXChanged {
-		if xRelative > t.currentCharacter {
-			t.preLenght = t.currentCharacter + 1
-		} else {
-			t.preLenght = t.currentCharacter - 1
-		}
-		t.currentCharacter = xRelative
+		t.preLenght = xRelative
+		t.ForceSetCurrentCharacter(xRelative)
 	}
 	if isYChanged {
 		if t.lines[yRelative].totalChar > t.preLenght {
-			t.currentCharacter = t.preLenght
-			xRelative = t.currentCharacter
+			t.ForceSetCurrentCharacter(t.preLenght)
+			xRelative = t.preLenght
 		} else {
-			t.currentCharacter = t.lines[yRelative].totalChar
-			xRelative = t.currentCharacter
+			t.ForceSetCurrentCharacter(t.lines[yRelative].totalChar)
+			xRelative = t.lines[yRelative].totalChar
 		}
 		t.ForceSetCurrentLine(yRelative)
 	}
-	return xRelative + t.xPos, yRelative + t.yPos
+	return xRelative + t.xPos , yRelative + t.yPos
 
 }
 
@@ -209,10 +211,10 @@ func (t *TextBlock) Type(char rune) {
 			newLine := t.lines[t.currentLine-1].split(t.currentCharacter)
 			t.lines = slices.Concat(t.lines[:t.currentLine], []*lineText{newLine}, t.lines[t.currentLine:])
 		}
-		t.currentCharacter = 0
+		t.ForceSetCurrentCharacter(0)
 	} else {
 		t.lines[t.currentLine].digit(char, t.currentCharacter)
-		t.currentCharacter++
+		t.ForceSetCurrentCharacter(t.currentCharacter + 1)
 		t.preLenght = t.currentCharacter
 	}
 	t.Touch()
@@ -229,7 +231,7 @@ func (t *TextBlock) Delete() {
 	defer t.Touch()
 	if t.currentCharacter == 0 {
 		if t.currentLine-1 >= 0 {
-			t.currentCharacter = t.lines[t.currentLine-1].totalChar
+			t.ForceSetCurrentCharacter(t.lines[t.currentLine-1].totalChar)
 			t.preLenght = t.currentCharacter
 			t.lines[t.currentLine-1].merge(t.lines[t.currentLine])
 			t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
@@ -240,7 +242,7 @@ func (t *TextBlock) Delete() {
 	}
 	deleteLine := t.lines[t.currentLine].delete(t.currentCharacter)
 	t.preLenght = t.currentCharacter - 1
-	t.currentCharacter--
+	t.ForceSetCurrentCharacter(t.currentCharacter - 1)
 	if deleteLine {
 		t.totalLine--
 		t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
@@ -249,10 +251,10 @@ func (t *TextBlock) Delete() {
 			t.lines = []*lineText{CreateLineText(t.initialCapacity)}
 			t.currentLine = 0
 			t.totalLine = 1
-			t.currentCharacter = 0
+			t.ForceSetCurrentCharacter(0)
 			return
 		}
-		t.currentCharacter = t.lines[t.currentLine].totalChar
+		t.ForceSetCurrentCharacter(t.lines[t.currentLine].totalChar)
 	}
 }
 func (t *TextBlock) GetPos() (int, int) {
@@ -266,14 +268,25 @@ func (t *TextBlock) GetVisibility() bool {
 }
 
 // todo da inserire i colori
-func (t *TextBlock) getFullText() string {
+func (t *TextBlock) getTextWithAnsi() string {
 	full := strings.Builder{}
 	for i, line := range t.lines {
 		if line == nil {
 			break
 		}
 		full.WriteString(U.GetAnsiMoveTo(t.xPos, t.yPos+i))
-		full.WriteString(line.getText())
+		full.WriteString(line.getText()[t.currentOffsetChar:])
+	}
+	return full.String()
+}
+
+func (t *TextBlock) getText() string {
+	full := strings.Builder{}
+	for _, line := range t.lines {
+		if line == nil {
+			break
+		}
+		full.WriteString(line.getText()[t.currentOffsetChar:]+"\n")
 	}
 	return full.String()
 }
