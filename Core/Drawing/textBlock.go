@@ -129,12 +129,18 @@ func (t *TextBlock) SetPos(x, y int) {
 func (t *TextBlock) GetSize() (int, int) {
 	return t.xSize, t.ySize
 }
-func (t *TextBlock) ForceSetCurrentCharacter(character int) {
+func (t *TextBlock) ForceSetCurrentCharacter(x int) {
 	t.currentOffsetChar = 0
-	if character >= t.xSize {
-		t.currentOffsetChar = character - t.xSize
-	}	
-	t.currentCharacter = character
+	if x >= t.xSize {
+		if x > 0 {
+			t.currentOffsetChar = x - t.xSize
+		}
+	}
+	if x >= 0 {
+		t.currentCharacter = x
+	}else{
+		t.currentOffsetChar -= x
+	}
 }
 
 func (t *TextBlock) ForceSetCurrentLine(line int) {
@@ -150,21 +156,16 @@ func (t *TextBlock) ForceSetCurrentLine(line int) {
 func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
 	xRelative := x - t.xPos
 	yRelative := y - t.yPos
-
-	if xRelative < 0 {
-		xRelative = 0
-	}
 	if yRelative < 0 {
 		yRelative = 0
-	}
-
-	if xRelative >= t.xSize {
-		return t.xSize, y //gestire lo scrolling del testo
 	}
 	if yRelative >= t.ySize {
 		return x, t.ySize
 	}
-
+	xOffset := 0
+	if xRelative > t.ySize {
+		xOffset = xRelative - t.xSize
+	}
 	isYChanged := yRelative != t.currentLine
 	isXChanged := xRelative != t.currentCharacter
 	if yRelative >= len(t.lines) {
@@ -174,8 +175,8 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
 		xRelative = t.lines[yRelative].totalChar
 	}
 	if isXChanged {
-		t.preLenght = xRelative
 		t.ForceSetCurrentCharacter(xRelative)
+		t.preLenght = xRelative + xOffset
 	}
 	if isYChanged {
 		if t.lines[yRelative].totalChar > t.preLenght {
@@ -185,7 +186,7 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
 		}
 		t.ForceSetCurrentLine(yRelative)
 	}
-	return t.currentCharacter + t.xPos , yRelative + t.yPos
+	return t.currentCharacter + t.xPos - xOffset, yRelative + t.yPos
 
 }
 
@@ -193,7 +194,7 @@ func (t *TextBlock) GetTotalCursor() (int, int) {
 	return t.lines[t.currentLine].totalChar, t.totalLine
 }
 func (t *TextBlock) GetCurrentCursor() (int, int) {
-	return t.currentCharacter, t.currentLine
+	return t.currentCharacter - t.currentOffsetChar, t.currentLine
 }
 func (t *TextBlock) Type(char rune) {
 	if char == '\n' {
@@ -273,7 +274,13 @@ func (t *TextBlock) getTextWithAnsi() string {
 			break
 		}
 		full.WriteString(U.GetAnsiMoveTo(t.xPos, t.yPos+i))
-		full.WriteString(line.getText()[t.currentOffsetChar:])
+		text := line.getText()
+		if len(text) > t.currentOffsetChar+t.xSize {
+			text = text[t.currentOffsetChar : t.currentOffsetChar+t.xSize]
+		} else {
+			text = text[t.currentOffsetChar:]
+		}
+		full.WriteString(text)
 	}
 	return full.String()
 }
@@ -284,7 +291,7 @@ func (t *TextBlock) getText() string {
 		if line == nil {
 			break
 		}
-		full.WriteString(line.getText()[t.currentOffsetChar:]+"\n")
+		full.WriteString(line.getText()[t.currentOffsetChar:t.currentOffsetChar+t.xSize] + "\n")
 	}
 	return full.String()
 }
