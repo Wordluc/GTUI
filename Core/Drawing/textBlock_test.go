@@ -245,9 +245,26 @@ func TestNewLineFromWhiteLine(t *testing.T) {
 	}
 }
 
-func TestGoOutCharacter (t *testing.T){
+func TestWriteOutSize(t *testing.T){
   TextBlock:=CreateTextBlock(0,0,4,100,1)
-  types(TextBlock,"ciao3")
+  types(TextBlock,"ciao3comeStai")
+	if TextBlock.getText() != "Stai\n" {
+		t.Errorf("expected %v, got %v", "Stai", TextBlock.getText())
+	}
+	TextBlock.SetCurrentCursor(5,0)
+	println(TextBlock.currentOffsetChar)
+	if TextBlock.getText() != "Stai\n" {
+		t.Errorf("expected %v, got %v", "Stai", TextBlock.getText())
+	}
+}
+func TestGoToOutSize(t *testing.T){
+  TextBlock:=CreateTextBlock(0,0,4,100,1)
+  types(TextBlock,"ciao3comeStai")
+	if TextBlock.getText() != "Stai\n" {
+		t.Errorf("expected %v, got %v", "Stai", TextBlock.getText())
+	}
+	TextBlock.SetCurrentCursor(5,0)
+	println(TextBlock.currentOffsetChar)
 	if TextBlock.getText() != "iao3\n" {
 		t.Errorf("expected %v, got %v", "iao3", TextBlock.getText())
 	}
