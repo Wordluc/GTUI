@@ -247,9 +247,9 @@ func TestNewLineFromWhiteLine(t *testing.T) {
 }
 
 func TestGoOutCharacter (t *testing.T){
-  TextBlock:=CreateTextBlock(0,0,5,100,1)
+  TextBlock:=CreateTextBlock(0,0,4,100,1)
   types(TextBlock,"ciao3")
-	if TextBlock.getFullText()[6:] != "ciao3" {
-		t.Errorf("expected %v, got %v", "ciao3", TextBlock.getFullText()[6:])
+	if TextBlock.getText() != "iao3\n" {
+		t.Errorf("expected %v, got %v", "iao3", TextBlock.getText())
 	}
 }
