@@ -141,35 +141,6 @@ func (t *TextBlock) ForceSetCurrentLine(line int) {
 	}
 }
 
-//is necessary to move one coordinate at time
-//func (t *TextBlock) SetCurrentCursor(ichar int, line int) {
-//	isYChanged := line != t.currentLine
-//	isXChanged := line == t.currentLine && ichar != t.currentCharacter
-//	if isXChanged {
-//		if ichar > t.currentCharacter {
-//			t.preLenght = t.currentCharacter + 1
-//		} else {
-//			t.preLenght = t.currentCharacter - 1
-//		}
-//		t.ForceSetCurrentChar(ichar)
-//	}
-//	if isYChanged {
-//		t.ForceSetCurrentLine(line)
-//		maxX, _ := t.GetTotalCursor()
-//		if t.preLenght > maxX {
-//			t.ForceSetCurrentChar(maxX)
-//		} else {
-//			t.ForceSetCurrentChar(t.preLenght)
-//		}
-//	}
-//}
-/*
-It gets where i want the cursor go, and i return the new position
-In this way i can manage the relative position with long text
-func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
-	...
-}
-*/
 func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
 	xRelative := x - t.xPos
 	yRelative := y - t.yPos
@@ -207,8 +178,10 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
 	if isYChanged {
 		if t.lines[yRelative].totalChar > t.preLenght {
 			t.currentCharacter = t.preLenght
+			xRelative = t.currentCharacter
 		} else {
 			t.currentCharacter = t.lines[yRelative].totalChar
+			xRelative = t.currentCharacter
 		}
 		t.ForceSetCurrentLine(yRelative)
 	}
