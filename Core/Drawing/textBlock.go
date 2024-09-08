@@ -130,17 +130,7 @@ func (t *TextBlock) GetSize() (int, int) {
 	return t.xSize, t.ySize
 }
 func (t *TextBlock) ForceSetCurrentCharacter(x int) {
-	t.currentOffsetChar = 0
-	if x >= t.xSize {
-		if x > 0 {
-			t.currentOffsetChar = x - t.xSize
-		}
-	}
-	if x >= 0 {
-		t.currentCharacter = x
-	}else{
-		t.currentOffsetChar -= x
-	}
+	t.currentCharacter = x
 }
 
 func (t *TextBlock) ForceSetCurrentLine(line int) {
@@ -162,21 +152,19 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
 	if yRelative >= t.ySize {
 		return x, t.ySize
 	}
-	xOffset := 0
-	if xRelative > t.ySize {
-		xOffset = xRelative - t.xSize
-	}
 	isYChanged := yRelative != t.currentLine
 	isXChanged := xRelative != t.currentCharacter
+
 	if yRelative >= len(t.lines) {
 		yRelative = len(t.lines) - 1
 	}
 	if xRelative >= t.lines[yRelative].totalChar {
 		xRelative = t.lines[yRelative].totalChar
 	}
+
 	if isXChanged {
 		t.ForceSetCurrentCharacter(xRelative)
-		t.preLenght = xRelative + xOffset
+		t.preLenght = xRelative
 	}
 	if isYChanged {
 		if t.lines[yRelative].totalChar > t.preLenght {
@@ -186,7 +174,7 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {
 		}
 		t.ForceSetCurrentLine(yRelative)
 	}
-	return t.currentCharacter + t.xPos - xOffset, yRelative + t.yPos
+	return t.currentCharacter + t.xPos, yRelative + t.yPos
 
 }
 
@@ -203,10 +191,7 @@ func (t *TextBlock) Type(char rune) {
 		if t.currentLine >= len(t.lines) {
 			t.lines = append(t.lines, CreateLineText(t.initialCapacity))
 		}
-		if t.lines[t.currentLine] == nil {
-			t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
-		}
-		if t.currentCharacter <= t.lines[t.currentLine-1].totalChar {
+		if t.currentCharacter > 0 && t.currentCharacter < t.lines[t.currentLine-1].totalChar {
 			newLine := t.lines[t.currentLine-1].split(t.currentCharacter)
 			t.lines = slices.Concat(t.lines[:t.currentLine], []*lineText{newLine}, t.lines[t.currentLine:])
 		}
