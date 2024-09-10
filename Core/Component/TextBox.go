@@ -19,7 +19,7 @@ type TextBox struct {
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
-	textBox := Drawing.CreateTextBlock(1, 1, sizeX-1, sizeY-1,  10)
+	textBox := Drawing.CreateTextBlock(1, 1, sizeX-2, sizeY-2,  10)
 	cont.AddChild(rect)
 	cont.AddChild(textBox)
 	cont.SetPos(x, y)
@@ -99,7 +99,7 @@ func (b *TextBox) DiffTotalToXY(x, y int) (int, int) {
 	x = x - xP
 	y = y - yP
 	diffX, diffY := b.textBlock.GetTotalCursor()
-	diffX = diffX - x 
+	diffX = diffX - x - 1
 	diffY = diffY - y - 1
 	return diffX, diffY
 }

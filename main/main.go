@@ -8,12 +8,13 @@ import (
 	"GTUI/Terminal"
 )
 
-var core *Core.Gtui 
+var core *Core.Gtui
 var components []Component.IComponent
+
 func main() {
-	kbr:=Keyboard.NewKeyboard()
-  core,_=Core.NewGtui(loop,kbr,&Terminal.Terminal{})
-	xS,yS:=20,20
+	kbr := Keyboard.NewKeyboard()
+	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
+	xS, yS := 20, 20
 	c := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
 	c.StartTyping()
 	components = append(components, c)
@@ -22,7 +23,7 @@ func main() {
 	core.Start()
 }
 
-func loop(keyb Kd.IKeyBoard) bool{
+func loop(keyb Kd.IKeyBoard) bool {
 	var x, y = core.GetCur()
 	if keyb.IsKeySPressed(Kd.KeyArrowDown) {
 		y++
