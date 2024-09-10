@@ -215,7 +215,10 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {//sistemare la logica
 			if nSlide<0{
 				nSlide=0
 			}
-			t.xRelativeMinSize=nSlide+1
+			t.xRelativeMinSize=nSlide
+			if t.preLenght>t.xSize-1{
+				t.xRelativeMinSize=nSlide+1
+			}
 			if t.xRelativeMinSize<0{
 				t.xRelativeMinSize=0
 			}
@@ -226,7 +229,10 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {//sistemare la logica
 			if nSlide<0{
 				nSlide=0
 			}
-			t.xRelativeMinSize=nSlide+1
+			t.xRelativeMinSize=nSlide
+			if t.lines[yRelative].totalChar>t.xSize-1{
+				t.xRelativeMinSize=nSlide+1
+			}
 			if t.xRelativeMinSize<0{
 				t.xRelativeMinSize=0
 			}
@@ -319,6 +325,8 @@ func (t *TextBlock) parseText(text string) string {
 	size := len(text)
 	if size > t.xRelativeMinSize{
 		start = t.xRelativeMinSize
+	}else{
+		return ""
 	}
 	if size > t.xRelativeMaxSize {
 		size = t.xRelativeMaxSize
