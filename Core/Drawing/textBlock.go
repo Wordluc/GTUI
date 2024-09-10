@@ -103,13 +103,14 @@ func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock
 		lines:            lines,
 		xPos:             x,
 		yPos:             y,
-		xSize:            xSize,
+		xSize:            xSize+1,
 		ySize:            ySize,
 		xRelativeMinSize: 0,
-		xRelativeMaxSize: xSize,
+		xRelativeMaxSize: xSize+1,
 		currentLine:      0,
 		initialCapacity:  initialCapacity,
 		totalLine:        1,
+		absoluteCurrentCharacter:0,
 	}
 }
 
@@ -167,7 +168,7 @@ func (t *TextBlock) ForceSetRelativeCharacter(x int) {
 func (t *TextBlock) ResetCurrentCharacter() {
 	t.absoluteCurrentCharacter = 0
 	t.xRelativeMinSize = 0
-	t.xRelativeMaxSize = t.xSize-1
+	t.xRelativeMaxSize = t.xSize
 	t.preLenght=0
 }
 func (t *TextBlock) GetRelativeCurrentCharacter() int {
@@ -209,14 +210,14 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {//sistemare la logica
 		t.ForceSetRelativeCharacter(xRelative)
 		t.preLenght = t.absoluteCurrentCharacter
 	}
-	if isYChanged {
+	if isYChanged {//TODO: da refattorizzare
 		if t.lines[yRelative].totalChar > t.preLenght {
 			nSlide:=t.preLenght-t.xSize
 			if nSlide<0{
 				nSlide=0
 			}
 			t.xRelativeMinSize=nSlide
-			if t.preLenght>t.xSize-1{
+			if t.preLenght>=t.xSize{
 				t.xRelativeMinSize=nSlide+1
 			}
 			if t.xRelativeMinSize<0{
@@ -230,7 +231,7 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) {//sistemare la logica
 				nSlide=0
 			}
 			t.xRelativeMinSize=nSlide
-			if t.lines[yRelative].totalChar>t.xSize-1{
+			if t.lines[yRelative].totalChar>=t.xSize{
 				t.xRelativeMinSize=nSlide+1
 			}
 			if t.xRelativeMinSize<0{
@@ -253,13 +254,14 @@ func (t *TextBlock) GetCurrentCursor() (int, int) {
 	return t.GetRelativeCurrentCharacter(), t.currentLine
 }
 func (t *TextBlock) Type(char rune) {
+	defer t.Touch()
 	if char == '\n' {
 		t.totalLine++
 		t.currentLine++
 		if t.currentLine >= len(t.lines) {
 			t.lines = append(t.lines, CreateLineText(t.initialCapacity))
-		}
-		if t.absoluteCurrentCharacter > 0 && t.absoluteCurrentCharacter < t.lines[t.currentLine-1].totalChar {
+		}	
+		if t.absoluteCurrentCharacter <= t.lines[t.currentLine-1].totalChar {
 			newLine := t.lines[t.currentLine-1].split(t.absoluteCurrentCharacter)
 			t.lines = slices.Concat(t.lines[:t.currentLine], []*lineText{newLine}, t.lines[t.currentLine:])
 		}
@@ -269,7 +271,6 @@ func (t *TextBlock) Type(char rune) {
 		t.ForceSetRelativeCharacter(t.GetRelativeCurrentCharacter()+1)
 		t.preLenght = t.absoluteCurrentCharacter
 	}
-	t.Touch()
 }
 func printArray(array []rune) {
 	for i, v := range array {
@@ -328,11 +329,11 @@ func (t *TextBlock) parseText(text string) string {
 	}else{
 		return ""
 	}
-	if size > t.xRelativeMaxSize {
-		size = t.xRelativeMaxSize
+	if size > t.xRelativeMaxSize-1 {
+		size = t.xRelativeMaxSize-1
 	}//i valori size and start devono globali
-	if diff:=size-start;diff>t.xSize-1{
-		start+=diff-t.xSize+1
+	if diff:=size-start;diff>t.xSize{
+		start+=diff-t.xSize
 	}
 	return text[start:size]
 }

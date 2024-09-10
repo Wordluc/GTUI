@@ -209,6 +209,22 @@ func TestNewLineInTheMiddleOfText1(t *testing.T) {
 		t.Errorf("expected %v, got %v", "a1", textBlock.lines[1].getText())
 	}
 }
+func TestCreateNewLineFromTwoLines(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	types(textBlock, "123a1")
+	types(textBlock, "aaaaaaa")
+	textBlock.SetCurrentCursor(5, 0)
+	textBlock.Type('\n')
+	if textBlock.lines[0].getText() != "123a1\n" {
+		t.Errorf("expected %v, got %v", "123a1", textBlock.lines[0].getText())
+	}
+	if textBlock.lines[1].getText() != "\n" {
+		t.Errorf("expected %v, got %v", "", textBlock.lines[1].getText())
+	}
+	if textBlock.lines[2].getText() != "aaaaaaa\n" {
+		t.Errorf("expected %v, got %v", "aaaaaaa", textBlock.lines[2].getText())
+	}
+}
 func TestNewLineInTheMiddleOfText2(t *testing.T) {
 	textBlock := CreateTextBlock(0, 0, 10, 100,1)
 	types(textBlock, "123a1\nciao2 prova\ngggg")
