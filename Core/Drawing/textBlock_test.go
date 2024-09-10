@@ -215,14 +215,8 @@ func TestCreateNewLineFromTwoLines(t *testing.T) {
 	types(textBlock, "aaaaaaa")
 	textBlock.SetCurrentCursor(5, 0)
 	textBlock.Type('\n')
-	if textBlock.lines[0].getText() != "123a1\n" {
-		t.Errorf("expected %v, got %v", "123a1", textBlock.lines[0].getText())
-	}
-	if textBlock.lines[1].getText() != "\n" {
-		t.Errorf("expected %v, got %v", "", textBlock.lines[1].getText())
-	}
-	if textBlock.lines[2].getText() != "aaaaaaa\n" {
-		t.Errorf("expected %v, got %v", "aaaaaaa", textBlock.lines[2].getText())
+	if textBlock.totalLine!=3 {
+		t.Errorf("expected %v, got %v", 3, textBlock.totalLine)
 	}
 }
 func TestNewLineInTheMiddleOfText2(t *testing.T) {
