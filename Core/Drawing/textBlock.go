@@ -199,7 +199,7 @@ func (t *TextBlock) SetCursor_Absolute(x int) {//TODO da gestire la y
 		nSlide = 0
 	}
 	t.xRelativeMinSize = nSlide
-	if x > t.xSize {
+	if x >= t.xSize {
 		nSlide++
 	}
 	t.xRelativeMinSize = nSlide
