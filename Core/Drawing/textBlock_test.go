@@ -54,7 +54,7 @@ func TestComeBackTypingAfterNewLine(t *testing.T) {
 	if textBlock.absoluteCurrentCharacter != 0 {
 		t.Errorf("expected %v, got %v", 0, textBlock.absoluteCurrentCharacter)
 	}
-	textBlock.ForceSetCurrentLine(0)
+	textBlock.SetYCursor_Absolute(0)
 	if textBlock.currentLine != 0 {
 		t.Errorf("expected %v, got %v", 0, textBlock.currentLine)
 	}
