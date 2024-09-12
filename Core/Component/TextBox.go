@@ -92,17 +92,6 @@ func (b *TextBox) GetGraphics() Core.IEntity {
 func (b *TextBox) IsTyping() bool {
 	return b.isTyping
 }
-//To delete, the work has to be done in the textBlock by SetCurrentCursor
-//so i can catch when move the cursor inside the textBlock but not move the real one outside of it
-func (b *TextBox) DiffTotalToXY(x, y int) (int, int) {
-	xP, yP := b.textBlock.GetPos()
-	x = x - xP
-	y = y - yP
-	diffX, diffY := b.textBlock.GetTotalCursor()
-	diffX = diffX - x - 1
-	diffY = diffY - y - 1
-	return diffX, diffY
-}
 
 func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 	xP, yP := b.textBlock.GetPos()

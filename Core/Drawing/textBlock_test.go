@@ -8,7 +8,7 @@ func types(textBlock *TextBlock, text string) {
 	}
 }
 func TestTypingInTextBlock(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('a')
 	textBlock.Type('2')
 	textBlock.Type('3')
@@ -39,7 +39,7 @@ func TestTypingInTextBlock(t *testing.T) {
 	}
 }
 func TestComeBackTypingAfterNewLine(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('a')
 	if textBlock.currentLine != 0 {
 		t.Errorf("expected %v, got %v", 0, textBlock.currentLine)
@@ -62,42 +62,42 @@ func TestComeBackTypingAfterNewLine(t *testing.T) {
 		t.Errorf("expected %v, got %v", 1, textBlock.lines[textBlock.currentLine].totalChar)
 	}
 }
+
 /*
 A2311
 NNN
 RRRR
 */
 func TestSetCurrentTextBlock(t *testing.T) {
-	textBlock := CreateTextBlock(70, 0, 10, 100,1)
+	textBlock := CreateTextBlock(70, 0, 10, 100, 1)
 	types(textBlock, "a2311\nnnn\nrrrr")
-	println(textBlock.preLenght)
 	x, y := textBlock.GetCurrentCursor()
-	x+=70
-	x,y=textBlock.SetCurrentCursor(x, y-1)
+	x += 70
+	x, y = textBlock.SetCurrentCursor(x, y-1)
 	if textBlock.preLenght != 4 {
 		t.Errorf("expected %v, got %v", 4, textBlock.preLenght)
 	}
-	x,y=textBlock.SetCurrentCursor(x-1, y)
+	x, y = textBlock.SetCurrentCursor(x-1, y)
 	if textBlock.absoluteCurrentCharacter != 2 || textBlock.currentLine != y {
 		t.Errorf("expected %v, %v, got %v, %v", 2, y, textBlock.absoluteCurrentCharacter, textBlock.currentLine)
 	}
-	x,y=textBlock.SetCurrentCursor(x, y-1)
+	x, y = textBlock.SetCurrentCursor(x, y-1)
 	if textBlock.preLenght != 2 {
 		t.Errorf("expected %v, got %v", 2, textBlock.preLenght)
 	}
 	if textBlock.absoluteCurrentCharacter != 2 || textBlock.currentLine != y {
 		t.Errorf("expected %v, %v, got %v, %v", 2, y, textBlock.absoluteCurrentCharacter, textBlock.currentLine)
 	}
-	x,y=textBlock.SetCurrentCursor(x+1, y+1)
+	x, y = textBlock.SetCurrentCursor(x+1, y+1)
 	if textBlock.preLenght != 3 {
 		t.Errorf("expected %v, got %v", 3, textBlock.preLenght)
 	}
 	if textBlock.absoluteCurrentCharacter != 3 || textBlock.currentLine != y {
 		t.Errorf("expected %v, %v, got %v, %v", 3, y, textBlock.absoluteCurrentCharacter, textBlock.currentLine)
 	}
-	x,y=textBlock.SetCurrentCursor(x, y-1)
-	x,y=textBlock.SetCurrentCursor(x+2, y)
-	x,y=textBlock.SetCurrentCursor(x, y+1)
+	x, y = textBlock.SetCurrentCursor(x, y-1)
+	x, y = textBlock.SetCurrentCursor(x+2, y)
+	x, y = textBlock.SetCurrentCursor(x, y+1)
 	if textBlock.absoluteCurrentCharacter != 3 || textBlock.currentLine != y {
 		t.Errorf("expected %v, %v, got %v, %v", 4, y, textBlock.absoluteCurrentCharacter, textBlock.currentLine)
 	}
@@ -106,7 +106,7 @@ func TestSetCurrentTextBlock(t *testing.T) {
 	}
 }
 func TestComeBackTyping(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('u')
 	textBlock.Type('c')
 	textBlock.Type('a')
@@ -146,7 +146,7 @@ func TestDeleteTextline(t *testing.T) {
 	}
 }
 func TestDeleteLine(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('u')
 	textBlock.Type('\n')
 	textBlock.Type('a')
@@ -181,7 +181,7 @@ func TestDeleteLine(t *testing.T) {
 	}
 }
 func TestFromTwoLinesDoesOnelIne(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('c')
 	textBlock.Type('\n')
 	textBlock.Type('a')
@@ -198,7 +198,7 @@ func TestFromTwoLinesDoesOnelIne(t *testing.T) {
 	}
 }
 func TestNewLineInTheMiddleOfText1(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	types(textBlock, "123a1")
 	textBlock.SetCurrentCursor(3, 0)
 	textBlock.Type('\n')
@@ -210,17 +210,21 @@ func TestNewLineInTheMiddleOfText1(t *testing.T) {
 	}
 }
 func TestCreateNewLineFromTwoLines(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	types(textBlock, "123a1")
 	types(textBlock, "aaaaaaa")
+//123a1aaaaaaa
 	textBlock.SetCurrentCursor(5, 0)
 	textBlock.Type('\n')
-	if textBlock.totalLine!=3 {
-		t.Errorf("expected %v, got %v", 3, textBlock.totalLine)
+	if textBlock.totalLine != 2 {
+		t.Errorf("expected %v, got %v", 2, textBlock.totalLine)
+	}
+	if textBlock.getText() != "123a1aa\naaaaa\n" {
+		t.Errorf("expected \n%v\n\ngot\n \n%v", "123a1aa\naaaaa", textBlock.getText())
 	}
 }
 func TestNewLineInTheMiddleOfText2(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	types(textBlock, "123a1\nciao2 prova\ngggg")
 	textBlock.SetCurrentCursor(4, 1)
 	textBlock.Type('\n')
@@ -244,7 +248,7 @@ func TestNewLineInTheMiddleOfText2(t *testing.T) {
 	}
 }
 func TestNewLineFromWhiteLine(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100,1)
+	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('\n')
 	textBlock.Type('c')
 	if textBlock.lines[0].getText() != "" {
@@ -255,34 +259,34 @@ func TestNewLineFromWhiteLine(t *testing.T) {
 	}
 }
 
-func TestWriteOutSize(t *testing.T){
-  TextBlock:=CreateTextBlock(0,0,4,100,1)
-  types(TextBlock,"ciao3comeStai")
+func TestWriteOutSize(t *testing.T) {
+	TextBlock := CreateTextBlock(0, 0, 4, 100, 1)
+	types(TextBlock, "ciao3comeStai")
 	if TextBlock.getText() != "Stai\n" {
 		t.Errorf("expected %v, got %v", "Stai", TextBlock.getText())
 	}
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
 	if TextBlock.getText() != "come\n" {
 		t.Errorf("expected %v, got %v", "come", TextBlock.getText())
 	}
 }
-func TestGoToOutSize(t *testing.T){
-  TextBlock:=CreateTextBlock(0,0,4,100,1)
-  types(TextBlock,"ciao3comeStai")
+func TestGoToOutSize(t *testing.T) {
+	TextBlock := CreateTextBlock(0, 0, 4, 100, 1)
+	types(TextBlock, "ciao3comeStai")
 	if TextBlock.getText() != "Stai\n" {
 		t.Errorf("expected %v, got %v", "Stai", TextBlock.getText())
-	}//Creare helper method for this
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
-	TextBlock.SetCurrentCursor(-1,0)
+	} //Creare helper method for this
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
+	TextBlock.SetCurrentCursor(-1, 0)
 	if TextBlock.getText() != "iao3\n" {
 		t.Errorf("expected %v, got %v", "iao3", TextBlock.getText())
 	}
