@@ -252,13 +252,14 @@ func (t *TextBlock) Type(char rune) {
 	if char == '\n' {
 		t.totalLine++
 		t.currentLine++
-		if t.currentLine >= len(t.lines) {
-			t.lines = append(t.lines, CreateLineText(t.initialCapacity))
-		}
 		if t.absoluteCurrentCharacter <= t.lines[t.currentLine-1].totalChar {
 			newLine := t.lines[t.currentLine-1].split(t.absoluteCurrentCharacter)
 			t.lines = slices.Concat(t.lines[:t.currentLine], []*lineText{newLine}, t.lines[t.currentLine:])
 			t.ResetCurrentCharacter()
+			return
+		}
+		if t.currentLine >= len(t.lines) {
+			t.lines = append(t.lines, CreateLineText(t.initialCapacity))
 			return
 		}
 	} else {
