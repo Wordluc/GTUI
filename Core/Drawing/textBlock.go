@@ -134,10 +134,10 @@ func (t *TextBlock) GetSize() (int, int) {
 	return t.xSize, t.ySize
 }
 
-// /Set the absolute character position,
-// /if x==size the text is slided to the right
-// /if x==-1 the text is slided to the left
-func (t *TextBlock) ForceSetRelativeCharacter(x int) {
+///Set the absolute character position,
+///if x==size the text is slided to the right
+///if x==-1 the text is slided to the left
+func (t *TextBlock) SetRelativeCharacter(x int) {
 	t.Touch()
 	if x == t.xSize {
 		if t.absoluteCurrentCharacter == t.lines[t.currentLine].totalChar {
@@ -166,8 +166,34 @@ func (t *TextBlock) ForceSetRelativeCharacter(x int) {
 	t.absoluteCurrentCharacter = t.xRelativeMinSize + x
 }
 
-// / Set the absolute character position,x is absolute
-func (t *TextBlock) SetAbsoluteCurrentCharacter(x int) {
+
+func (t *TextBlock) ResetCurrentCharacter() {
+	t.absoluteCurrentCharacter = 0
+	t.xRelativeMinSize = 0
+	t.xRelativeMaxSize = t.xSize
+	t.preLenght = 0
+}
+
+func (t *TextBlock) GetRelativeCursorCharacter() int {
+	if r := t.absoluteCurrentCharacter - t.xRelativeMinSize; r < 0 {
+		return 0
+	} else {
+		return r
+	}
+}
+
+func (t *TextBlock) ForceSetCurrentLine(line int) {
+	if line >= len(t.lines) {
+		return
+	}
+	t.currentLine = line
+	if t.lines[t.currentLine] == nil {
+		t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
+	}
+}
+
+/// Set the absolute character position,x is absolute
+func (t *TextBlock) SetCursor_Absolute(x int) {//TODO da gestire la y
 	nSlide := x - t.xSize
 	if nSlide < 0 {
 		nSlide = 0
@@ -183,30 +209,8 @@ func (t *TextBlock) SetAbsoluteCurrentCharacter(x int) {
 	}
 	t.absoluteCurrentCharacter = x
 }
-func (t *TextBlock) ResetCurrentCharacter() {
-	t.absoluteCurrentCharacter = 0
-	t.xRelativeMinSize = 0
-	t.xRelativeMaxSize = t.xSize
-	t.preLenght = 0
-}
-func (t *TextBlock) GetRelativeCurrentCharacter() int {
-	if r := t.absoluteCurrentCharacter - t.xRelativeMinSize; r < 0 {
-		return 0
-	} else {
-		return r
-	}
-}
-func (t *TextBlock) ForceSetCurrentLine(line int) {
-	if line >= len(t.lines) {
-		return
-	}
-	t.currentLine = line
-	if t.lines[t.currentLine] == nil {
-		t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
-	}
-}
 
-func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) { //sistemare la logica di cambio y
+func (t *TextBlock) SetCursor_Relative(x, y int) (int, int) {
 	xRelative := x - t.xPos
 	yRelative := y - t.yPos
 
@@ -217,7 +221,7 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) { //sistemare la logic
 		return x, t.ySize
 	}
 	isYChanged := yRelative != t.currentLine
-	isXChanged := xRelative != t.GetRelativeCurrentCharacter()
+	isXChanged := xRelative != t.GetRelativeCursorCharacter()
 	if yRelative >= len(t.lines) {
 		yRelative = len(t.lines) - 1
 	}
@@ -225,28 +229,29 @@ func (t *TextBlock) SetCurrentCursor(x, y int) (int, int) { //sistemare la logic
 		xRelative = t.lines[yRelative].totalChar
 	}
 	if isXChanged {
-		t.ForceSetRelativeCharacter(xRelative)
+		t.SetRelativeCharacter(xRelative)
 		t.preLenght = t.absoluteCurrentCharacter
 	}
-	if isYChanged { //TODO: da refattorizzare
+	if isYChanged {	
 		if t.lines[yRelative].totalChar > t.preLenght {
-			t.SetAbsoluteCurrentCharacter(t.preLenght)
+			t.SetCursor_Absolute(t.preLenght)
 		} else {
-			t.SetAbsoluteCurrentCharacter(t.lines[yRelative].totalChar)
+			t.SetCursor_Absolute(t.lines[yRelative].totalChar)
 		}
 		t.ForceSetCurrentLine(yRelative)
 	}
 	t.Touch()
-	return t.GetRelativeCurrentCharacter() + t.xPos, yRelative + t.yPos
-
+	return t.GetRelativeCursorCharacter() + t.xPos, yRelative + t.yPos
 }
 
 func (t *TextBlock) GetTotalCursor() (int, int) {
 	return t.lines[t.currentLine].totalChar, t.totalLine
 }
+
 func (t *TextBlock) GetCurrentCursor() (int, int) {
-	return t.GetRelativeCurrentCharacter(), t.currentLine
+	return t.GetRelativeCursorCharacter(), t.currentLine
 }
+
 func (t *TextBlock) Type(char rune) {
 	defer t.Touch()
 	if char == '\n' {
@@ -257,15 +262,12 @@ func (t *TextBlock) Type(char rune) {
 		t.ResetCurrentCharacter()
 	} else {
 		t.lines[t.currentLine].digit(char, t.absoluteCurrentCharacter)
-		t.ForceSetRelativeCharacter(t.GetRelativeCurrentCharacter() + 1)
+		t.SetRelativeCharacter(t.GetRelativeCursorCharacter() + 1)
 		t.preLenght = t.absoluteCurrentCharacter
 	}
 }
-func printArray(array []rune) {
-	for i, v := range array {
-		println(i, ":", string(v))
-	}
-}
+
+///Delete the current character and move the cursor to the left
 func (t *TextBlock) Delete() {
 	if t.totalLine == 1 && t.absoluteCurrentCharacter == 0 {
 		return
@@ -273,7 +275,7 @@ func (t *TextBlock) Delete() {
 	defer t.Touch()
 	if t.absoluteCurrentCharacter == 0 {
 		if t.currentLine-1 >= 0 {
-			t.SetAbsoluteCurrentCharacter(t.lines[t.currentLine-1].totalChar)
+			t.SetCursor_Absolute(t.lines[t.currentLine-1].totalChar)
 			t.preLenght = t.absoluteCurrentCharacter
 			t.lines[t.currentLine-1].merge(t.lines[t.currentLine])
 			t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
@@ -284,7 +286,7 @@ func (t *TextBlock) Delete() {
 	}
 	deleteLine := t.lines[t.currentLine].delete(t.absoluteCurrentCharacter)
 	t.preLenght = t.absoluteCurrentCharacter - 1
-	t.SetAbsoluteCurrentCharacter(t.absoluteCurrentCharacter - 1)
+	t.SetCursor_Absolute(t.absoluteCurrentCharacter - 1)
 	if deleteLine {
 		t.totalLine--
 		t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
@@ -296,20 +298,23 @@ func (t *TextBlock) Delete() {
 			t.ResetCurrentCharacter()
 			return
 		}
-		t.SetAbsoluteCurrentCharacter(t.lines[t.currentLine].totalChar)
+		t.SetCursor_Absolute(t.lines[t.currentLine].totalChar)
 	}
 }
+
 func (t *TextBlock) GetPos() (int, int) {
 	return t.xPos, t.yPos
 }
+
 func (t *TextBlock) SetVisibility(visible bool) {
 	t.visible = visible
 }
+
 func (t *TextBlock) GetVisibility() bool {
 	return t.visible
 }
 
-// todo da inserire i colori
+//TODO da inserire i colori
 func (t *TextBlock) parseText(text string) string {
 	start := 0
 	size := len(text)
@@ -326,6 +331,7 @@ func (t *TextBlock) parseText(text string) string {
 	}
 	return text[start:size]
 }
+
 func (t *TextBlock) getTextWithAnsi() string {
 	full := strings.Builder{}
 	for i, line := range t.lines {
