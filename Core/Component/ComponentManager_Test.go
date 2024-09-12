@@ -104,7 +104,7 @@ func TestDiffWithComponent(t *testing.T) {
 	from := []IComponent{&b}
 	to := []IComponent{&b}
 	result := []IComponent{}
-	if !slices.Equal(Utils.Diff(from, to), result) {
+	if !slices.Equal(Utils.GetDiff(from, to), result) {
 		t.Errorf("Diff failed")
 	}
 }
