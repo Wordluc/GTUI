@@ -14,3 +14,8 @@ func Diff[element comparable](from []element, to []element)[]element {
 	}
 	return result
 }
+func printArray(array []rune) {
+	for i, v := range array {
+		println(i, ":", string(v))
+	}
+}

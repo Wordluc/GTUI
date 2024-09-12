@@ -39,12 +39,13 @@ func (b *TextBox) loopTyping() {
 		if !b.isTyping {
 			return
 		}
-    key=rune(str[0])
-		if key=='\b'{
-			b.textBlock.Delete()
-			continue
-		} 
-		b.textBlock.Type(key)
+		for _,key=range str{
+			if key=='\b'{
+				b.textBlock.Delete()
+				continue
+			} 
+			b.textBlock.Type(key)
+		}
 	}
 }
 
@@ -103,7 +104,7 @@ func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 	return diffX, diffY
 }
 func (b *TextBox) SetCurrentPosCursor(x, y int)(int,int) {
-	return b.textBlock.SetCurrentCursor(x, y)
+	return b.textBlock.SetCursor_Relative(x, y)
 }
 func (b *TextBox) getShape() (InteractiveShape, error) {
 	x, y := b.textBlock.GetPos()
