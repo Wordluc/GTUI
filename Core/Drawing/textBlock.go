@@ -108,9 +108,9 @@ func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock
 		xSize:                    xSize + 1,
 		ySize:                    ySize,
 		xRelativeMinSize:         0,
-		xRelativeMaxSize:         xSize + 1,
 		yRelativeMinSize:         0,
-		yRelativeMaxSize:         ySize + 1,
+		xRelativeMaxSize:         xSize + 1,
+		yRelativeMaxSize:         ySize,
 		currentLine:              0,
 		initialCapacity:          initialCapacity,
 		totalLine:                1,
@@ -123,7 +123,7 @@ func (t *TextBlock) Touch() {
 }
 func (t *TextBlock) GetAnsiCode(defaultColor Color.Color) string {
 	if t.isChanged {
-		t.ansiCode = t.getTextWithAnsi()
+		t.ansiCode = t.GetText(true)
 		t.isChanged = false
 	}
 	return t.ansiCode
@@ -137,7 +137,6 @@ func (t *TextBlock) SetPos(x, y int) {
 func (t *TextBlock) GetSize() (int, int) {
 	return t.xSize, t.ySize
 }
-
 
 func (t *TextBlock) GetPos() (int, int) {
 	return t.xPos, t.yPos
@@ -159,24 +158,24 @@ func (t *TextBlock) GetCurrentCursor() (int, int) {
 	return t.GetXCursor_Relative(), t.GetYCursor_Relative()
 }
 
-///Set the absolute character position by loking at the relative position in the window,
-///if x>=size the text is slided to the right
-///if x<0 the text is slided to the left
+// /Set the absolute character position by loking at the relative position in the window,
+// /if x>=size the text is slided to the right
+// /if x<0 the text is slided to the left
 func (t *TextBlock) SetXCursor_Relative(x int) {
-	t.Touch()
+	defer t.Touch()
 	if x >= t.xSize {
-		if t.absoluteCurrentCharacter == t.lines[t.currentLine].totalChar {
+		if t.absoluteCurrentCharacter+x - t.xSize+1>t.lines[t.currentLine].totalChar {
 			return
 		}
-		t.xRelativeMaxSize+=x-t.xSize+1
-		t.xRelativeMinSize+=x-t.xSize+1
-		t.absoluteCurrentCharacter+=x-t.xSize+1
+		t.xRelativeMaxSize += x - t.xSize + 1
+		t.xRelativeMinSize += x - t.xSize + 1
+		t.absoluteCurrentCharacter += x - t.xSize + 1
 		return
 	}
-	if x <0 {
-		t.absoluteCurrentCharacter+=x
-		t.xRelativeMaxSize+=x
-		t.xRelativeMinSize+=x
+	if x < 0 {
+		t.absoluteCurrentCharacter += x
+		t.xRelativeMaxSize += x
+		t.xRelativeMinSize += x
 		if t.xRelativeMinSize < 0 {
 			t.xRelativeMinSize = 0
 		}
@@ -192,6 +191,7 @@ func (t *TextBlock) SetXCursor_Relative(x int) {
 }
 
 func (t *TextBlock) SetXCursor_Absolute(x int) {
+	defer t.Touch()
 	nSlide := x - t.xSize
 	if nSlide < 0 {
 		nSlide = 0
@@ -209,21 +209,23 @@ func (t *TextBlock) SetXCursor_Absolute(x int) {
 }
 
 func (t *TextBlock) SetYCursor_Relative(y int) {
-	t.Touch()
+	defer t.Touch()
 	if y >= t.ySize {
-		println("\a")
-		if t.currentLine == t.totalLine {
-         return			
-		} 
-		t.yRelativeMaxSize+=y-t.ySize+1
-		t.yRelativeMinSize+=y-t.ySize+1
-		t.currentLine+=y-t.ySize+1
+		if t.currentLine+y-t.ySize >= t.totalLine {
+			return
+		}
+		//		if diff:=t.currentLine - t.totalLine;diff>0 {
+		//			y=-diff
+		//		}
+		t.yRelativeMaxSize += y - t.ySize + 1
+		t.yRelativeMinSize += y - t.ySize + 1
+		t.currentLine += y - t.ySize + 1
 		return
 	}
-	if y <0 {
-		t.currentLine+=y
-		t.yRelativeMaxSize+=y
-		t.yRelativeMinSize+=y
+	if y < 0 {
+		t.currentLine += y
+		t.yRelativeMaxSize += y
+		t.yRelativeMinSize += y
 		if t.yRelativeMinSize < 0 {
 			t.yRelativeMinSize = 0
 		}
@@ -239,6 +241,7 @@ func (t *TextBlock) SetYCursor_Relative(y int) {
 }
 
 func (t *TextBlock) SetYCursor_Absolute(y int) {
+	defer t.Touch()
 	nSlide := y - t.ySize
 	if nSlide < 0 {
 		nSlide = 0
@@ -261,7 +264,7 @@ func (t *TextBlock) SetYCursor_Absolute(y int) {
 	}
 }
 
-func (t *TextBlock) ResetCurrentCharacter() {
+func (t *TextBlock) ResetXCursor() {
 	t.absoluteCurrentCharacter = 0
 	t.xRelativeMinSize = 0
 	t.xRelativeMaxSize = t.xSize
@@ -287,29 +290,28 @@ func (t *TextBlock) SetCursor_Relative(x, y int) (int, int) {
 	xRelative := x - t.xPos
 	yRelative := y - t.yPos
 
-	if yRelative < 0 {
-		yRelative = 0
-	}
 	isYChanged := yRelative != t.GetYCursor_Relative()
 	isXChanged := xRelative != t.GetXCursor_Relative()
-	if yRelative >= len(t.lines) {
-		yRelative = len(t.lines) - 1
+	if t.yRelativeMinSize+yRelative >= len(t.lines) {
+		yRelative = len(t.lines) - 1 - t.yRelativeMinSize
 	}
-	if yRelative >= 0 && xRelative >= t.lines[yRelative].totalChar {
-		xRelative = t.lines[yRelative].totalChar
+	if t.yRelativeMinSize+yRelative < 0 {
+		yRelative = 0
+	}
+	if xRelative >= t.lines[t.yRelativeMinSize+yRelative].totalChar {
+		xRelative = t.lines[t.yRelativeMinSize+yRelative].totalChar
+	}
+	if isYChanged {
+		t.SetYCursor_Relative(yRelative)
+		if t.lines[t.currentLine].totalChar > t.preLenght {
+			t.SetXCursor_Absolute(t.preLenght)
+		} else {
+			t.SetXCursor_Absolute(t.lines[t.currentLine].totalChar)
+		}
 	}
 	if isXChanged {
 		t.SetXCursor_Relative(xRelative)
 		t.preLenght = t.absoluteCurrentCharacter
-	}
-	if isYChanged {	
-		if t.lines[yRelative].totalChar > t.preLenght {
-			t.SetXCursor_Absolute(t.preLenght)
-		} else {
-			t.SetXCursor_Absolute(t.lines[yRelative].totalChar)
-		}
-		t.SetYCursor_Relative(yRelative)
-		//t.SetYCursor_Absolute(yRelative)
 	}
 	t.Touch()
 	return t.GetXCursor_Relative() + t.xPos, t.GetYCursor_Relative() + t.yPos
@@ -319,10 +321,10 @@ func (t *TextBlock) Type(char rune) {
 	defer t.Touch()
 	if char == '\n' {
 		t.totalLine++
-		t.currentLine++
+		t.SetYCursor_Relative(t.GetYCursor_Relative() + 1)
 		newLine := t.lines[t.currentLine-1].split(t.absoluteCurrentCharacter)
 		t.lines = slices.Concat(t.lines[:t.currentLine], []*lineText{newLine}, t.lines[t.currentLine:])
-		t.ResetCurrentCharacter()
+		t.ResetXCursor()
 	} else {
 		t.lines[t.currentLine].digit(char, t.absoluteCurrentCharacter)
 		t.SetXCursor_Relative(t.GetXCursor_Relative() + 1)
@@ -330,7 +332,7 @@ func (t *TextBlock) Type(char rune) {
 	}
 }
 
-///Delete the current character and move the cursor to the left
+// /Delete the current character and move the cursor to the left
 func (t *TextBlock) Delete() {
 	if t.totalLine == 1 && t.absoluteCurrentCharacter == 0 {
 		return
@@ -342,7 +344,7 @@ func (t *TextBlock) Delete() {
 			t.preLenght = t.absoluteCurrentCharacter
 			t.lines[t.currentLine-1].merge(t.lines[t.currentLine])
 			t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
-			t.currentLine--
+			t.SetYCursor_Relative(t.GetYCursor_Relative() - 1)
 			t.totalLine--
 		}
 		return
@@ -353,19 +355,19 @@ func (t *TextBlock) Delete() {
 	if deleteLine {
 		t.totalLine--
 		t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
-		t.currentLine--
+		t.SetYCursor_Relative(t.GetYCursor_Relative() - 1)
 		if t.totalLine == 0 {
 			t.lines = []*lineText{CreateLineText(t.initialCapacity)}
-			t.currentLine = 0
+			t.currentLine = 0 //Reset y and min max
 			t.totalLine = 1
-			t.ResetCurrentCharacter()
+			t.ResetXCursor()
 			return
 		}
 		t.SetXCursor_Absolute(t.lines[t.currentLine].totalChar)
 	}
 }
 
-//TODO da inserire i colori
+// TODO da inserire i colori
 func (t *TextBlock) parseText(text string) string {
 	start := 0
 	size := len(text)
@@ -383,39 +385,28 @@ func (t *TextBlock) parseText(text string) string {
 	return text[start:size]
 }
 
-func (t *TextBlock) getTextWithAnsi() string {
+func (t *TextBlock) GetText(withAnsiCode bool) string {
 	full := strings.Builder{}
+	y := 0
 	for i, line := range t.lines {
-		if i<t.yRelativeMinSize {
+		if i < t.yRelativeMinSize {
 			continue
 		}
-		if i>t.yRelativeMaxSize {
+		if i >= t.yRelativeMaxSize {
 			break
 		}
 		if line == nil {
 			break
 		}
-		full.WriteString(U.GetAnsiMoveTo(t.xPos, t.yPos+i))
+		if withAnsiCode {
+			full.WriteString(U.GetAnsiMoveTo(t.xPos, t.yPos+y))
+		}
 		text := line.getText()
 		full.WriteString(t.parseText(text))
-	}
-	return full.String()
-}
-
-func (t *TextBlock) getText() string {
-	full := strings.Builder{}
-	for i, line := range t.lines {
-		if i<t.yRelativeMinSize {
-			continue
+		if !withAnsiCode {
+			full.WriteRune('\n')
 		}
-		if i>t.yRelativeMaxSize {
-			break
-		}
-		if line == nil {
-			break
-		}
-		text := line.getText()
-		full.WriteString(t.parseText(text) + "\n")
+		y++
 	}
 	return full.String()
 }

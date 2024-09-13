@@ -219,8 +219,8 @@ func TestCreateNewLineFromTwoLines(t *testing.T) {
 	if textBlock.totalLine != 2 {
 		t.Errorf("expected %v, got %v", 2, textBlock.totalLine)
 	}
-	if textBlock.getText() != "123a1aa\naaaaa\n" {
-		t.Errorf("expected \n%v\n\ngot\n \n%v", "123a1aa\naaaaa", textBlock.getText())
+	if textBlock.GetText(false) != "123a1aa\naaaaa\n" {
+		t.Errorf("expected \n%v\n\ngot\n \n%v", "123a1aa\naaaaa", textBlock.GetText(false))
 	}
 }
 func TestNewLineInTheMiddleOfText2(t *testing.T) {
@@ -259,25 +259,25 @@ func TestNewLineFromWhiteLine(t *testing.T) {
 	}
 }
 
-func TestWriteOutSize(t *testing.T) {
+func TestWriteOutSizeX(t *testing.T) {
 	TextBlock := CreateTextBlock(0, 0, 4, 100, 1)
 	types(TextBlock, "ciao3comeStai")
-	if TextBlock.getText() != "Stai\n" {
-		t.Errorf("expected %v, got %v", "Stai", TextBlock.getText())
+	if TextBlock.GetText(false) != "Stai\n" {
+		t.Errorf("expected %v, got %v", "Stai", TextBlock.GetText(false))
 	}
 	TextBlock.SetCursor_Relative(-1, 0)
 	TextBlock.SetCursor_Relative(-1, 0)
 	TextBlock.SetCursor_Relative(-1, 0)
 	TextBlock.SetCursor_Relative(-1, 0)
-	if TextBlock.getText() != "come\n" {
-		t.Errorf("expected %v, got %v", "come", TextBlock.getText())
+	if TextBlock.GetText(false) != "come\n" {
+		t.Errorf("expected %v, got %v", "come", TextBlock.GetText(false))
 	}
 }
-func TestGoToOutSize(t *testing.T) {
+func TestGoToOutSizeX(t *testing.T) {
 	TextBlock := CreateTextBlock(0, 0, 4, 100, 1)
 	types(TextBlock, "ciao3comeStai")
-	if TextBlock.getText() != "Stai\n" {
-		t.Errorf("expected %v, got %v", "Stai", TextBlock.getText())
+	if TextBlock.GetText(false) != "Stai\n" {
+		t.Errorf("expected %v, got %v", "Stai", TextBlock.GetText(false))
 	} //Creare helper method for this
 	TextBlock.SetCursor_Relative(-1, 0)
 	TextBlock.SetCursor_Relative(-1, 0)
@@ -287,7 +287,23 @@ func TestGoToOutSize(t *testing.T) {
 	TextBlock.SetCursor_Relative(-1, 0)
 	TextBlock.SetCursor_Relative(-1, 0)
 	TextBlock.SetCursor_Relative(-1, 0)
-	if TextBlock.getText() != "iao3\n" {
-		t.Errorf("expected %v, got %v", "iao3", TextBlock.getText())
+	if TextBlock.GetText(false) != "iao3\n" {
+		t.Errorf("expected %v, got %v", "iao3", TextBlock.GetText(false))
+	}
+}
+
+func TestGoToOutSizeY(t *testing.T) {
+	TextBlock := CreateTextBlock(0, 0, 4, 4, 1)
+	types(TextBlock, "\n\n\n\n\n")
+	if TextBlock.yRelativeMinSize!=1{
+    t.Errorf("expected %v, got %v", 1, TextBlock.yRelativeMinSize)
+	}
+	if TextBlock.currentLine!=4{
+		t.Errorf("expected %v, got %v", 4, TextBlock.currentLine)
+	}
+	TextBlock.Type('p')
+	TextBlock.Type('p')
+	if TextBlock.absoluteCurrentCharacter!=2{
+		t.Errorf("expected %v, got %v", 2, TextBlock.absoluteCurrentCharacter)
 	}
 }

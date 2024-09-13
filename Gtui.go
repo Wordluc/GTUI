@@ -51,8 +51,8 @@ func (c *Gtui) SetCur(x, y int) {
 	c.SetVisibilityCursor(true)
 	compPreSet, _ := c.componentManager.Search(c.xCursor, c.yCursor)
 	compsPostSet, _ := c.componentManager.Search(x, y)
-	inPreButNotInPost := Utils.Diff(compsPostSet, compPreSet)
-	inPostButNotInPre := Utils.Diff(compPreSet, compsPostSet)
+	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
+	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
 	for _, e := range inPreButNotInPost {
 		e.OnLeave()
 	}
