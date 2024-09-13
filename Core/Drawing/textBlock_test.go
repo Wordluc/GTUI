@@ -295,11 +295,11 @@ func TestGoToOutSizeX(t *testing.T) {
 func TestGoToOutSizeY(t *testing.T) {
 	TextBlock := CreateTextBlock(0, 0, 4, 4, 1)
 	types(TextBlock, "\n\n\n\n\n")
-	if TextBlock.yRelativeMinSize!=1{
-    t.Errorf("expected %v, got %v", 1, TextBlock.yRelativeMinSize)
+	if TextBlock.yRelativeMinSize!=2{
+    t.Errorf("expected %v, got %v", 2, TextBlock.yRelativeMinSize)
 	}
-	if TextBlock.currentLine!=4{
-		t.Errorf("expected %v, got %v", 4, TextBlock.currentLine)
+	if TextBlock.currentLine!=5{
+		t.Errorf("expected %v, got %v", 5, TextBlock.currentLine)
 	}
 	TextBlock.Type('p')
 	TextBlock.Type('p')
