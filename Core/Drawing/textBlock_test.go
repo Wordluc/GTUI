@@ -54,7 +54,7 @@ func TestComeBackTypingAfterNewLine(t *testing.T) {
 	if textBlock.absoluteCurrentCharacter != 0 {
 		t.Errorf("expected %v, got %v", 0, textBlock.absoluteCurrentCharacter)
 	}
-	textBlock.SetYCursor_Absolute(0)
+	textBlock.SetCursor_Relative(0, 0)
 	if textBlock.currentLine != 0 {
 		t.Errorf("expected %v, got %v", 0, textBlock.currentLine)
 	}
@@ -71,7 +71,7 @@ RRRR
 func TestSetCurrentTextBlock(t *testing.T) {
 	textBlock := CreateTextBlock(70, 0, 10, 100, 1)
 	typing(textBlock, "a2311\nnnn\nrrrr")
-	x, y := textBlock.GetCurrentCursor()
+	x, y := textBlock.GetCursor_Relative()
 	x += 70
 	x, y = textBlock.SetCursor_Relative(x, y-1)
 	if textBlock.preLenght != 4 {
@@ -299,4 +299,34 @@ func TestGoToOutSizeY(t *testing.T) {
 	if TextBlock.absoluteCurrentCharacter!=2{
 		t.Errorf("expected %v, got %v", 2, TextBlock.absoluteCurrentCharacter)
 	}
+	x,_:=TextBlock.SetCursor_Relative(1,5)
+	if x!=1{
+		t.Errorf("expected %v, got %v", 1, x)
+	}
+	TextBlock.Type('t')
+	if TextBlock.absoluteCurrentCharacter!=2{//it starts from 0
+		t.Errorf("expected %v, got %v", 3, TextBlock.absoluteCurrentCharacter)
+	}
+	if TextBlock.lines[TextBlock.currentLine].getText()!="ptp"{
+    t.Errorf("expected %v, got %v", "ptp", TextBlock.lines[TextBlock.currentLine].getText())
+	}
+}
+
+func TestGoOutSizeRapidly(t *testing.T) {
+	TextBlock := CreateTextBlock(0, 0, 4, 4, 1)
+  TextBlock.Type('2')
+  TextBlock.Type('4')
+	TextBlock.SetCursor_Relative(0,0)
+	TextBlock.SetCursor_Relative(10,0)
+	if TextBlock.absoluteCurrentCharacter!=2{
+		t.Errorf("expected %v, got %v", 2, TextBlock.absoluteCurrentCharacter)
+	}
+	TextBlock.Type('\n')
+	TextBlock.Type('\n')
+	TextBlock.SetCursor_Relative(0,0)
+	TextBlock.SetCursor_Relative(0,10)
+	if TextBlock.currentLine!=2{
+		t.Errorf("expected %v, got %v", 2, TextBlock.currentLine)
+	}
+
 }
