@@ -3,26 +3,37 @@ package main
 import (
 	Core "GTUI"
 	"GTUI/Core/Component"
+	"GTUI/Core/Utils/Color"
 	"GTUI/Keyboard"
 	Kd "GTUI/Keyboard"
 	"GTUI/Terminal"
 )
 
-var core *Core.Gtui 
+var core *Core.Gtui
 var components []Component.IComponent
+
 func main() {
-	kbr:=Keyboard.NewKeyboard()
-  core,_=Core.NewGtui(loop,kbr,&Terminal.Terminal{})
-	xS,yS:=20,20
+	kbr := Keyboard.NewKeyboard()
+	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
+	xS, yS := 50, 40
 	c := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
-	c.StartTyping()
+	c.SetOnLeave(func() {
+		c.GetVisibleArea().SetColor(Color.Get(Color.Gray,Color.None))
+	})
+	c.SetOnHover(func() {
+		c.GetVisibleArea().SetColor(Color.Get(Color.White,Color.None))
+	})
 	components = append(components, c)
-	core.InsertComponent(c)
-	core.SetCur(1, 1)
+	if e:=core.InsertComponent(c) ;e!= nil {
+		panic(e)
+	}
+	if e:=core.SetCur(1, 1); e != nil {
+		panic(e)
+	}
 	core.Start()
 }
 
-func loop(keyb Kd.IKeyBoard) bool{
+func loop(keyb Kd.IKeyBoard) bool {
 	var x, y = core.GetCur()
 	if keyb.IsKeySPressed(Kd.KeyArrowDown) {
 		y++
@@ -48,7 +59,9 @@ func loop(keyb Kd.IKeyBoard) bool{
 	if keyb.IsKeySPressed(Kd.KeyEnter) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(Component.IWritableComponent); ok {
-				c.StartTyping()
+				if !c.IsTyping() {
+					c.StartTyping()
+				}
 			}
 		})
 	}

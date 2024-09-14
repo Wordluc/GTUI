@@ -3,7 +3,6 @@ package Component
 import (
 	"GTUI/Core"
 	"GTUI/Core/Drawing"
-	"GTUI/Core/Utils/Color"
 )
 
 type TextBox struct {
@@ -14,12 +13,13 @@ type TextBox struct {
 	streamText  StreamCharacter
 	onClick     func()
 	onLeave     func()
+	onHover     func()
 }
 
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
-	textBox := Drawing.CreateTextBlock(1, 1, sizeX-1, sizeY-1,  10)
+	textBox := Drawing.CreateTextBlock(1, 1, sizeX-2, sizeY-2,  10)
 	cont.AddChild(rect)
 	cont.AddChild(textBox)
 	cont.SetPos(x, y)
@@ -39,12 +39,13 @@ func (b *TextBox) loopTyping() {
 		if !b.isTyping {
 			return
 		}
-    key=rune(str[0])
-		if key=='\b'{
-			b.textBlock.Delete()
-			continue
-		} 
-		b.textBlock.Type(key)
+		for _,key=range str{
+			if key=='\b'{
+				b.textBlock.Delete()
+				continue
+			} 
+			b.textBlock.Type(key)
+		}
 	}
 }
 
@@ -76,45 +77,41 @@ func (b *TextBox) SetOnClick(onClick func()) {
 func (b *TextBox) SetOnLeave(onLeave func()) {
 	b.onLeave = onLeave
 }
+func (b *TextBox) SetOnHover(onHover func()) {
+	b.onHover = onHover
+}
 func (b *TextBox) OnRelease() {}
 
 func (b *TextBox) OnHover() {
+	b.onHover()
 	if b.isTyping {
 		return
 	}
-	b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 
 func (b *TextBox) GetGraphics() Core.IEntity {
 	return b.graphics
 }
 
+func (b *TextBox) GetVisibleArea() *Drawing.Rectangle {
+	return b.visibleArea
+}
+
 func (b *TextBox) IsTyping() bool {
 	return b.isTyping
-}
-//To delete, the work has to be done in the textBlock by SetCurrentCursor
-//so i can catch when move the cursor inside the textBlock but not move the real one outside of it
-func (b *TextBox) DiffTotalToXY(x, y int) (int, int) {
-	xP, yP := b.textBlock.GetPos()
-	x = x - xP
-	y = y - yP
-	diffX, diffY := b.textBlock.GetTotalCursor()
-	diffX = diffX - x 
-	diffY = diffY - y - 1
-	return diffX, diffY
 }
 
 func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 	xP, yP := b.textBlock.GetPos()
 	x = x - xP
 	y = y - yP
-	diffX, diffY := b.textBlock.GetCurrentCursor()
+	diffX, diffY := b.textBlock.GetCursor_Relative()
 	diffX = diffX - x
 	diffY = diffY - y
 	return diffX, diffY
 }
 func (b *TextBox) SetCurrentPosCursor(x, y int)(int,int) {
-	return b.textBlock.SetCurrentCursor(x, y)
+	return b.textBlock.SetCursor_Relative(x, y)
 }
 func (b *TextBox) getShape() (InteractiveShape, error) {
 	x, y := b.textBlock.GetPos()

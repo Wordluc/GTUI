@@ -50,6 +50,10 @@ func (s *ComponentM) Add(comp IComponent) error {
 	for i := shape.xPos; i < finalX; i++ {
 		for j := shape.yPos; j < finalY; j++ {
 			xC, yC := i/s.ChunkSize, j/s.ChunkSize
+			if xC >= s.nChunkX || yC >= s.nChunkY {
+				return errors.New("component out of range")
+			}
+			comp.OnLeave()
 			ele := (*s.Map)[xC][yC]
 			if ele == nil {
 				(*s.Map)[xC][yC] = &[]IComponent{comp}
