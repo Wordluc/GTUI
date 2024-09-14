@@ -7,6 +7,7 @@ import (
 	"GTUI/Core/Utils/Color"
 	"GTUI/Keyboard"
 	"GTUI/Terminal"
+	"errors"
 	"strings"
 	"time"
 )
@@ -44,9 +45,9 @@ func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITermina
 	}, nil
 }
 
-func (c *Gtui) SetCur(x, y int) {
+func (c *Gtui) SetCur(x, y int)error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
-		return
+		return errors.New("cursor out of range")
 	}
 	c.SetVisibilityCursor(true)
 	compPreSet, _ := c.componentManager.Search(c.xCursor, c.yCursor)
@@ -63,9 +64,13 @@ func (c *Gtui) SetCur(x, y int) {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
+				return nil
 			}
 		}
 	}
+
+	c.yCursor = y
+	c.xCursor = x
 	for _, comp := range compsPostSet {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
 			if ci.IsTyping() { //redo
@@ -76,6 +81,7 @@ func (c *Gtui) SetCur(x, y int) {
 	}
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	c.SetVisibilityCursor(false)
+	return nil
 }
 func (c *Gtui) GetCur() (int, int) {
 	return c.xCursor, c.yCursor
@@ -107,9 +113,9 @@ func (c *Gtui) InsertEntity(entity Core.IEntity) {
 	c.buff = append(c.buff, entity)
 }
 
-func (c *Gtui) InsertComponent(component Component.IComponent) {
+func (c *Gtui) InsertComponent(component Component.IComponent) error {
 	c.buff = append(c.buff, component.GetGraphics())
-	c.componentManager.Add(component)
+	return c.componentManager.Add(component)
 }
 func (c *Gtui) EventOn(x, y int, event func(Component.IComponent)) error {
 	resultArray, e := c.componentManager.Search(x, y)

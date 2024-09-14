@@ -3,7 +3,6 @@ package Component
 import (
 	"GTUI/Core"
 	"GTUI/Core/Drawing"
-	"GTUI/Core/Utils/Color"
 )
 
 type TextBox struct {
@@ -14,6 +13,7 @@ type TextBox struct {
 	streamText  StreamCharacter
 	onClick     func()
 	onLeave     func()
+	onHover     func()
 }
 
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
@@ -77,17 +77,24 @@ func (b *TextBox) SetOnClick(onClick func()) {
 func (b *TextBox) SetOnLeave(onLeave func()) {
 	b.onLeave = onLeave
 }
+func (b *TextBox) SetOnHover(onHover func()) {
+	b.onHover = onHover
+}
 func (b *TextBox) OnRelease() {}
 
 func (b *TextBox) OnHover() {
+	b.onHover()
 	if b.isTyping {
 		return
 	}
-	b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 
 func (b *TextBox) GetGraphics() Core.IEntity {
 	return b.graphics
+}
+
+func (b *TextBox) GetVisibleArea() *Drawing.Rectangle {
+	return b.visibleArea
 }
 
 func (b *TextBox) IsTyping() bool {

@@ -361,6 +361,11 @@ func (t *TextBlock) SetCursor_Relative(x, y int) (int, int) {
 	if t.yRelativeMinSize+yRelative < 0 {
 		yRelative = 0
 	}
+
+	if t.xRelativeMinSize+xRelative < 0 {
+		xRelative = 0
+	}
+
 	if xRelative + t.xRelativeMinSize >= t.lines[t.yRelativeMinSize+yRelative].totalChar {
 		xRelative = t.lines[t.yRelativeMinSize+yRelative].totalChar - t.xRelativeMinSize 
 	}
