@@ -98,7 +98,7 @@ func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 	xP, yP := b.textBlock.GetPos()
 	x = x - xP
 	y = y - yP
-	diffX, diffY := b.textBlock.GetCurrentCursor()
+	diffX, diffY := b.textBlock.GetCursor_Relative()
 	diffX = diffX - x
 	diffY = diffY - y
 	return diffX, diffY
