@@ -15,7 +15,7 @@ var components []Component.IComponent
 
 func main() {
 	kbr := Keyboard.NewKeyboard()
-	var totalError Utils.CError
+	totalError := Utils.NewError()
 	var e error
 	core, e = Core.NewGtui(loop, kbr, &Terminal.Terminal{}); 
 	totalError.Add(e)

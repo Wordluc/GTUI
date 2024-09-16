@@ -19,17 +19,14 @@ type Button struct {
 }
 
 func CreateButton(x, y, sizeX, sizeY int, text string) (*Button, error) {
-	var totalError Utils.CError
+	totalError := Utils.NewError()
 	cont, e := Drawing.CreateContainer(0, 0)
-	if totalError.Add(e) {
-		return nil, totalError
-	}
-
+	totalError.Add(e) 
 	rect, e := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
-	if totalError.Add(e) {
+	totalError.Add(e) 
+   if totalError.HasError() {
 		return nil, totalError
 	}
-
 	textD := Drawing.CreateTextField(0, 0)
 	textD.Type(text)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2

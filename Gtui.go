@@ -28,7 +28,7 @@ type Gtui struct {
 
 func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
 	xSize, ySize := term.Size()
-	var totalError Utils.CError
+	totalError := Utils.NewError()
 	totalError.AddIf(loop == nil || keyb == nil || term == nil , errors.New("invalid size"))
 	componentManager,e:= Component.Create(xSize, ySize, 5)
 	totalError.Add(e)

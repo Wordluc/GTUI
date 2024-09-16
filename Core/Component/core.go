@@ -25,7 +25,7 @@ type ComponentManager struct {
 }
 
 func Create(xSize, ySize, chunkSize int) (*ComponentManager, error) {
-	var totalError Utils.CError
+	totalError := Utils.NewError()
 	xChunk := xSize/chunkSize + 1
 	yChunk := ySize/chunkSize + 1
 	if totalError.AddIf((xSize == 0 || ySize == 0), errors.New("invalid chunk size")) {
@@ -45,17 +45,16 @@ func Create(xSize, ySize, chunkSize int) (*ComponentManager, error) {
 }
 
 func (s *ComponentManager) Add(comp IComponent) error {
-	var totalError Utils.CError
 	shape, e := comp.getShape()
-	if totalError.Add(e) {
-		return totalError
-	} 
+	if e != nil {
+		return e
+	}
 	finalX, finalY := shape.xPos+shape.Width, shape.yPos+shape.Height
 	for i := shape.xPos; i < finalX; i++ {
 		for j := shape.yPos; j < finalY; j++ {
 			xC, yC := i/s.ChunkSize, j/s.ChunkSize
-			if totalError.AddIf(xC >= s.nChunkX || yC >= s.nChunkY, errors.New("component out of range")){
-				return totalError
+			if (xC >= s.nChunkX || yC >= s.nChunkY){
+				return errors.New("component out of range")
 			}
 			comp.OnLeave()
 			ele := (*s.Map)[xC][yC]
@@ -74,7 +73,7 @@ func (s *ComponentManager) Add(comp IComponent) error {
 func (s *ComponentManager) Search(x, y int) ([]IComponent, error) {
 	var xiChunk int = x / s.ChunkSize
 	var yiChunk int = y / s.ChunkSize
-	var totalError Utils.CError
+	totalError := Utils.NewError()
 	totalError.AddIf(xiChunk >= len(*s.Map) || yiChunk >= len((*s.Map)[xiChunk]), errors.New("component out of range"))
 	totalError.AddIf(xiChunk < 0 || yiChunk < 0, errors.New("component out of range"))
 	totalError.AddIf(xiChunk >= s.nChunkX || yiChunk >= s.nChunkY, errors.New("component out of range"))
