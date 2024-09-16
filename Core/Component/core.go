@@ -1,6 +1,7 @@
 package Component
 
 import (
+	"GTUI/Core/Utils"
 	"errors"
 	"fmt"
 )
@@ -16,42 +17,45 @@ type InteractiveShape struct {
 	Width  int
 	Height int
 }
-type ComponentM struct {
+type ComponentManager struct {
 	Map       *[][]*[]IComponent
 	ChunkSize int
 	nChunkX   int
 	nChunkY   int
 }
 
-func Create(xSize, ySize, chunkSize int) *ComponentM {
-	xChunk := xSize / chunkSize+1
-	yChunk := ySize / chunkSize+1
+func Create(xSize, ySize, chunkSize int) (*ComponentManager, error) {
+	var totalError Utils.CError
+	xChunk := xSize/chunkSize + 1
+	yChunk := ySize/chunkSize + 1
+	if totalError.AddIf((xSize == 0 || ySize == 0), errors.New("invalid chunk size")) {
+		return nil, totalError
+	}
+
 	matrix := make([][]*[]IComponent, xChunk)
 	for i := range xChunk {
 		matrix[i] = make([]*[]IComponent, yChunk)
 	}
-	return &ComponentM{
+	return &ComponentManager{
 		Map:       &matrix,
 		ChunkSize: chunkSize,
 		nChunkX:   xChunk,
 		nChunkY:   yChunk,
-	}
+	}, nil
 }
 
-func (s *ComponentM) Add(comp IComponent) error {
-	if s == nil {
-		return errors.New("component manager is nil")
-	}
+func (s *ComponentManager) Add(comp IComponent) error {
+	var totalError Utils.CError
 	shape, e := comp.getShape()
-	if e != nil {
-		return e
-	}
+	if totalError.Add(e) {
+		return totalError
+	} 
 	finalX, finalY := shape.xPos+shape.Width, shape.yPos+shape.Height
 	for i := shape.xPos; i < finalX; i++ {
 		for j := shape.yPos; j < finalY; j++ {
 			xC, yC := i/s.ChunkSize, j/s.ChunkSize
-			if xC >= s.nChunkX || yC >= s.nChunkY {
-				return errors.New("component out of range")
+			if totalError.AddIf(xC >= s.nChunkX || yC >= s.nChunkY, errors.New("component out of range")){
+				return totalError
 			}
 			comp.OnLeave()
 			ele := (*s.Map)[xC][yC]
@@ -67,33 +71,27 @@ func (s *ComponentM) Add(comp IComponent) error {
 	return nil
 }
 
-func (s *ComponentM) Search(x, y int) ([]IComponent, error) {
-	if s == nil {
-		return nil, errors.New("component manager is nil")
-	}
+func (s *ComponentManager) Search(x, y int) ([]IComponent, error) {
 	var xiChunk int = x / s.ChunkSize
 	var yiChunk int = y / s.ChunkSize
-	if xiChunk >= len(*s.Map) || yiChunk >= len((*s.Map)[xiChunk]) {
-		return nil, fmt.Errorf("no node found at %d, %d", x, y)
-	}
-	//Check range
-	if xiChunk < 0 || yiChunk < 0 {
-		return nil, errors.New("no node found at " + fmt.Sprintf("%d, %d", x, y))
-	}
-	if xiChunk >= s.nChunkX || yiChunk >= s.nChunkY {
-		return nil, errors.New("no node found at " + fmt.Sprintf("%d, %d", x, y))
-	}
+	var totalError Utils.CError
+	totalError.AddIf(xiChunk >= len(*s.Map) || yiChunk >= len((*s.Map)[xiChunk]), errors.New("component out of range"))
+	totalError.AddIf(xiChunk < 0 || yiChunk < 0, errors.New("component out of range"))
+	totalError.AddIf(xiChunk >= s.nChunkX || yiChunk >= s.nChunkY, errors.New("component out of range"))
 	eles := (*s.Map)[xiChunk][yiChunk]
-	if eles == nil {
-		return nil, errors.New("no node found at " + fmt.Sprintf("%d, %d", x, y))
+	totalError.AddIf(eles == nil, errors.New("no node found at "+fmt.Sprintf("%d, %d", x, y)))
+
+	if totalError.HasError() {
+		return nil, totalError
 	}
+
 	res := []IComponent{}
 	for _, ele := range *eles {
 		shape, e := ele.getShape()
 		if e != nil {
 			return nil, e
 		}
-			if x>= shape.xPos && x < shape.xPos+shape.Width && y >= shape.yPos && y < shape.yPos+shape.Height {
+		if x >= shape.xPos && x < shape.xPos+shape.Width && y >= shape.yPos && y < shape.yPos+shape.Height {
 			res = append(res, ele)
 		}
 	}

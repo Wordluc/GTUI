@@ -3,6 +3,7 @@ package main
 import (
 	Core "GTUI"
 	"GTUI/Core/Component"
+	"GTUI/Core/Utils"
 	"GTUI/Core/Utils/Color"
 	"GTUI/Keyboard"
 	Kd "GTUI/Keyboard"
@@ -14,41 +15,44 @@ var components []Component.IComponent
 
 func main() {
 	kbr := Keyboard.NewKeyboard()
-	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
+	var totalError Utils.CError
+	var e error
+	core, e = Core.NewGtui(loop, kbr, &Terminal.Terminal{}); 
+	totalError.Add(e)
 	xS, yS := 50, 40
-	c := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
+	c, e := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
+	totalError.Add(e)
 	c.SetOnLeave(func() {
-		c.GetVisibleArea().SetColor(Color.Get(Color.Gray,Color.None))
+		c.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
 	})
 	c.SetOnHover(func() {
-		c.GetVisibleArea().SetColor(Color.Get(Color.White,Color.None))
+		c.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
 	components = append(components, c)
-	if e:=core.InsertComponent(c) ;e!= nil {
-		panic(e)
-	}
-	if e:=core.SetCur(1, 1); e != nil {
-		panic(e)
+	totalError.Add(core.InsertComponent(c))
+	totalError.Add(core.SetCur(0, 0))
+	if totalError.HasError() {
+		panic(totalError)
 	}
 	core.Start()
 }
 
 func loop(keyb Kd.IKeyBoard) bool {
 	var x, y = core.GetCur()
-	if keyb.IsKeySPressed(Kd.KeyArrowDown) {
+	if keyb.IsSpecialKeyPressed(Kd.KeyArrowDown) {
 		y++
 	}
-	if keyb.IsKeySPressed(Kd.KeyArrowUp) {
+	if keyb.IsSpecialKeyPressed(Kd.KeyArrowUp) {
 		y--
 	}
-	if keyb.IsKeySPressed(Kd.KeyArrowRight) {
+	if keyb.IsSpecialKeyPressed(Kd.KeyArrowRight) {
 		x++
 	}
-	if keyb.IsKeySPressed(Kd.KeyArrowLeft) {
+	if keyb.IsSpecialKeyPressed(Kd.KeyArrowLeft) {
 		x--
 	}
 
-	if keyb.IsKeySPressed(Kd.KeyCtrlQ) {
+	if keyb.IsSpecialKeyPressed(Kd.KeyCtrlQ) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(Component.IWritableComponent); ok {
 				c.StopTyping()
@@ -56,7 +60,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 		})
 	}
 
-	if keyb.IsKeySPressed(Kd.KeyEnter) {
+	if keyb.IsSpecialKeyPressed(Kd.KeyEnter) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(Component.IWritableComponent); ok {
 				if !c.IsTyping() {

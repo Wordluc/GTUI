@@ -8,7 +8,7 @@ func typing(textBlock *TextBlock, text string) {
 	}
 }
 func TestTypingInTextBlock(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
+	textBlock,_ := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('a')
 	textBlock.Type('2')
 	textBlock.Type('3')
@@ -39,7 +39,7 @@ func TestTypingInTextBlock(t *testing.T) {
 	}
 }
 func TestComeBackTypingAfterNewLine(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
+	textBlock ,_:= CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('a')
 	if textBlock.currentLine != 0 {
 		t.Errorf("expected %v, got %v", 0, textBlock.currentLine)
@@ -69,7 +69,7 @@ NNN
 RRRR
 */
 func TestSetCurrentTextBlock(t *testing.T) {
-	textBlock := CreateTextBlock(70, 0, 10, 100, 1)
+	textBlock ,_:= CreateTextBlock(70, 0, 10, 100, 1)
 	typing(textBlock, "a2311\nnnn\nrrrr")
 	x, y := textBlock.GetCursor_Relative()
 	x += 70
@@ -106,7 +106,7 @@ func TestSetCurrentTextBlock(t *testing.T) {
 	}
 }
 func TestComeBackTyping(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
+	textBlock,_ := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('u')
 	textBlock.Type('c')
 	textBlock.Type('a')
@@ -129,7 +129,7 @@ func TestComeBackTyping(t *testing.T) {
 }
 
 func TestDeleteTextline(t *testing.T) {
-	textLine := CreateLineText(10)
+	textLine ,_:= CreateLineText(10)
 	textLine.digit('1', 0)
 	textLine.digit('t', 1)
 	textLine.digit('2', 2)
@@ -146,7 +146,7 @@ func TestDeleteTextline(t *testing.T) {
 	}
 }
 func TestDeleteLine(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
+	textBlock ,_:= CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('u')
 	textBlock.Type('\n')
 	textBlock.Type('a')
@@ -181,7 +181,7 @@ func TestDeleteLine(t *testing.T) {
 	}
 }
 func TestFromTwoLinesDoesOnelIne(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
+	textBlock,_ := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('c')
 	textBlock.Type('\n')
 	textBlock.Type('a')
@@ -198,7 +198,7 @@ func TestFromTwoLinesDoesOnelIne(t *testing.T) {
 	}
 }
 func TestNewLineInTheMiddleOfText1(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
+	textBlock ,_:= CreateTextBlock(0, 0, 10, 100, 1)
 	typing(textBlock, "123a1")
 	textBlock.SetCursor_Relative(3, 0)
 	textBlock.Type('\n')
@@ -210,7 +210,7 @@ func TestNewLineInTheMiddleOfText1(t *testing.T) {
 	}
 }
 func TestCreateNewLineFromTwoLines(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
+	textBlock ,_:= CreateTextBlock(0, 0, 10, 100, 1)
 	typing(textBlock, "123a1")
 	typing(textBlock, "aaaaaaa")
 //123a1aaaaaaa
@@ -224,7 +224,7 @@ func TestCreateNewLineFromTwoLines(t *testing.T) {
 	}
 }
 func TestNewLineInTheMiddleOfText2(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
+	textBlock ,_:= CreateTextBlock(0, 0, 10, 100, 1)
 	typing(textBlock, "123a1\nciao2 prova\ngggg")
 	textBlock.SetCursor_Relative(4, 1)
 	textBlock.Type('\n')
@@ -248,7 +248,7 @@ func TestNewLineInTheMiddleOfText2(t *testing.T) {
 	}
 }
 func TestNewLineFromWhiteLine(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
+	textBlock,_ := CreateTextBlock(0, 0, 10, 100, 1)
 	textBlock.Type('\n')
 	textBlock.Type('c')
 	if textBlock.lines[0].getText() != "" {
@@ -260,7 +260,7 @@ func TestNewLineFromWhiteLine(t *testing.T) {
 }
 
 func TestWriteOutSizeX(t *testing.T) {
-	TextBlock := CreateTextBlock(0, 0, 4, 100, 1)
+	TextBlock,_ := CreateTextBlock(0, 0, 4, 100, 1)
 	typing(TextBlock, "ciao3comeStai")
 	if TextBlock.GetText(false) != "Stai\n" {
 		t.Errorf("expected %v, got %v", "Stai", TextBlock.GetText(false))
@@ -274,7 +274,7 @@ func TestWriteOutSizeX(t *testing.T) {
 	}
 }
 func TestGoToOutSizeX(t *testing.T) {
-	TextBlock := CreateTextBlock(0, 0, 4, 100, 1)
+	TextBlock,_ := CreateTextBlock(0, 0, 4, 100, 1)
 	typing(TextBlock, "ciao3comeStai")
 	if TextBlock.GetText(false) != "Stai\n" {
 		t.Errorf("expected %v, got %v", "Stai", TextBlock.GetText(false))
@@ -286,7 +286,7 @@ func TestGoToOutSizeX(t *testing.T) {
 }
 
 func TestGoToOutSizeY(t *testing.T) {
-	TextBlock := CreateTextBlock(0, 0, 4, 4, 1)
+	TextBlock,_ := CreateTextBlock(0, 0, 4, 4, 1)
 	typing(TextBlock, "\n\n\n\n\n")
 	if TextBlock.yRelativeMinSize!=2{
     t.Errorf("expected %v, got %v", 2, TextBlock.yRelativeMinSize)
@@ -313,7 +313,7 @@ func TestGoToOutSizeY(t *testing.T) {
 }
 
 func TestGoOutSizeRapidly(t *testing.T) {
-	TextBlock := CreateTextBlock(0, 0, 4, 4, 1)
+	TextBlock,_ := CreateTextBlock(0, 0, 4, 4, 1)
   TextBlock.Type('2')
   TextBlock.Type('4')
 	TextBlock.SetCursor_Relative(0,0)

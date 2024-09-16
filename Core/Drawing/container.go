@@ -14,13 +14,13 @@ type Container struct {
 	visible  bool
 }
 
-func CreateContainer( x, y int) *Container {
+func CreateContainer(x, y int) (*Container, error) {
 	return &Container{
-		xPos:  x,
-		yPos:  y,
-		color: Color.GetNoneColor(),
+		xPos:    x,
+		yPos:    y,
+		color:   Color.GetNoneColor(),
 		visible: true,
-	}
+	}, nil
 }
 
 func (c *Container) GetChildren() []Core.IEntity {
@@ -65,7 +65,7 @@ func (c *Container) getAnsiCode(defaultColor Color.Color) string {
 		str.WriteString(child.GetAnsiCode(defaultColor))
 		str.WriteString(c.color.GetAnsiColor())
 	}
-		str.WriteString(Color.GetResetColor())
+	str.WriteString(Color.GetResetColor())
 	return str.String()
 }
 

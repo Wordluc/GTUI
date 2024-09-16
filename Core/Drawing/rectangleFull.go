@@ -18,8 +18,11 @@ type RectangleFull struct {
 	visible     bool
 }
 
-func CreateRectangleFull(x, y, width, height int) *RectangleFull {
-	border := CreateRectangle(x, y, width, height)
+func CreateRectangleFull(x, y, width, height int) (*RectangleFull,error) {
+	border,e := CreateRectangle(x, y, width, height)
+	if e != nil {
+		return nil,e
+	}
 	return &RectangleFull{
 		ansiCode:    "",
 		XPos:        x,
@@ -30,7 +33,7 @@ func CreateRectangleFull(x, y, width, height int) *RectangleFull {
 		insideColor: Color.GetNoneColor(),
 		border:      border,
 		visible:     true,
-	}
+	},nil
 }
 
 func (r *RectangleFull) Touch() {

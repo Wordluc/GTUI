@@ -9,8 +9,8 @@ type IKeyBoard interface {
 	// return true if the character is pressed
 	IsKeyPressed(key rune) bool
 	// return true if the key is pressed e.g: Space, Enter, Backspace, etc.
-	IsKeySPressed(key Key) bool
+	IsSpecialKeyPressed(key Key) bool
 	GetChannels() []chan string
 	NewChannel() int
-	DeleteChannel(int)
+	DeleteChannel(int) error
 }

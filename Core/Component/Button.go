@@ -3,23 +3,33 @@ package Component
 import (
 	"GTUI/Core"
 	"GTUI/Core/Drawing"
+	"GTUI/Core/Utils"
 	"GTUI/Core/Utils/Color"
 )
 
 type OnEvent func()
 type Button struct {
-	graphics        *Drawing.Container
-	visibleArea     *Drawing.Rectangle
-	onClick         OnEvent
-	onRelease       OnEvent
-	onHover         OnEvent
-	onLeave         OnEvent
-	isClicked       bool
+	graphics    *Drawing.Container
+	visibleArea *Drawing.Rectangle
+	onClick     OnEvent
+	onRelease   OnEvent
+	onHover     OnEvent
+	onLeave     OnEvent
+	isClicked   bool
 }
 
-func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
-	cont := Drawing.CreateContainer(0, 0)
-	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
+func CreateButton(x, y, sizeX, sizeY int, text string) (*Button, error) {
+	var totalError Utils.CError
+	cont, e := Drawing.CreateContainer(0, 0)
+	if totalError.Add(e) {
+		return nil, totalError
+	}
+
+	rect, e := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
+	if totalError.Add(e) {
+		return nil, totalError
+	}
+
 	textD := Drawing.CreateTextField(0, 0)
 	textD.Type(text)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2
@@ -28,10 +38,10 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont.AddChild(textD)
 	cont.SetPos(x, y)
 	return &Button{
-		graphics:        cont,
-		visibleArea:     rect,
-		isClicked:       false,
-	}
+		graphics:    cont,
+		visibleArea: rect,
+		isClicked:   false,
+	}, nil
 }
 
 func (b *Button) SetOnClick(onClick OnEvent) {
@@ -57,7 +67,7 @@ func (b *Button) OnRelease() {
 	if b.onRelease != nil {
 		b.onRelease()
 	}
-	b.isClicked=false
+	b.isClicked = false
 	b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 func (b *Button) OnHover() {
@@ -77,23 +87,23 @@ func (b *Button) OnLeave() {
 	}
 }
 func (b *Button) updateColorByClick() {
-   if b.isClicked{
-			b.visibleArea.SetColor(Color.Get(Color.Blue, Color.None))
-	 }else{
-			b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
-	 }
+	if b.isClicked {
+		b.visibleArea.SetColor(Color.Get(Color.Blue, Color.None))
+	} else {
+		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
+	}
 }
 func (b *Button) GetGraphics() Core.IEntity {
 	return b.graphics
 }
-func (b *Button) getShape() (InteractiveShape,error) {
-	x,y:=b.visibleArea.GetPos()
-	xDim,yDim:=b.visibleArea.GetSize()
-	shape:=InteractiveShape{
-      xPos:x+1,
-		yPos:y+1,
-		Width:xDim-1,
-		Height:yDim-1,
+func (b *Button) getShape() (InteractiveShape, error) {
+	x, y := b.visibleArea.GetPos()
+	xDim, yDim := b.visibleArea.GetSize()
+	shape := InteractiveShape{
+		xPos:   x + 1,
+		yPos:   y + 1,
+		Width:  xDim - 1,
+		Height: yDim - 1,
 	}
-	return shape,nil
+	return shape, nil
 }

@@ -3,6 +3,7 @@ package Drawing
 import (
 	U "GTUI/Core/Utils"
 	"GTUI/Core/Utils/Color"
+	"errors"
 	"slices"
 	"strings"
 )
@@ -13,12 +14,15 @@ type lineText struct {
 	totalChar       int
 }
 
-func CreateLineText(initialCapacity int) *lineText {
+func CreateLineText(initialCapacity int) (*lineText,error) {
+	if initialCapacity < 0 {
+		return nil, errors.New("invalid capacity")
+	}
 	return &lineText{
 		line:            make([]rune, initialCapacity),
 		initialCapacity: initialCapacity,
 		totalChar:       0,
-	}
+	},nil
 }
 
 func (t *lineText) getText() string {
@@ -65,17 +69,30 @@ func (t *lineText) merge(add *lineText) {
 	t.totalChar += add.totalChar
 }
 
-func (t *lineText) split(i int) *lineText {
+func (t *lineText) split(i int) (*lineText,error) {
+	var e error
+	if i < 0{
+		return nil,errors.New("index lineText is negative")
+	}
 	if i >= t.totalChar {
 		return CreateLineText(t.initialCapacity)
 	}
+	if t.totalChar > len(t.line) {
+		return nil,errors.New("index lineText is out of range")
+	}
+	if i >len(t.line){
+		return nil,errors.New("index lineText is out of range")
+	}
 	splited := t.line[i:t.totalChar]
 	t.line = t.line[:i]
-	newLine := CreateLineText(t.initialCapacity)
+	newLine,e := CreateLineText(t.initialCapacity)
+	if e != nil {
+		return nil, e
+	}
 	newLine.totalChar = t.totalChar - i
 	newLine.line = splited
 	t.totalChar = i
-	return newLine
+	return newLine,nil
 }
 
 type TextBlock struct {
@@ -98,9 +115,16 @@ type TextBlock struct {
 	preLenght                int
 }
 
-func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock {
+func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) (*TextBlock ,error){
 	lines := make([]*lineText, 1)
-	lines[0] = CreateLineText(initialCapacity)
+	var e error
+	if lines == nil {
+		return nil, errors.New("failed to create text block")
+	}
+	lines[0],e = CreateLineText(initialCapacity)
+	if e != nil {
+		return nil, e
+	}
 	return &TextBlock{
 		visible:                  true,
 		ansiCode:                 "",
@@ -118,7 +142,7 @@ func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock
 		initialCapacity:          initialCapacity,
 		totalLine:                1,
 		absoluteCurrentCharacter: 0,
-	}
+	},nil
 }
 
 func (t *TextBlock) Touch() {
@@ -164,9 +188,9 @@ func (t *TextBlock) GetCursor_Relative() (int, int) {
 }
 
 ///Delete the current character
-func (t *TextBlock) Delete() {
+func (t *TextBlock) Delete() error {
 	if t.totalLine == 1 && t.absoluteCurrentCharacter == 0 {
-		return
+		return nil
 	}
 	defer t.Touch()
 	if t.absoluteCurrentCharacter == 0 {
@@ -178,7 +202,7 @@ func (t *TextBlock) Delete() {
 			t.setYCursor_Relative(t.getYCursor_Relative() - 1)
 			t.totalLine--
 		}
-		return
+		return nil
 	}
 	deleteLine := t.lines[t.currentLine].delete(t.absoluteCurrentCharacter)
 	t.preLenght = t.absoluteCurrentCharacter - 1
@@ -188,14 +212,19 @@ func (t *TextBlock) Delete() {
 		t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
 		t.setYCursor_Relative(t.getYCursor_Relative() - 1)
 		if t.totalLine == 0 {
-			t.lines = []*lineText{CreateLineText(t.initialCapacity)}
+			line,e:= CreateLineText(t.initialCapacity)
+			if e != nil {
+				return e
+			}
+			t.lines = []*lineText{line}
 			t.currentLine = 0 //Reset y and min max
 			t.totalLine = 1
 			t.resetXCursor()
-			return
+			return nil
 		}
 		t.setXCursor_Absolute(t.lines[t.currentLine].totalChar)
 	}
+	return nil
 }
 
 func (t *TextBlock) GetText(withAnsiCode bool) string {
@@ -316,8 +345,9 @@ func (t *TextBlock) getXCursor_Relative() int {
 	}
 }
 
-func (t *TextBlock) setYCursor_Absolute(y int) {
+func (t *TextBlock) setYCursor_Absolute(y int) error {
 	defer t.Touch()
+	var e error
 	nSlide := y - t.ySize
 	if nSlide < 0 {
 		nSlide = 0
@@ -333,11 +363,12 @@ func (t *TextBlock) setYCursor_Absolute(y int) {
 	}
 	t.currentLine = y
 	if y >= len(t.lines) {
-		return
+		return nil
 	}
 	if t.lines[t.currentLine] == nil {
-		t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
+		t.lines[t.currentLine],e = CreateLineText(t.initialCapacity)
 	}
+	return e
 }
 
 func (t *TextBlock) getYCursor_Relative() int {
@@ -392,12 +423,15 @@ func (t *TextBlock) resetXCursor() {
 	t.preLenght = 0
 }
 
-func (t *TextBlock) Type(char rune) {
+func (t *TextBlock) Type(char rune) error {
 	defer t.Touch()
 	if char == '\n' {
 		t.totalLine++
 		t.setYCursor_Relative(t.getYCursor_Relative() + 1)
-		newLine := t.lines[t.currentLine-1].split(t.absoluteCurrentCharacter)
+		newLine,e := t.lines[t.currentLine-1].split(t.absoluteCurrentCharacter)
+		if e != nil {
+			return e
+		}
 		t.lines = slices.Concat(t.lines[:t.currentLine], []*lineText{newLine}, t.lines[t.currentLine:])
 		t.resetXCursor()
 	} else {
@@ -405,6 +439,7 @@ func (t *TextBlock) Type(char rune) {
 		t.setXCursor_Relative(t.getXCursor_Relative() + 1)
 		t.preLenght = t.absoluteCurrentCharacter
 	}
+	return nil
 }
 // TODO da inserire i colori
 func (t *TextBlock) parseText(text string) string {

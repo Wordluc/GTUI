@@ -18,7 +18,7 @@ type Rectangle struct {
 	visible   bool
 }
 
-func CreateRectangle(x, y, width, height int) *Rectangle {
+func CreateRectangle(x, y, width, height int) (*Rectangle,error) {
 	return &Rectangle{
 		ansiCode:  "",
 		xPos:      x,
@@ -28,7 +28,7 @@ func CreateRectangle(x, y, width, height int) *Rectangle {
 		height:    height,
 		color:     Color.GetNoneColor(),
 		visible:   true,
-	}
+	},nil
 }
 
 func (r *Rectangle) Touch() {

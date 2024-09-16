@@ -17,7 +17,7 @@ type Gtui struct {
 	term             Terminal.ITerminal
 	keyb             Keyboard.IKeyBoard
 	buff             []Core.IEntity
-	componentManager *Component.ComponentM
+	componentManager *Component.ComponentManager
 	xCursor          int
 	yCursor          int
 	xSize            int
@@ -28,15 +28,20 @@ type Gtui struct {
 
 func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
 	xSize, ySize := term.Size()
-	componentManager := Component.Create(xSize, ySize, 5)
+	var totalError Utils.CError
+	totalError.AddIf(loop == nil || keyb == nil || term == nil , errors.New("invalid size"))
+	componentManager,e:= Component.Create(xSize, ySize, 5)
+	totalError.Add(e)
+	if totalError.HasError() {
+		return nil, totalError
+	}
 	return &Gtui{
 		globalColor:      Color.GetDefaultColor(),
 		cursorVisibility: true,
 		loop:             loop,
 		term:             term,
 		keyb:             keyb,
-		buff: make([]Core.IEntity,
-			0),
+		buff: make([]Core.IEntity,0),
 		componentManager: componentManager,
 		xCursor:          0,
 		yCursor:          0,
@@ -54,9 +59,6 @@ func (c *Gtui) SetCur(x, y int)error {
 	compsPostSet, _ := c.componentManager.Search(x, y)
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
 	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
-	for _, e := range inPreButNotInPost {
-		e.OnLeave()
-	}
 	for _, e := range inPostButNotInPre {
 		e.OnHover()
 	}
@@ -65,6 +67,8 @@ func (c *Gtui) SetCur(x, y int)error {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
 				return nil
+			}else{
+		      ci.(Component.IComponent).OnLeave()
 			}
 		}
 	}
@@ -73,7 +77,7 @@ func (c *Gtui) SetCur(x, y int)error {
 	c.xCursor = x
 	for _, comp := range compsPostSet {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
-			if ci.IsTyping() { //redo
+			if ci.IsTyping() {
 				c.xCursor, c.yCursor = ci.SetCurrentPosCursor(x, y)
 				break
 			}
@@ -181,7 +185,6 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 		return false
 	}
 	c.IClear()
-	//c.AllineCursor()
 	c.IRefreshAll()
 	return true
 }

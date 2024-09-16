@@ -1,24 +1,29 @@
 package Keyboard
 
 import (
+	"errors"
+
 	"github.com/eiannone/keyboard"
 )
 
 type Keyboard struct {
 	key       stateKey
-	IsRunning bool
+	isRunning bool
 	channel   []chan string
 	loop      Loop
 }
+
 type stateKey struct {
 	key  Key
 	rune rune
 }
+
 func NewKeyboard() *Keyboard {
-	return &Keyboard{ channel: make([]chan string, 0), IsRunning: false}
+	return &Keyboard{ channel: make([]chan string, 0), isRunning: false}
 }
+
 func (t *Keyboard) Start(Loop Loop) error {
-	t.IsRunning = true
+	t.isRunning = true
 	t.loop = Loop
 	eventKey, e := keyboard.GetKeys(1)
 	if e != nil {
@@ -27,21 +32,28 @@ func (t *Keyboard) Start(Loop Loop) error {
 	t.keyListening(eventKey)
 	return nil
 }
+
 func (t *Keyboard) GetChannels() []chan string {
 	return t.channel
 }
+
 func (t *Keyboard) NewChannel() int {
 	channel := make(chan string)
 	t.channel = append(t.channel, channel)
 	i := len(t.channel) - 1
 	return i
 }
-func (t *Keyboard) DeleteChannel(i int) {
-	if i <= 0 {
+
+func (t *Keyboard) DeleteChannel(i int) error {
+	if i == 0 {
 		t.channel = []chan string{}
-		return
+		return nil
+	}
+	if i<0 || i >= len(t.channel) {
+		return errors.New("index out of range")
 	}
 	t.channel = append(t.channel[:i], t.channel[i+1:]...)
+	return nil
 }
 
 func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
@@ -80,7 +92,7 @@ func (t *Keyboard) GetKey() (byte, error) {
 	return byte(t.key.rune), nil
 }
 
-func (t *Keyboard) IsKeySPressed(key Key) bool {
+func (t *Keyboard) IsSpecialKeyPressed(key Key) bool {
 	return t.key.key == key
 }
 
