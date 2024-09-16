@@ -24,13 +24,14 @@ type Gtui struct {
 	ySize            int
 	cursorVisibility bool
 	loop             Keyboard.Loop
+	isRunning        bool
 }
 
 func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
 	xSize, ySize := term.Size()
 	totalError := Utils.NewError()
-	totalError.AddIf(loop == nil || keyb == nil || term == nil , errors.New("invalid size"))
-	componentManager,e:= Component.Create(xSize, ySize, 5)
+	totalError.AddIf(loop == nil || keyb == nil || term == nil, errors.New("invalid size"))
+	componentManager, e := Component.Create(xSize, ySize, 5)
 	totalError.Add(e)
 	if totalError.HasError() {
 		return nil, totalError
@@ -41,16 +42,17 @@ func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITermina
 		loop:             loop,
 		term:             term,
 		keyb:             keyb,
-		buff: make([]Core.IEntity,0),
+		buff:             make([]Core.IEntity, 0),
 		componentManager: componentManager,
 		xCursor:          0,
 		yCursor:          0,
 		xSize:            xSize,
 		ySize:            ySize,
+		isRunning:        false,
 	}, nil
 }
 
-func (c *Gtui) SetCur(x, y int)error {
+func (c *Gtui) SetCur(x, y int) error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
 		return errors.New("cursor out of range")
 	}
@@ -67,9 +69,11 @@ func (c *Gtui) SetCur(x, y int)error {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
 				return nil
-			}else{
-		      ci.(Component.IComponent).OnLeave()
+			} else {
+				ci.(Component.IComponent).OnLeave()
 			}
+		} else {
+			comp.OnLeave()
 		}
 	}
 
@@ -82,6 +86,9 @@ func (c *Gtui) SetCur(x, y int)error {
 				break
 			}
 		}
+	}
+	if !c.isRunning {
+		return nil
 	}
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	c.SetVisibilityCursor(false)
@@ -108,6 +115,7 @@ func (c *Gtui) Start() {
 	c.term.Start()
 	c.term.Clear()
 	c.IRefreshAll()
+	c.isRunning = true
 	c.keyb.Start(c.innerLoop)
 	c.term.Clear()
 	c.term.Stop()
@@ -121,6 +129,7 @@ func (c *Gtui) InsertComponent(component Component.IComponent) error {
 	c.buff = append(c.buff, component.GetGraphics())
 	return c.componentManager.Add(component)
 }
+
 func (c *Gtui) EventOn(x, y int, event func(Component.IComponent)) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
@@ -131,6 +140,7 @@ func (c *Gtui) EventOn(x, y int, event func(Component.IComponent)) error {
 	}
 	return nil
 }
+
 func (c *Gtui) Click(x, y int) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {

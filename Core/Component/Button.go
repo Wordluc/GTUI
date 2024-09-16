@@ -4,7 +4,7 @@ import (
 	"GTUI/Core"
 	"GTUI/Core/Drawing"
 	"GTUI/Core/Utils"
-	"GTUI/Core/Utils/Color"
+	"errors"
 )
 
 type OnEvent func()
@@ -20,14 +20,16 @@ type Button struct {
 
 func CreateButton(x, y, sizeX, sizeY int, text string) (*Button, error) {
 	totalError := Utils.NewError()
+	totalError.AddIf(sizeX <= 0 || sizeY <= 0, errors.New("invalid size"))
 	cont, e := Drawing.CreateContainer(0, 0)
 	totalError.Add(e) 
 	rect, e := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
 	totalError.Add(e) 
-   if totalError.HasError() {
+	textD,e := Drawing.CreateTextField(0, 0)
+	totalError.Add(e)
+	if totalError.HasError() {
 		return nil, totalError
 	}
-	textD := Drawing.CreateTextField(0, 0)
 	textD.Type(text)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2
 	textD.SetPos(xC, yC)
@@ -50,14 +52,18 @@ func (b *Button) SetOnRelease(onRelease OnEvent) {
 func (b *Button) SetOnHover(onHover OnEvent) {
 	b.onHover = onHover
 }
-
+func (b *Button) SetOnLeave(onLeave OnEvent) {
+	b.onLeave = onLeave
+}
+func (b *Button) GetVisibleArea() *Drawing.Rectangle {
+	return b.visibleArea
+}
 func (b *Button) OnClick() {
 	if !b.isClicked {
 		b.isClicked = true
 		if b.onClick != nil {
 			b.onClick()
 		}
-		b.updateColorByClick()
 	}
 }
 func (b *Button) OnRelease() {
@@ -65,29 +71,15 @@ func (b *Button) OnRelease() {
 		b.onRelease()
 	}
 	b.isClicked = false
-	b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 func (b *Button) OnHover() {
-	if !b.isClicked {
-		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
-	}
 	if b.onHover != nil {
 		b.onHover()
 	}
 }
 func (b *Button) OnLeave() {
-	if !b.isClicked {
-		b.visibleArea.SetColor(Color.GetDefaultColor())
-	}
 	if b.onLeave != nil {
-		b.OnLeave()
-	}
-}
-func (b *Button) updateColorByClick() {
-	if b.isClicked {
-		b.visibleArea.SetColor(Color.Get(Color.Blue, Color.None))
-	} else {
-		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
+		b.onLeave()
 	}
 }
 func (b *Button) GetGraphics() Core.IEntity {

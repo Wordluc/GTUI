@@ -62,6 +62,10 @@ func (b *TextBox) StartTyping() {
 	b.isTyping = true
 	go b.loopTyping()
 	b.streamText.Delete()
+} 
+
+func (b *TextBox) Clear() {
+	b.textBlock.Clear()
 }
 func (b *TextBox) StopTyping() {
 	b.streamText.Delete()

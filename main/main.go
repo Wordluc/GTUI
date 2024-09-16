@@ -3,7 +3,6 @@ package main
 import (
 	Core "GTUI"
 	"GTUI/Core/Component"
-	"GTUI/Core/Utils"
 	"GTUI/Core/Utils/Color"
 	"GTUI/Keyboard"
 	Kd "GTUI/Keyboard"
@@ -11,29 +10,48 @@ import (
 )
 
 var core *Core.Gtui
-var components []Component.IComponent
 
 func main() {
-	kbr := Keyboard.NewKeyboard()
-	totalError := Utils.NewError()
 	var e error
-	core, e = Core.NewGtui(loop, kbr, &Terminal.Terminal{}); 
-	totalError.Add(e)
+	kbr := Keyboard.NewKeyboard()
+	core, e = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
+	if e != nil {
+		panic(e)
+	}
 	xS, yS := 50, 40
-	c, e := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
-	totalError.Add(e)
+	c, e := Component.CreateTextBox(10, 0, xS, yS, core.CreateStreamingCharacter())
+	if e != nil {
+		panic(e)
+	}
+	if e = core.SetCur(0, 0); e != nil {
+		panic(e)
+	}
+
 	c.SetOnLeave(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
 	})
 	c.SetOnHover(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
-	components = append(components, c)
-	totalError.Add(core.InsertComponent(c))
-	totalError.Add(core.SetCur(0, 0))
-	if totalError.HasError() {
-		panic(totalError)
+
+	if e = core.InsertComponent(c); e != nil {
+		panic(e)
 	}
+	button, e := Component.CreateButton(60, 1, 10, 5, "Cancella")
+	button.SetOnClick(func() {
+		button.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
+		c.Clear()
+	})
+	button.SetOnRelease(func() {
+		button.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
+	})
+	button.SetOnLeave(func() {
+		button.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
+	})
+	if e != nil {
+		panic(e)
+	}
+	core.InsertComponent(button)
 	core.Start()
 }
 
@@ -61,6 +79,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 	}
 
 	if keyb.IsSpecialKeyPressed(Kd.KeyEnter) {
+		core.Click(x, y)
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(Component.IWritableComponent); ok {
 				if !c.IsTyping() {
@@ -71,9 +90,6 @@ func loop(keyb Kd.IKeyBoard) bool {
 	}
 
 	core.SetCur(x, y)
-	if keyb.IsKeyPressed('c') {
-		core.Click(x, y)
-	}
 	if keyb.IsKeyPressed('q') {
 		return false
 	}

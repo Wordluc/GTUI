@@ -118,9 +118,6 @@ type TextBlock struct {
 func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) (*TextBlock ,error){
 	lines := make([]*lineText, 1)
 	var e error
-	if lines == nil {
-		return nil, errors.New("failed to create text block")
-	}
 	lines[0],e = CreateLineText(initialCapacity)
 	if e != nil {
 		return nil, e
@@ -225,6 +222,18 @@ func (t *TextBlock) Delete() error {
 		t.setXCursor_Absolute(t.lines[t.currentLine].totalChar)
 	}
 	return nil
+}
+
+func (t *TextBlock) Clear() {
+	t.lines = make([]*lineText, 1)
+	t.lines[0],_ = CreateLineText(t.initialCapacity)
+	t.currentLine = 0
+	t.totalLine = 1
+	t.xRelativeMaxSize = t.xSize+1
+	t.yRelativeMaxSize = t.ySize
+	t.xRelativeMinSize = 0
+	t.yRelativeMinSize = 0
+	t.Touch()
 }
 
 func (t *TextBlock) GetText(withAnsiCode bool) string {

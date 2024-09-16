@@ -1,8 +1,5 @@
 package Utils
 
-import (
-	"fmt"
-)
 
 type CError struct {
 	error    []error
@@ -25,7 +22,7 @@ func (e *CError) Error() string {
 		}
 		error += v.Error() + "->"
 	}
-	return fmt.Sprint(e.error)
+	return error
 }
 
 // add an error, return true if there is an error and false if is nil

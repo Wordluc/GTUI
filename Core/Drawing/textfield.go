@@ -16,7 +16,7 @@ type TextField struct {
 	visible   bool
 }
 
-func CreateTextField(x, y int) *TextField {
+func CreateTextField(x, y int) (*TextField,error) {
 	return &TextField{
 		XPos:      x,
 		YPos:      y,
@@ -24,7 +24,7 @@ func CreateTextField(x, y int) *TextField {
 		color:     Color.GetDefaultColor(),
 		visible:   true,
 		text:      strings.Builder{},
-	}
+	},nil
 }
 
 func (s *TextField) Type(text string) {

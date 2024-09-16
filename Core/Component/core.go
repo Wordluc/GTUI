@@ -25,11 +25,10 @@ type ComponentManager struct {
 }
 
 func Create(xSize, ySize, chunkSize int) (*ComponentManager, error) {
-	totalError := Utils.NewError()
 	xChunk := xSize/chunkSize + 1
 	yChunk := ySize/chunkSize + 1
-	if totalError.AddIf((xSize == 0 || ySize == 0), errors.New("invalid chunk size")) {
-		return nil, totalError
+	if xSize == 0 || ySize == 0{
+     return nil,errors.New("invalid chunk size")
 	}
 
 	matrix := make([][]*[]IComponent, xChunk)
@@ -54,6 +53,9 @@ func (s *ComponentManager) Add(comp IComponent) error {
 		for j := shape.yPos; j < finalY; j++ {
 			xC, yC := i/s.ChunkSize, j/s.ChunkSize
 			if (xC >= s.nChunkX || yC >= s.nChunkY){
+				return errors.New("component out of range")
+			}
+			if xC < 0 || yC < 0 {
 				return errors.New("component out of range")
 			}
 			comp.OnLeave()
