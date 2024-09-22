@@ -2,6 +2,7 @@ package Keyboard
 
 import (
 	"github.com/eiannone/keyboard"
+	"github.com/atotto/clipboard"
 )
 
 type Keyboard struct {
@@ -71,6 +72,13 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 			break
 		}
 	}
+}
+func (t *Keyboard) GetClickboard() string{
+	text,e:=clipboard.ReadAll()
+	if e!=nil{
+		text=""
+	}
+	return text
 }
 func (t *Keyboard) Stop() {
 	keyboard.Close()

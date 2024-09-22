@@ -13,4 +13,5 @@ type IKeyBoard interface {
 	GetChannels() []chan string
 	NewChannel() int
 	DeleteChannel(int)
+	GetClickboard() string
 }

@@ -54,9 +54,6 @@ func (c *Gtui) SetCur(x, y int)error {
 	compsPostSet, _ := c.componentManager.Search(x, y)
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
 	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
-	for _, e := range inPreButNotInPost {
-		e.OnLeave()
-	}
 	for _, e := range inPostButNotInPre {
 		e.OnHover()
 	}
@@ -65,6 +62,8 @@ func (c *Gtui) SetCur(x, y int)error {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
 				return nil
+			}else{
+				comp.OnLeave()
 			}
 		}
 	}

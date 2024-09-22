@@ -49,6 +49,15 @@ func (b *TextBox) loopTyping() {
 	}
 }
 
+func (v *TextBox) Paste(text string) {
+	for _,char:=range text{
+		if char=='\r'{
+       continue
+		}	
+		v.textBlock.Type(char)
+	}
+}
+
 func (b *TextBox) StartTyping() {
 	b.isTyping = true
 	go b.loopTyping()
