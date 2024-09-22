@@ -40,7 +40,7 @@ func (b *TextBox) loopTyping() {
 		if !b.isTyping {
 			return
 		}
-		for _,key=range str{
+		for _,key=range []rune(str){
 			if key=='\b'{
 				b.textBlock.Delete()
 				continue
@@ -51,7 +51,7 @@ func (b *TextBox) loopTyping() {
 }
 
 func (v *TextBox) Paste(text string) {
-	for _,char:=range text{
+	for _,char:=range []rune(text){
 		if char=='\r'{
        continue
 		}	
