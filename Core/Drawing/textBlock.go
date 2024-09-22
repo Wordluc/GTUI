@@ -178,24 +178,29 @@ func (t *TextBlock) SetWrap(isOn bool) {
 	}
 }
 
-//Delete the current character
+// Delete the current character
+func (t *TextBlock) deleteWrapping() {
+	defer t.Touch()
+	t.wrap = false
+	var xToInvert int
+	var yToInvert int
+	//invert the cursor with the wrapping starting, so the cursor point will be bigger than the wrapping
+	if t.currentLine < t.yStartingWrapping || (t.currentLine == t.yStartingWrapping && t.absoluteCurrentCharacter < t.xStartingWrapping) {
+		xToInvert = t.absoluteCurrentCharacter
+		yToInvert = t.currentLine
+		t.setXCursor_Absolute(t.xStartingWrapping)
+		t.setYCursor_Absolute(t.yStartingWrapping)
+		t.xStartingWrapping = xToInvert
+		t.yStartingWrapping = yToInvert
+	}
+	for t.absoluteCurrentCharacter > t.xStartingWrapping || t.currentLine > t.yStartingWrapping {
+		t.Delete()
+	}
+}
 func (t *TextBlock) Delete() {
 	if t.wrap {
-		defer t.Touch()
-		t.wrap = false
-		var xToInvert int
-		var yToInvert int
-		if t.currentLine <t.yStartingWrapping || (t.currentLine == t.yStartingWrapping && t.absoluteCurrentCharacter < t.xStartingWrapping) {
-			xToInvert = t.absoluteCurrentCharacter
-			yToInvert = t.currentLine
-			t.setXCursor_Absolute(t.xStartingWrapping)
-			t.setYCursor_Absolute(t.yStartingWrapping)
-         t.xStartingWrapping = xToInvert
-			t.yStartingWrapping = yToInvert
-		}
-		for ;t.absoluteCurrentCharacter>t.xStartingWrapping || t.currentLine>t.yStartingWrapping;{
-			t.Delete()
-		}
+		t.deleteWrapping()
+		return
 	}
 	if t.totalLine == 1 && t.absoluteCurrentCharacter == 0 {
 		return
@@ -477,6 +482,9 @@ func (t *TextBlock) resetXCursor() {
 
 func (t *TextBlock) Type(char rune) {
 	defer t.Touch()
+	if t.wrap {
+		t.deleteWrapping()
+	}
 	if char == '\n' {
 		t.totalLine++
 		t.setYCursor_Relative(t.getYCursor_Relative() + 1)
