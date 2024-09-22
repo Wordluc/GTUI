@@ -41,7 +41,8 @@ func (t *lineText) digit(char rune, i int) {
 		t.line = slices.Concat(t.line, make([]rune, t.initialCapacity))
 	}
 }
-///delete the character i, if the line is empty return true
+
+// /delete the character i, if the line is empty return true
 func (t *lineText) delete(i int) bool {
 	if t.totalChar <= 0 {
 		return true
@@ -58,6 +59,7 @@ func (t *lineText) delete(i int) bool {
 		t.totalChar = 0
 	}
 	return false
+
 }
 
 func (t *lineText) merge(add *lineText) {
@@ -96,6 +98,7 @@ type TextBlock struct {
 	initialCapacity          int
 	totalLine                int
 	preLenght                int
+	tabSize                  int
 }
 
 func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock {
@@ -118,6 +121,7 @@ func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock
 		initialCapacity:          initialCapacity,
 		totalLine:                1,
 		absoluteCurrentCharacter: 0,
+		tabSize:                  4,
 	}
 }
 
@@ -163,7 +167,7 @@ func (t *TextBlock) GetCursor_Relative() (int, int) {
 	return t.getXCursor_Relative(), t.getYCursor_Relative()
 }
 
-///Delete the current character
+// /Delete the current character
 func (t *TextBlock) Delete() {
 	if t.totalLine == 1 && t.absoluteCurrentCharacter == 0 {
 		return
@@ -223,13 +227,14 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 	}
 	return full.String()
 }
-// /Set the absolute character position by looking at the relative position in the window,
-// /if x>=size the text is slided to the right
-// /if x<0 the text is slided to the left
+
+// Set the absolute character position by looking at the relative position in the window,
+// if x>=size the text is slided to the right
+// if x<0 the text is slided to the left
 func (t *TextBlock) setXCursor_Relative(x int) {
 	defer t.Touch()
 	if x >= t.xSize {
-		if t.absoluteCurrentCharacter+x - t.xSize+1>t.lines[t.currentLine].totalChar {
+		if t.absoluteCurrentCharacter+x-t.xSize+1 > t.lines[t.currentLine].totalChar {
 			return
 		}
 		t.xRelativeMaxSize += x - t.xSize + 1
@@ -273,9 +278,9 @@ func (t *TextBlock) setXCursor_Absolute(x int) {
 	t.absoluteCurrentCharacter = x
 }
 
-// /Set the absolute character position by looking at the relative position in the window,
-// /if y>=size the text is slided to the right
-// /if y<0 the text is slided to the left
+// Set the absolute character position by looking at the relative position in the window,
+// if y>=size the text is slided to the right
+// if y<0 the text is slided to the left
 func (t *TextBlock) setYCursor_Relative(y int) {
 	defer t.Touch()
 	if y >= t.ySize {
@@ -353,7 +358,6 @@ func (t *TextBlock) SetCursor_Relative(x, y int) (int, int) {
 	yRelative := y - t.yPos
 	isYChanged := yRelative != t.getYCursor_Relative()
 	isXChanged := xRelative != t.getXCursor_Relative()
-  
 	if t.yRelativeMinSize+yRelative >= len(t.lines) {
 		yRelative = len(t.lines) - 1 - t.yRelativeMinSize
 	}
@@ -366,8 +370,8 @@ func (t *TextBlock) SetCursor_Relative(x, y int) (int, int) {
 		xRelative = 0
 	}
 
-	if xRelative + t.xRelativeMinSize >= t.lines[t.yRelativeMinSize+yRelative].totalChar {
-		xRelative = t.lines[t.yRelativeMinSize+yRelative].totalChar - t.xRelativeMinSize 
+	if xRelative+t.xRelativeMinSize >= t.lines[t.yRelativeMinSize+yRelative].totalChar {
+		xRelative = t.lines[t.yRelativeMinSize+yRelative].totalChar - t.xRelativeMinSize
 	}
 	if isYChanged {
 		t.setYCursor_Relative(yRelative)
@@ -401,11 +405,20 @@ func (t *TextBlock) Type(char rune) {
 		t.lines = slices.Concat(t.lines[:t.currentLine], []*lineText{newLine}, t.lines[t.currentLine:])
 		t.resetXCursor()
 	} else {
-		t.lines[t.currentLine].digit(char, t.absoluteCurrentCharacter)
-		t.setXCursor_Relative(t.getXCursor_Relative() + 1)
-		t.preLenght = t.absoluteCurrentCharacter
+		if char == '	' {
+			for i := 0; i < t.tabSize; i++ {
+				t.lines[t.currentLine].digit(' ', t.absoluteCurrentCharacter)
+				t.setXCursor_Relative(t.getXCursor_Relative() + 1)
+				t.preLenght = t.absoluteCurrentCharacter
+			}
+		} else {
+			t.lines[t.currentLine].digit(char, t.absoluteCurrentCharacter)
+			t.setXCursor_Relative(t.getXCursor_Relative() + 1)
+			t.preLenght = t.absoluteCurrentCharacter
+		}
 	}
 }
+
 // TODO da inserire i colori
 func (t *TextBlock) parseText(text string) string {
 	start := 0
@@ -423,4 +436,3 @@ func (t *TextBlock) parseText(text string) string {
 	}
 	return text[start:size]
 }
-
