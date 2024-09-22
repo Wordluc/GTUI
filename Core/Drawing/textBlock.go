@@ -93,12 +93,15 @@ type TextBlock struct {
 	xRelativeMinSize         int
 	yRelativeMaxSize         int
 	yRelativeMinSize         int
+	xStartingWrapping        int
+	yStartingWrapping        int
 	absoluteCurrentCharacter int
 	currentLine              int
 	initialCapacity          int
 	totalLine                int
 	preLenght                int
 	tabSize                  int
+	wrap                     bool
 }
 
 func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock {
@@ -122,6 +125,7 @@ func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock
 		totalLine:                1,
 		absoluteCurrentCharacter: 0,
 		tabSize:                  4,
+		wrap:                     false,
 	}
 }
 
@@ -150,7 +154,6 @@ func (t *TextBlock) GetSize() (int, int) {
 func (t *TextBlock) GetPos() (int, int) {
 	return t.xPos, t.yPos
 }
-
 func (t *TextBlock) SetVisibility(visible bool) {
 	t.visible = visible
 }
@@ -165,6 +168,14 @@ func (t *TextBlock) GetTotalCursor() (int, int) {
 
 func (t *TextBlock) GetCursor_Relative() (int, int) {
 	return t.getXCursor_Relative(), t.getYCursor_Relative()
+}
+
+func (t *TextBlock) SetWrap(isOn bool) {
+	t.wrap = isOn
+	if isOn {
+		t.xStartingWrapping = t.absoluteCurrentCharacter
+		t.yStartingWrapping = t.currentLine
+	}
 }
 
 // /Delete the current character
@@ -202,9 +213,19 @@ func (t *TextBlock) Delete() {
 	}
 }
 
+func insertTextToOrigin(origin, text string, pos int) string {
+	if pos > len(origin) {
+		return origin + text
+	}
+	return origin[:pos] + text + origin[pos:]
+}
 func (t *TextBlock) GetText(withAnsiCode bool) string {
 	full := strings.Builder{}
 	y := 0
+	if !t.wrap {
+		t.xStartingWrapping = t.absoluteCurrentCharacter
+		t.yStartingWrapping = t.currentLine
+	}
 	for i, line := range t.lines {
 		if i < t.yRelativeMinSize {
 			continue
@@ -219,13 +240,57 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 			full.WriteString(U.GetAnsiMoveTo(t.xPos, t.yPos+y))
 		}
 		text := line.getText()
-		full.WriteString(t.parseText(text))
+		text = t.parseText(text)
+		if !(t.yStartingWrapping == t.currentLine && t.xStartingWrapping == t.absoluteCurrentCharacter) && t.wrap {
+			if t.currentLine > t.yStartingWrapping {
+				if t.currentLine == i {
+					text = insertTextToOrigin(text, "\033[m", t.absoluteCurrentCharacter)
+				}
+				if t.yStartingWrapping == i {
+					text = insertTextToOrigin(text, "\033[100m", t.xStartingWrapping)
+				}
+			} else if t.currentLine < t.yStartingWrapping {
+				if t.currentLine == i {
+					text = insertTextToOrigin(text, "\033[100m", t.absoluteCurrentCharacter)
+				}
+				if t.yStartingWrapping == i {
+					text = insertTextToOrigin(text, "\033[m", t.xStartingWrapping)
+				}
+			} else {
+				if t.currentLine == i {
+					if t.absoluteCurrentCharacter > t.xStartingWrapping {
+						text = insertTextToOrigin(text, "\033[m", t.absoluteCurrentCharacter)
+						text = insertTextToOrigin(text, "\033[100m", t.xStartingWrapping)
+					} else {
+						text = insertTextToOrigin(text, "\033[m", t.xStartingWrapping)
+						text = insertTextToOrigin(text, "\033[100m", t.absoluteCurrentCharacter)
+					}
+				}
+			}
+		}
+		full.WriteString(text)
 		if !withAnsiCode {
 			full.WriteRune('\n')
 		}
 		y++
 	}
 	return full.String()
+}
+func (t *TextBlock) parseText(text string) string {
+	start := 0
+	size := len(text)
+	if size > t.xRelativeMinSize {
+		start = t.xRelativeMinSize
+	} else {
+		return ""
+	}
+	if size > t.xRelativeMaxSize-1 {
+		size = t.xRelativeMaxSize - 1
+	} //i valori size and start devono globali
+	if diff := size - start; diff > t.xSize {
+		start += diff - t.xSize
+	}
+	return text[start:size] //"text[start:size]
 }
 
 // Set the absolute character position by looking at the relative position in the window,
@@ -287,9 +352,6 @@ func (t *TextBlock) setYCursor_Relative(y int) {
 		if t.currentLine+y-t.ySize >= t.totalLine {
 			return
 		}
-		//		if diff:=t.currentLine - t.totalLine;diff>0 {
-		//			y=-diff
-		//		}
 		t.yRelativeMaxSize += y - t.ySize + 1
 		t.yRelativeMinSize += y - t.ySize + 1
 		t.currentLine += y - t.ySize + 1
@@ -419,20 +481,7 @@ func (t *TextBlock) Type(char rune) {
 	}
 }
 
-// TODO da inserire i colori
-func (t *TextBlock) parseText(text string) string {
-	start := 0
-	size := len(text)
-	if size > t.xRelativeMinSize {
-		start = t.xRelativeMinSize
-	} else {
-		return ""
-	}
-	if size > t.xRelativeMaxSize-1 {
-		size = t.xRelativeMaxSize - 1
-	} //i valori size and start devono globali
-	if diff := size - start; diff > t.xSize {
-		start += diff - t.xSize
-	}
-	return text[start:size]
+// types a character without moving the cursor
+func (t *TextBlock) ForceType(char rune) {
+	t.lines[t.currentLine].digit(char, t.absoluteCurrentCharacter)
 }

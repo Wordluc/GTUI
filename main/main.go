@@ -78,6 +78,16 @@ func loop(keyb Kd.IKeyBoard) bool {
 		})
 	}
 
+	if keyb.IsKeySPressed(Kd.KeyCtrlA) {
+		core.EventOn(x, y, func(c Component.IComponent) {
+			if c, ok := c.(*Component.TextBox); ok {
+				if c.IsTyping(){
+					c.Wrap(true)
+					
+				}
+			}
+		})
+	}
 	if keyb.IsKeyPressed('c') {
 		core.Click(x, y)
 	}

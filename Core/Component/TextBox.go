@@ -11,6 +11,7 @@ type TextBox struct {
 	textBlock   *Drawing.TextBlock
 	isTyping    bool
 	streamText  StreamCharacter
+	wrap        bool
 	onClick     func()
 	onLeave     func()
 	onHover     func()
@@ -56,6 +57,10 @@ func (v *TextBox) Paste(text string) {
 		}	
 		v.textBlock.Type(char)
 	}
+}
+
+func (t *TextBox) Wrap(isOn bool) {
+	t.textBlock.SetWrap(isOn)
 }
 
 func (b *TextBox) StartTyping() {
