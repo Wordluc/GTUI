@@ -11,6 +11,7 @@ type TextBox struct {
 	textBlock   *Drawing.TextBlock
 	isTyping    bool
 	streamText  StreamCharacter
+	wrap        bool
 	onClick     func()
 	onLeave     func()
 	onHover     func()
@@ -39,7 +40,7 @@ func (b *TextBox) loopTyping() {
 		if !b.isTyping {
 			return
 		}
-		for _,key=range str{
+		for _,key=range []rune(str){
 			if key=='\b'{
 				b.textBlock.Delete()
 				continue
@@ -47,6 +48,23 @@ func (b *TextBox) loopTyping() {
 			b.textBlock.Type(key)
 		}
 	}
+}
+
+func (v *TextBox) Paste(text string) {
+	for _,char:=range []rune(text){
+		if char=='\r'{
+       continue
+		}	
+		v.textBlock.Type(char)
+	}
+}
+
+func (v *TextBox) Copy() string {
+	return v.textBlock.GetSelectedText()
+}
+
+func (t *TextBox) SetWrap(isOn bool) {
+	t.textBlock.SetWrap(isOn)
 }
 
 func (b *TextBox) StartTyping() {

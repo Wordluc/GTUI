@@ -48,6 +48,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 		x--
 	}
 
+	core.SetCur(x, y)
 	if keyb.IsKeySPressed(Kd.KeyCtrlQ) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(Component.IWritableComponent); ok {
@@ -66,7 +67,36 @@ func loop(keyb Kd.IKeyBoard) bool {
 		})
 	}
 
-	core.SetCur(x, y)
+	if keyb.IsKeySPressed(Kd.KeyCtrlV) {
+		core.EventOn(x, y, func(c Component.IComponent) {
+			if c, ok := c.(*Component.TextBox); ok {
+				if c.IsTyping(){
+					c.Paste(keyb.GetClickboard())
+					core.AllineCursor()
+				}
+			}
+		})
+	}
+
+	if keyb.IsKeySPressed(Kd.KeyCtrlA) {
+		core.EventOn(x, y, func(c Component.IComponent) {
+			if c, ok := c.(*Component.TextBox); ok {
+				if c.IsTyping(){
+					c.SetWrap(true)
+					
+				}
+			}
+		})
+	}
+	if keyb.IsKeySPressed(Kd.KeyCtrlC) {
+		core.EventOn(x, y, func(c Component.IComponent) {
+			if c, ok := c.(*Component.TextBox); ok {
+				if c.IsTyping(){
+					keyb.InsertClickboard(c.Copy())
+				}
+			}
+		})
+	}
 	if keyb.IsKeyPressed('c') {
 		core.Click(x, y)
 	}

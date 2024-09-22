@@ -1,6 +1,9 @@
 package Keyboard
 
 import (
+	"strings"
+
+	"github.com/atotto/clipboard"
 	"github.com/eiannone/keyboard"
 )
 
@@ -50,6 +53,9 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 		if v.Key == keyboard.KeySpace {
 			v.Rune = ' '
 		}
+		if v.Key == keyboard.KeyTab {
+			v.Rune = '	'
+		}
 		if v.Key == keyboard.KeyEnter {
 			v.Rune = '\n'
 		}
@@ -71,6 +77,16 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 			break
 		}
 	}
+}
+func (t *Keyboard) GetClickboard() string{
+	text,e:=clipboard.ReadAll()
+	if e!=nil{
+		text=""
+	}
+	return text
+}
+func (t *Keyboard) InsertClickboard(text string) {
+	clipboard.WriteAll(strings.ReplaceAll(text, "\x00",""))
 }
 func (t *Keyboard) Stop() {
 	keyboard.Close()
