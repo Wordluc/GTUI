@@ -1,8 +1,10 @@
 package Keyboard
 
 import (
-	"github.com/eiannone/keyboard"
+	"strings"
+
 	"github.com/atotto/clipboard"
+	"github.com/eiannone/keyboard"
 )
 
 type Keyboard struct {
@@ -79,6 +81,9 @@ func (t *Keyboard) GetClickboard() string{
 		text=""
 	}
 	return text
+}
+func (t *Keyboard) InsertClickboard(text string) {
+	clipboard.WriteAll(strings.ReplaceAll(text, "\x00",""))
 }
 func (t *Keyboard) Stop() {
 	keyboard.Close()
