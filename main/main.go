@@ -77,6 +77,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 			}
 		})
 	}
+
 	if keyb.IsKeyPressed('c') {
 		core.Click(x, y)
 	}
