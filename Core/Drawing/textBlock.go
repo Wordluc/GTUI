@@ -177,8 +177,44 @@ func (t *TextBlock) SetWrap(isOn bool) {
 		t.yStartingWrapping = t.currentLine
 	}
 }
-
-// Delete the current character
+//get the wrapped text
+func (t *TextBlock) GetSelectedText() string {
+	var str strings.Builder
+	xStarting:=t.xStartingWrapping
+	yStarting:=t.yStartingWrapping
+	xEnding:=t.absoluteCurrentCharacter
+	yEnding:=t.currentLine
+	if t.currentLine < t.yStartingWrapping || (t.currentLine == t.yStartingWrapping && t.absoluteCurrentCharacter < t.xStartingWrapping) {
+      xStarting = t.absoluteCurrentCharacter
+		yStarting = t.currentLine
+		xEnding = t.xStartingWrapping
+      yEnding = t.yStartingWrapping
+	}
+	for yi,line:=range t.lines[yStarting:] {
+		if yi==yStarting{
+         if xStarting>line.totalChar{
+	         continue
+         }else{
+            str.WriteString(string(line.line[xStarting:])+"\n")
+				continue
+			}
+		}
+		if yi>yEnding{
+			break
+		}
+		if yi==yEnding{
+         if xEnding>line.totalChar{
+				str.WriteString(string(line.line))
+			}else{
+				str.WriteString(string(line.line[:xEnding]))
+			}
+			break
+		}
+		str.WriteString(string(line.line)+"\n")
+	}
+	return str.String()
+}
+//delete the selected text
 func (t *TextBlock) deleteWrapping() {
 	defer t.Touch()
 	t.wrap = false
@@ -197,6 +233,7 @@ func (t *TextBlock) deleteWrapping() {
 		t.Delete()
 	}
 }
+// Delete the current character
 func (t *TextBlock) Delete() {
 	if t.wrap {
 		t.deleteWrapping()
@@ -263,7 +300,7 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 		}
 		text := line.getText()
 		text = t.parseText(text)
-		if !(t.yStartingWrapping == t.currentLine && t.xStartingWrapping == t.absoluteCurrentCharacter) && t.wrap {
+		if !(t.yStartingWrapping == t.currentLine && t.xStartingWrapping == t.absoluteCurrentCharacter) && t.wrap {//TODO: da sistemare
 			if t.currentLine > t.yStartingWrapping {
 				if t.currentLine == i {
 					text = insertTextToOrigin(text, "\033[m", t.absoluteCurrentCharacter)
@@ -504,9 +541,4 @@ func (t *TextBlock) Type(char rune) {
 			t.preLenght = t.absoluteCurrentCharacter
 		}
 	}
-}
-
-// types a character without moving the cursor
-func (t *TextBlock) ForceType(char rune) {
-	t.lines[t.currentLine].digit(char, t.absoluteCurrentCharacter)
 }

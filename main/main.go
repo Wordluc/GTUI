@@ -88,6 +88,15 @@ func loop(keyb Kd.IKeyBoard) bool {
 			}
 		})
 	}
+	if keyb.IsKeySPressed(Kd.KeyCtrlC) {
+		core.EventOn(x, y, func(c Component.IComponent) {
+			if c, ok := c.(*Component.TextBox); ok {
+				if c.IsTyping(){
+					keyb.InsertClickboard(c.Copy())
+				}
+			}
+		})
+	}
 	if keyb.IsKeyPressed('c') {
 		core.Click(x, y)
 	}

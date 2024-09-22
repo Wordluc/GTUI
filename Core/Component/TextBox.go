@@ -59,6 +59,10 @@ func (v *TextBox) Paste(text string) {
 	}
 }
 
+func (v *TextBox) Copy() string {
+	return v.textBlock.CopyText()
+}
+
 func (t *TextBox) Wrap(isOn bool) {
 	t.textBlock.SetWrap(isOn)
 }
