@@ -337,19 +337,26 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 }
 func (t *TextBlock) parseText(text string) string {
 	start := 0
-	size := len(text)
-	if size > t.xRelativeMinSize {
+	apperanceSize := len([]rune(text))
+	logicSize := len(text)
+	if apperanceSize > t.xRelativeMinSize {
 		start = t.xRelativeMinSize
 	} else {
 		return ""
 	}
-	if size > t.xRelativeMaxSize-1 {
-		size = t.xRelativeMaxSize-1
+	//da sistemare
+	if apperanceSize > t.xRelativeMaxSize-1 {
+		if logicSize==apperanceSize {
+			logicSize = t.xRelativeMaxSize-1
+		}else{
+			logicSize = t.xRelativeMaxSize+(logicSize-apperanceSize-1)
+		}
 	}
-	if diff := size - start; diff > t.xSize {
-		start += diff - t.xSize
-	}
-	return text[start:size]
+
+//	if diff := logicSize - start; diff > t.xSize {
+//		start += diff - t.xSize
+//	}
+	return text[start:logicSize]
 }
 
 // Set the absolute character position by looking at the relative position in the window,
