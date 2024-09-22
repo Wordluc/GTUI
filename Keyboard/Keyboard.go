@@ -1,7 +1,6 @@
 package Keyboard
 
 import (
-	"strings"
 
 	"github.com/atotto/clipboard"
 	"github.com/eiannone/keyboard"
@@ -86,7 +85,7 @@ func (t *Keyboard) GetClickboard() string{
 	return text
 }
 func (t *Keyboard) InsertClickboard(text string) {
-	clipboard.WriteAll(strings.ReplaceAll(text, "\x00",""))
+	clipboard.WriteAll(text)
 }
 func (t *Keyboard) Stop() {
 	keyboard.Close()

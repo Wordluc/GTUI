@@ -216,7 +216,7 @@ func TestCreateNewLineFromTwoLines(t *testing.T) {
 	textBlock := CreateTextBlock(0, 0, 10, 100, 1)
 	typing(textBlock, "123a1")
 	typing(textBlock, "aaaaaaa")
-//123a1aaaaaaa
+	//123a1aaaaaaa
 	textBlock.SetCursor_Relative(5, 0)
 	textBlock.Type('\n')
 	if textBlock.totalLine != 2 {
@@ -291,65 +291,94 @@ func TestGoToOutSizeX(t *testing.T) {
 func TestGoToOutSizeY(t *testing.T) {
 	TextBlock := CreateTextBlock(0, 0, 4, 4, 1)
 	typing(TextBlock, "\n\n\n\n\n")
-	if TextBlock.yRelativeMinSize!=2{
-    t.Errorf("expected %v, got %v", 2, TextBlock.yRelativeMinSize)
+	if TextBlock.yRelativeMinSize != 2 {
+		t.Errorf("expected %v, got %v", 2, TextBlock.yRelativeMinSize)
 	}
-	if TextBlock.currentLine!=5{
+	if TextBlock.currentLine != 5 {
 		t.Errorf("expected %v, got %v", 5, TextBlock.currentLine)
 	}
 	TextBlock.Type('p')
 	TextBlock.Type('p')
-	if TextBlock.absoluteCurrentCharacter!=2{
+	if TextBlock.absoluteCurrentCharacter != 2 {
 		t.Errorf("expected %v, got %v", 2, TextBlock.absoluteCurrentCharacter)
 	}
-	x,_:=TextBlock.SetCursor_Relative(1,5)
-	if x!=1{
+	x, _ := TextBlock.SetCursor_Relative(1, 5)
+	if x != 1 {
 		t.Errorf("expected %v, got %v", 1, x)
 	}
 	TextBlock.Type('t')
-	if TextBlock.absoluteCurrentCharacter!=2{//it starts from 0
+	if TextBlock.absoluteCurrentCharacter != 2 { //it starts from 0
 		t.Errorf("expected %v, got %v", 3, TextBlock.absoluteCurrentCharacter)
 	}
-	if TextBlock.lines[TextBlock.currentLine].getText()!="ptp"{
-    t.Errorf("expected %v, got %v", "ptp", TextBlock.lines[TextBlock.currentLine].getText())
+	if TextBlock.lines[TextBlock.currentLine].getText() != "ptp" {
+		t.Errorf("expected %v, got %v", "ptp", TextBlock.lines[TextBlock.currentLine].getText())
 	}
 }
 
 func TestGoOutSizeRapidly(t *testing.T) {
 	TextBlock := CreateTextBlock(0, 0, 4, 4, 1)
-  TextBlock.Type('2')
-  TextBlock.Type('4')
-	TextBlock.SetCursor_Relative(0,0)
-	TextBlock.SetCursor_Relative(10,0)
-	if TextBlock.absoluteCurrentCharacter!=2{
+	TextBlock.Type('2')
+	TextBlock.Type('4')
+	TextBlock.SetCursor_Relative(0, 0)
+	TextBlock.SetCursor_Relative(10, 0)
+	if TextBlock.absoluteCurrentCharacter != 2 {
 		t.Errorf("expected %v, got %v", 2, TextBlock.absoluteCurrentCharacter)
 	}
 	TextBlock.Type('\n')
 	TextBlock.Type('\n')
-	TextBlock.SetCursor_Relative(0,0)
-	TextBlock.SetCursor_Relative(0,10)
-	if TextBlock.currentLine!=2{
+	TextBlock.SetCursor_Relative(0, 0)
+	TextBlock.SetCursor_Relative(0, 10)
+	if TextBlock.currentLine != 2 {
 		t.Errorf("expected %v, got %v", 2, TextBlock.currentLine)
 	}
 
 }
 func TestSpecialCharacter(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 48, 100,1)
-	for _,c:=range "pblic class persona(string nome,int etá,int 64 sesso){"{
-        textBlock.Type(c)
+	textBlock := CreateTextBlock(0, 0, 48, 100, 1)
+	for _, c := range "pblic class persona(string nome,int etá,int 64 sesso){" {
+		textBlock.Type(c)
 	}
-	textBlock.SetCursor_Relative(-6,0)
+	textBlock.SetCursor_Relative(-6, 0)
 	if textBlock.GetText(false) != "pblic class persona(string nome,int etá,int 64 s\n" {
 		t.Errorf("expected %v, got |%v|", "", strings.Split(textBlock.GetText(false), "\n")[0])
 	}
 }
 func TestSpecialCharacter2(t *testing.T) {
-	textBlock := CreateTextBlock(0, 0, 48, 100,1)
-	for _,c:=range "pblic clàss persona(string nome,int etá,int 64 sesso){"{
-        textBlock.Type(c)
+	textBlock := CreateTextBlock(0, 0, 48, 100, 1)
+	for _, c := range "pblic clàss persona(string nome,int etá,int 64 sesso){" {
+		textBlock.Type(c)
 	}
 	textBlock.setXCursor_Absolute(0)
-		if textBlock.GetText(false) != "pblic clàss persona(string nome,int etá,int 64 s\n" {
+	if textBlock.GetText(false) != "pblic clàss persona(string nome,int etá,int 64 s\n" {
 		t.Errorf("expected %v, got |%v|", "", strings.Split(textBlock.GetText(false), "\n")[0])
+	}
+}
+func TestCopyTextInline(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 48, 100, 1)
+	for _, c := range "ciao sono luca" {
+		textBlock.Type(c)
+	}
+	textBlock.setXCursor_Absolute(0)
+	textBlock.setXCursor_Relative(10)
+	textBlock.SetWrap(true)
+	textBlock.setXCursor_Relative(14)
+	copiedText := textBlock.GetSelectedText()
+	if copiedText != "luca" {
+		t.Errorf("expected %v, got %v", "luca", copiedText)
+	}
+}
+func TestCopyTextMultiline(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 48, 100, 1)
+	for _, c := range "ciao sono luca\nche bello" {
+		textBlock.Type(c)
+	}
+	textBlock.setXCursor_Absolute(0)
+	textBlock.setYCursor_Absolute(0)
+	textBlock.setXCursor_Relative(10)
+	textBlock.SetWrap(true)
+	textBlock.SetCursor_Relative(9,1)
+	copiedText := textBlock.GetSelectedText()
+	if copiedText != "luca\nche bello" {
+		t.Errorf("expected %v, got %v", "luca\nche bello", copiedText)
 	}
 }
