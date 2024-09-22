@@ -348,7 +348,7 @@ func TestSpecialCharacter2(t *testing.T) {
 	for _,c:=range "pblic clàss persona(string nome,int etá,int 64 sesso){"{
         textBlock.Type(c)
 	}
-	textBlock.SetCursor_Relative(-6,0)
+	textBlock.setXCursor_Absolute(0)
 		if textBlock.GetText(false) != "pblic clàss persona(string nome,int etá,int 64 s\n" {
 		t.Errorf("expected %v, got |%v|", "", strings.Split(textBlock.GetText(false), "\n")[0])
 	}
