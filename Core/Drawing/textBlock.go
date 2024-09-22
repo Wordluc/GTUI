@@ -178,8 +178,25 @@ func (t *TextBlock) SetWrap(isOn bool) {
 	}
 }
 
-// /Delete the current character
+//Delete the current character
 func (t *TextBlock) Delete() {
+	if t.wrap {
+		defer t.Touch()
+		t.wrap = false
+		var xToInvert int
+		var yToInvert int
+		if t.currentLine <t.yStartingWrapping || (t.currentLine == t.yStartingWrapping && t.absoluteCurrentCharacter < t.xStartingWrapping) {
+			xToInvert = t.absoluteCurrentCharacter
+			yToInvert = t.currentLine
+			t.setXCursor_Absolute(t.xStartingWrapping)
+			t.setYCursor_Absolute(t.yStartingWrapping)
+         t.xStartingWrapping = xToInvert
+			t.yStartingWrapping = yToInvert
+		}
+		for ;t.absoluteCurrentCharacter>t.xStartingWrapping || t.currentLine>t.yStartingWrapping;{
+			t.Delete()
+		}
+	}
 	if t.totalLine == 1 && t.absoluteCurrentCharacter == 0 {
 		return
 	}
