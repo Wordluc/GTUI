@@ -60,10 +60,10 @@ func (v *TextBox) Paste(text string) {
 }
 
 func (v *TextBox) Copy() string {
-	return v.textBlock.CopyText()
+	return v.textBlock.GetSelectedText()
 }
 
-func (t *TextBox) Wrap(isOn bool) {
+func (t *TextBox) SetWrap(isOn bool) {
 	t.textBlock.SetWrap(isOn)
 }
 

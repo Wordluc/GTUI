@@ -344,12 +344,12 @@ func (t *TextBlock) parseText(text string) string {
 		return ""
 	}
 	if size > t.xRelativeMaxSize-1 {
-		size = t.xRelativeMaxSize - 1
-	} //i valori size and start devono globali
+		size = t.xRelativeMaxSize-1
+	}
 	if diff := size - start; diff > t.xSize {
 		start += diff - t.xSize
 	}
-	return text[start:size] //"text[start:size]
+	return text[start:size]
 }
 
 // Set the absolute character position by looking at the relative position in the window,
