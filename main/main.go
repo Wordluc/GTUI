@@ -82,7 +82,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping(){
-					c.Wrap(true)
+					c.SetWrap(true)
 					
 				}
 			}

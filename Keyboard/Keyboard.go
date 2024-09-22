@@ -53,6 +53,9 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 		if v.Key == keyboard.KeySpace {
 			v.Rune = ' '
 		}
+		if v.Key == keyboard.KeyTab {
+			v.Rune = '	'
+		}
 		if v.Key == keyboard.KeyEnter {
 			v.Rune = '\n'
 		}
