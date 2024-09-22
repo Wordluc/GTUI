@@ -1,6 +1,9 @@
 package Drawing
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func typing(textBlock *TextBlock, text string) {
 	for _, char := range text {
@@ -329,4 +332,24 @@ func TestGoOutSizeRapidly(t *testing.T) {
 		t.Errorf("expected %v, got %v", 2, TextBlock.currentLine)
 	}
 
+}
+func TestSpecialCharacter(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 48, 100,1)
+	for _,c:=range "pblic class persona(string nome,int etá,int 64 sesso){"{
+        textBlock.Type(c)
+	}
+	textBlock.SetCursor_Relative(-6,0)
+	if textBlock.GetText(false) != "pblic class persona(string nome,int etá,int 64 s\n" {
+		t.Errorf("expected %v, got |%v|", "", strings.Split(textBlock.GetText(false), "\n")[0])
+	}
+}
+func TestSpecialCharacter2(t *testing.T) {
+	textBlock := CreateTextBlock(0, 0, 48, 100,1)
+	for _,c:=range "pblic clàss persona(string nome,int etá,int 64 sesso){"{
+        textBlock.Type(c)
+	}
+	textBlock.SetCursor_Relative(-6,0)
+		if textBlock.GetText(false) != "pblic clàss persona(string nome,int etá,int 64 s\n" {
+		t.Errorf("expected %v, got |%v|", "", strings.Split(textBlock.GetText(false), "\n")[0])
+	}
 }
