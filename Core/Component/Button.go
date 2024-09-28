@@ -1,9 +1,9 @@
 package Component
 
 import (
-	"GTUI/Core"
-	"GTUI/Core/Drawing"
-	"GTUI/Core/Utils/Color"
+	"github.com/Wordluc/GTUI/Core"
+	"github.com/Wordluc/GTUI/Core/Drawing"
+	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 
 type OnEvent func()
