@@ -1,12 +1,12 @@
-package SmokeTest
+package main
 
 import (
-	Core "GTUI"
-	"GTUI/Core/Component"
-	"GTUI/Core/Utils/Color"
-	"GTUI/Keyboard"
-	Kd "GTUI/Keyboard"
-	"GTUI/Terminal"
+	Core "github.com/Wordluc/GTUI"
+	"github.com/Wordluc/GTUI/Core/Component"
+	"github.com/Wordluc/GTUI/Core/Utils/Color"
+	"github.com/Wordluc/GTUI/Keyboard"
+	Kd "github.com/Wordluc/GTUI/Keyboard"
+	"github.com/Wordluc/GTUI/Terminal"
 )
 
 var core *Core.Gtui
