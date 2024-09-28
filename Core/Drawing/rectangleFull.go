@@ -1,8 +1,8 @@
 package Drawing
 
 import (
-	"github.com/Wordluc/GTUI/Core/Utils/Color"
-	U "github.com/Wordluc/GTUI/Core/Utils"
+	"GTUI/Core/Utils/Color"
+	U "GTUI/Core/Utils"
 	"strings"
 )
 

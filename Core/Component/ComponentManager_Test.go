@@ -1,7 +1,7 @@
 package Component
 
 import (
-	"github.com/Wordluc/GTUI/Core/Utils"
+	"GTUI/Core/Utils"
 	"slices"
 	"testing"
 )

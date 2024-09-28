@@ -1,12 +1,12 @@
 package GTUI
 
 import (
-	"github.com/Wordluc/GTUI/Core"
-	"github.com/Wordluc/GTUI/Core/Component"
-	"github.com/Wordluc/GTUI/Core/Utils"
-	"github.com/Wordluc/GTUI/Core/Utils/Color"
-	"github.com/Wordluc/GTUI/Keyboard"
-	"github.com/Wordluc/GTUI/Terminal"
+	"GTUI/Core"
+	"GTUI/Core/Component"
+	"GTUI/Core/Utils"
+	"GTUI/Core/Utils/Color"
+	"GTUI/Keyboard"
+	"GTUI/Terminal"
 	"errors"
 	"strings"
 	"time"
