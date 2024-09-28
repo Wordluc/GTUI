@@ -1,6 +1,6 @@
 package Core
 
-import "GTUI/Core/Utils/Color"
+import "github.com/Wordluc/GTUI/Core/Utils/Color"
 
 type IEntity interface {
 	Touch()
