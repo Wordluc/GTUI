@@ -1,7 +1,7 @@
 package Component
 
 import (
-	"GTUI/Core"
+	"github.com/Wordluc/GTUI/Core"
 )
 
 type IComponent interface {

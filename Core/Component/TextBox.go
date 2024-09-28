@@ -1,8 +1,8 @@
 package Component
 
 import (
-	"GTUI/Core"
-	"GTUI/Core/Drawing"
+	"github.com/Wordluc/GTUI/Core"
+	"github.com/Wordluc/GTUI/Core/Drawing"
 )
 
 type TextBox struct {
