@@ -1,4 +1,4 @@
-package main
+package SmokeTest
 
 import (
 	Core "GTUI"
@@ -58,13 +58,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 	}
 
 	if keyb.IsKeySPressed(Kd.KeyEnter) {
-		core.EventOn(x, y, func(c Component.IComponent) {
-			if c, ok := c.(Component.IWritableComponent); ok {
-				if !c.IsTyping() {
-					c.StartTyping()
-				}
-			}
-		})
+		core.Click(x, y)
 	}
 
 	if keyb.IsKeySPressed(Kd.KeyCtrlV) {
@@ -97,10 +91,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 			}
 		})
 	}
-	if keyb.IsKeyPressed('c') {
-		core.Click(x, y)
-	}
-	if keyb.IsKeyPressed('q') {
+	if keyb.IsKeySPressed(Kd.KeyCtrlQ) {
 		return false
 	}
 	return true

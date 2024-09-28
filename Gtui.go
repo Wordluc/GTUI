@@ -36,7 +36,7 @@ func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITermina
 		term:             term,
 		keyb:             keyb,
 		buff: make([]Core.IEntity,
-			0),
+		0),
 		componentManager: componentManager,
 		xCursor:          0,
 		yCursor:          0,
@@ -45,7 +45,7 @@ func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITermina
 	}, nil
 }
 
-func (c *Gtui) SetCur(x, y int)error {
+func (c *Gtui) SetCur(x, y int) error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
 		return errors.New("cursor out of range")
 	}
@@ -62,7 +62,7 @@ func (c *Gtui) SetCur(x, y int)error {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
 				return nil
-			}else{
+			} else {
 				comp.OnLeave()
 			}
 		}
@@ -132,6 +132,12 @@ func (c *Gtui) Click(x, y int) error {
 		return e
 	}
 	for i := range resultArray {
+		if c, ok := resultArray[i].(Component.IWritableComponent); ok {
+			if !c.IsTyping() {
+				c.StartTyping()
+				continue
+			}
+		}
 		resultArray[i].OnClick()
 		time.AfterFunc(time.Millisecond*1000, func() {
 			resultArray[i].OnRelease()
