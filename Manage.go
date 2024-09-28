@@ -2,7 +2,7 @@ package GTUI
 
 
 import (
-	"github.com/Wordluc/GTUI/Core/Utils/Color"
+	"GTUI/Core/Utils/Color"
 )
 
 func (c *Gtui) ISetGlobalColor(color Color.Color) {
