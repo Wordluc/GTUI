@@ -9,3 +9,5 @@ require (
 	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/term v0.23.0
 )
+
+replace GTUI => github.com/Wordluc/GTUI v0.5.0
