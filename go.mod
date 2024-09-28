@@ -1,5 +1,4 @@
 module github.com/Wordluc/GTUI
-replace github.com/Wordluc/GTUI v0.4.0 => C:/Users/frang/Desktop/Training/GTUI/
 go 1.22.1
 
 require (
