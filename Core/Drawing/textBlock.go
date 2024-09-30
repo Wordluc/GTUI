@@ -221,24 +221,42 @@ func (t *TextBlock) GetSelectedText() string {
 		str.WriteString(string(line.line) + "\n")
 	}
 	t.wrap = false
-	return strings.ReplaceAll(str.String(), "\x00","")
+	return strings.ReplaceAll(str.String(), "\x00", "")
+}
+
+type WrapperEdges struct {
+	startX int
+	startY int
+	endX   int
+	endY   int
+}
+
+func (t *TextBlock) getWrapperEdges() WrapperEdges {
+	var result WrapperEdges = WrapperEdges{
+		startX: t.xStartingWrapping,
+		startY: t.yStartingWrapping,
+		endX:   t.absoluteCurrentCharacter,
+		endY:   t.currentLine,
+	}
+	//invert the cursor with the wrapping starting, so the cursor point will be bigger than the wrapping
+	if t.currentLine < t.yStartingWrapping || (t.currentLine == t.yStartingWrapping && t.absoluteCurrentCharacter < t.xStartingWrapping) {
+		result.startX = t.absoluteCurrentCharacter
+		result.startY = t.currentLine
+		result.endX = t.xStartingWrapping
+		result.endY = t.yStartingWrapping
+	}
+	return result
 }
 
 // delete the selected text
 func (t *TextBlock) deleteWrapping() {
 	defer t.Touch()
 	t.wrap = false
-	var xToInvert int
-	var yToInvert int
-	//invert the cursor with the wrapping starting, so the cursor point will be bigger than the wrapping
-	if t.currentLine < t.yStartingWrapping || (t.currentLine == t.yStartingWrapping && t.absoluteCurrentCharacter < t.xStartingWrapping) {
-		xToInvert = t.absoluteCurrentCharacter
-		yToInvert = t.currentLine
-		t.setXCursor_Absolute(t.xStartingWrapping)
-		t.setYCursor_Absolute(t.yStartingWrapping)
-		t.xStartingWrapping = xToInvert
-		t.yStartingWrapping = yToInvert
-	}
+	edge := t.getWrapperEdges()
+	t.setXCursor_Absolute(edge.endX)
+	t.setYCursor_Absolute(edge.endY)
+	t.xStartingWrapping = edge.startX
+	t.yStartingWrapping = edge.startY
 	for t.absoluteCurrentCharacter > t.xStartingWrapping || t.currentLine > t.yStartingWrapping {
 		t.Delete()
 	}
@@ -311,33 +329,13 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 		}
 		text := line.getText()
 		text = t.parseText(text)
-		if !(t.yStartingWrapping == t.currentLine && t.xStartingWrapping == t.absoluteCurrentCharacter) && t.wrap { //TODO: da sistemare
-			if t.currentLine > t.yStartingWrapping {
-				if t.currentLine == i {
-					text = insertTextToOrigin(text, "\033[m", t.absoluteCurrentCharacter)
-				}
-				if t.yStartingWrapping == i {
-					text = insertTextToOrigin(text, "\033[100m", t.xStartingWrapping)
-				}
-			} else if t.currentLine < t.yStartingWrapping {
-				if t.currentLine == i {
-					text = insertTextToOrigin(text, "\033[100m", t.absoluteCurrentCharacter)
-				}
-				if t.yStartingWrapping == i {
-					text = insertTextToOrigin(text, "\033[m", t.xStartingWrapping)
-				}
-			} else {
-				if t.currentLine == i {
-					if t.absoluteCurrentCharacter > t.xStartingWrapping {
-						text = insertTextToOrigin(text, "\033[m", t.absoluteCurrentCharacter)
-						text = insertTextToOrigin(text, "\033[100m", t.xStartingWrapping)
-					} else {
-						text = insertTextToOrigin(text, "\033[m", t.xStartingWrapping)
-						text = insertTextToOrigin(text, "\033[100m", t.absoluteCurrentCharacter)
-					}
-				}
-			}
+		edge := t.getWrapperEdges()
+		if edge.startY == i {
+			text = insertTextToOrigin(text, "\033[100m", edge.startX)
+		} else if edge.endY == i {
+			text = insertTextToOrigin(text, "\033[m", edge.endX)
 		}
+
 		full.WriteString(text)
 		if !withAnsiCode {
 			full.WriteRune('\n')
