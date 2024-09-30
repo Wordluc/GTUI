@@ -1,4 +1,4 @@
-package SmokeTest
+package main
 
 import (
 	Core "github.com/Wordluc/GTUI"
