@@ -67,6 +67,9 @@ func (t *TextBox) SetWrap(isOn bool) {
 	t.textBlock.SetWrap(isOn)
 }
 
+func (t *TextBox) GetWrap()bool {
+	return t.textBlock.GetWrap()
+}
 func (b *TextBox) StartTyping() {
 	b.isTyping = true
 	go b.loopTyping()
