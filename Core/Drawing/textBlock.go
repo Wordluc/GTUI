@@ -177,6 +177,9 @@ func (t *TextBlock) SetWrap(isOn bool) {
 		t.yStartingWrapping = t.currentLine
 	}
 }
+func (t *TextBlock) GetWrap() bool {
+	return t.wrap
+}
 
 // get the wrapped text
 func (t *TextBlock) GetSelectedText() string {
@@ -330,10 +333,13 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 		text := line.getText()
 		text = t.parseText(text)
 		edge := t.getWrapperEdges()
-		if edge.startY == i {
-			text = insertTextToOrigin(text, "\033[100m", edge.startX)
-		} else if edge.endY == i {
-			text = insertTextToOrigin(text, "\033[m", edge.endX)
+		if t.wrap{
+			if edge.endY == i {
+				text = insertTextToOrigin(text, "\033[m", edge.endX)
+			}
+			if edge.startY == i {
+				text = insertTextToOrigin(text, "\033[100m", edge.startX)
+			} 
 		}
 
 		full.WriteString(text)

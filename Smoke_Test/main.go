@@ -18,16 +18,16 @@ func main() {
 	xS, yS := 50, 40
 	c := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
 	c.SetOnLeave(func() {
-		c.GetVisibleArea().SetColor(Color.Get(Color.Gray,Color.None))
+		c.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
 	})
 	c.SetOnHover(func() {
-		c.GetVisibleArea().SetColor(Color.Get(Color.White,Color.None))
+		c.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
 	components = append(components, c)
-	if e:=core.InsertComponent(c) ;e!= nil {
+	if e := core.InsertComponent(c); e != nil {
 		panic(e)
 	}
-	if e:=core.SetCur(1, 1); e != nil {
+	if e := core.SetCur(1, 1); e != nil {
 		panic(e)
 	}
 	core.Start()
@@ -64,7 +64,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 	if keyb.IsKeySPressed(Kd.KeyCtrlV) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
-				if c.IsTyping(){
+				if c.IsTyping() {
 					c.Paste(keyb.GetClickboard())
 					core.AllineCursor()
 				}
@@ -75,9 +75,8 @@ func loop(keyb Kd.IKeyBoard) bool {
 	if keyb.IsKeySPressed(Kd.KeyCtrlA) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
-				if c.IsTyping(){
-					c.SetWrap(true)
-					
+				if c.IsTyping() {
+					c.SetWrap(!c.GetWrap())
 				}
 			}
 		})
@@ -85,7 +84,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 	if keyb.IsKeySPressed(Kd.KeyCtrlC) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
-				if c.IsTyping(){
+				if c.IsTyping() {
 					keyb.InsertClickboard(c.Copy())
 				}
 			}
