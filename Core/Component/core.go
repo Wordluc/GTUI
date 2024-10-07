@@ -55,11 +55,11 @@ func (c *ComplexInteractiveShape) addShape(shape IInteractiveShape) {
 }
 
 type ComponentM struct {
-	Map       *[][]*[]IComponent
+	Map        *[][]*[]IComponent
 	components []IComponent
-	ChunkSize int
-	nChunkX   int
-	nChunkY   int
+	ChunkSize  int
+	nChunkX    int
+	nChunkY    int
 }
 
 func Create(xSize, ySize, chunkSize int) *ComponentM {
@@ -102,22 +102,24 @@ func (s *ComponentM) Add(comp IComponent) error {
 				comp.OnOut(i, j)
 				ele := (*s.Map)[xC][yC]
 				if ele == nil {
+					s.components = append(s.components, comp)
 					(*s.Map)[xC][yC] = &[]IComponent{comp}
 				} else {
 					if (*ele)[len((*ele))-1] != comp {
+						s.components = append(s.components, comp)
 						(*ele) = append(*ele, comp)
 					}
 				}
-				s.components = append(s.components, comp)
 			}
 		}
 	}
 	return nil
 }
-func (s *ComponentM) Refresh()  {
+
+func (s *ComponentM) Refresh() {
 	s.Clean()
-	for _,comp:= range s.components{
-       s.Add(comp)
+	for _, comp := range s.components {
+		s.Add(comp)
 	}
 }
 

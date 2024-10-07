@@ -100,7 +100,7 @@ func (b *TextBox) OnOut(_,_ int) {
 func (b *TextBox) SetOnClick(onClick func()) {
 	b.onClick = onClick
 }
-func (b *TextBox) SetOnLeave(onLeave func()) {
+func (b *TextBox) SetOnOut(onLeave func()) {
 	b.onLeave = onLeave
 }
 func (b *TextBox) SetOnHover(onHover func()) {
