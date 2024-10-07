@@ -63,8 +63,27 @@ func (c *Gtui) SetCur(x, y int) error {
 		comp.OnOut(x, y)
 	}
 
+
+	for i := 0; i < len(inPreButNotInPost); i++ {
+		if ci, ok := inPreButNotInPost[i].(*Component.Container); ok {
+			if !ci.GetActivity() {
+				continue
+			}
+			inPreButNotInPost = append(inPreButNotInPost, ci.GetComponent()...)
+		}
+	}
+	for _, comp := range inPreButNotInPost {
+		if ci, ok := comp.(Component.IWritableComponent); ok {
+			if ci.IsTyping() {
+				ci.SetCurrentPosCursor(x, y)
+				return nil
+			} 
+		}
+	}
+
 	c.yCursor = y
 	c.xCursor = x
+
 	for i := 0; i < len(compsPostSet); i++ {
 		if ci, ok := compsPostSet[i].(*Component.Container); ok {
 			if !ci.GetActivity() {
@@ -73,7 +92,6 @@ func (c *Gtui) SetCur(x, y int) error {
 			compsPostSet = append(compsPostSet, ci.GetComponent()...)
 		}
 	}
-
 	for _, comp := range compsPostSet {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
 			if ci.IsTyping() {
