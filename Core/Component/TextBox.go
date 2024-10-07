@@ -32,7 +32,9 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox 
 		textBlock:   textBox,
 	}
 }
-
+func (b *TextBox) SetPos(x, y int) {
+	b.graphics.SetPos(x, y)
+}
 func (b *TextBox) loopTyping() {
 	channel := b.streamText.Get()
 	var key rune
@@ -71,6 +73,9 @@ func (t *TextBox) GetWrap()bool {
 	return t.textBlock.GetWrap()
 }
 func (b *TextBox) StartTyping() {
+	if b.isTyping {
+		return
+	}
 	b.isTyping = true
 	go b.loopTyping()
 	b.streamText.Delete()
@@ -79,18 +84,18 @@ func (b *TextBox) StopTyping() {
 	b.streamText.Delete()
 	b.isTyping = false
 }
-func (b *TextBox) OnClick() {
-	if b.onClick == nil {
-		return
+
+func (b *TextBox) OnClick(_,_ int) {
+	if b.onClick != nil {
+		b.onClick()
 	}
-	b.onClick()
+	b.StartTyping()
 }
 
-func (b *TextBox) OnLeave() {
-	if b.onLeave == nil {
-		return
+func (b *TextBox) OnOut(_,_ int) {
+	if b.onLeave != nil {
+		b.onLeave()
 	}
-	b.onLeave()
 }
 func (b *TextBox) SetOnClick(onClick func()) {
 	b.onClick = onClick
@@ -101,12 +106,11 @@ func (b *TextBox) SetOnLeave(onLeave func()) {
 func (b *TextBox) SetOnHover(onHover func()) {
 	b.onHover = onHover
 }
-func (b *TextBox) OnRelease() {}
+func (b *TextBox) OnRelease(_,_ int) {}
 
-func (b *TextBox) OnHover() {
-	b.onHover()
-	if b.isTyping {
-		return
+func (b *TextBox) OnHover(_,_ int) {
+	if b.onHover != nil {
+		b.onHover()
 	}
 }
 
@@ -134,14 +138,14 @@ func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 func (b *TextBox) SetCurrentPosCursor(x, y int)(int,int) {
 	return b.textBlock.SetCursor_Relative(x, y)
 }
-func (b *TextBox) getShape() (InteractiveShape, error) {
+func (b *TextBox) getShape() (IInteractiveShape, error) {
 	x, y := b.textBlock.GetPos()
 	xDim, yDim := b.textBlock.GetSize()
-	shape := InteractiveShape{
+	shape := BaseInteractiveShape{
 		xPos:   x,
 		yPos:   y,
 		Width:  xDim,
 		Height: yDim,
 	}
-	return shape, nil
+	return &shape, nil
 }

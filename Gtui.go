@@ -1,13 +1,13 @@
 package GTUI
 
 import (
+	"errors"
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
 	"github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"github.com/Wordluc/GTUI/Keyboard"
 	"github.com/Wordluc/GTUI/Terminal"
-	"errors"
 	"strings"
 	"time"
 )
@@ -54,30 +54,35 @@ func (c *Gtui) SetCur(x, y int) error {
 	compsPostSet, _ := c.componentManager.Search(x, y)
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
 	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
+
 	for _, e := range inPostButNotInPre {
-		e.OnHover()
+		e.OnHover(x, y)
 	}
+
 	for _, comp := range inPreButNotInPost {
-		if ci, ok := comp.(Component.IWritableComponent); ok {
-			if ci.IsTyping() {
-				ci.SetCurrentPosCursor(x, y)
-				return nil
-			} else {
-				comp.OnLeave()
-			}
-		}
+		comp.OnOut(x, y)
 	}
 
 	c.yCursor = y
 	c.xCursor = x
+	for i := 0; i < len(compsPostSet); i++ {
+		if ci, ok := compsPostSet[i].(*Component.Container); ok {
+			if !ci.GetActivity() {
+				continue
+			}
+			compsPostSet = append(compsPostSet, ci.GetComponent()...)
+		}
+	}
+
 	for _, comp := range compsPostSet {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
-			if ci.IsTyping() { //redo
+			if ci.IsTyping() {
 				c.xCursor, c.yCursor = ci.SetCurrentPosCursor(x, y)
 				break
 			}
 		}
 	}
+
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	c.SetVisibilityCursor(false)
 	return nil
@@ -116,31 +121,34 @@ func (c *Gtui) InsertComponent(component Component.IComponent) error {
 	c.buff = append(c.buff, component.GetGraphics())
 	return c.componentManager.Add(component)
 }
+func (c *Gtui) RefreshComponents() {
+	c.componentManager.Refresh()
+}
 func (c *Gtui) EventOn(x, y int, event func(Component.IComponent)) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
 		return e
+	}
+	for i := 0; i < len(resultArray); i++ {
+		if ci, ok := resultArray[i].(*Component.Container); ok {
+			resultArray = append(resultArray, ci.GetComponent()...)
+		}
 	}
 	for i := range resultArray {
 		event(resultArray[i])
 	}
 	return nil
 }
+
 func (c *Gtui) Click(x, y int) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
 		return e
 	}
 	for i := range resultArray {
-		if c, ok := resultArray[i].(Component.IWritableComponent); ok {
-			if !c.IsTyping() {
-				c.StartTyping()
-				continue
-			}
-		}
-		resultArray[i].OnClick()
+		resultArray[i].OnClick(x, y)
 		time.AfterFunc(time.Millisecond*1000, func() {
-			resultArray[i].OnRelease()
+			resultArray[i].OnRelease(x, y)
 			c.IRefreshAll()
 		})
 	}
@@ -151,6 +159,14 @@ func (c *Gtui) AllineCursor() {
 	c.SetVisibilityCursor(false)
 	x, y := c.GetCur()
 	comps, _ := c.componentManager.Search(x, y)
+	for i := 0; i < len(comps); i++ {
+		if ci, ok := comps[i].(*Component.Container); ok {
+			if !ci.GetActivity() {
+				continue
+			}
+			comps = append(comps, ci.GetComponent()...)
+		}
+	}
 	for _, comp := range comps {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
 			if ci.IsTyping() {
