@@ -53,7 +53,7 @@ func (c *ComplexInteractiveShape) getShapes() []BaseInteractiveShape {
 func (c *ComplexInteractiveShape) addShape(shape IInteractiveShape) {
 	c.shapes = append(c.shapes, shape)
 }
-
+//TODO: da ottimizzare
 type ComponentM struct {
 	Map        *[][]*[]IComponent
 	components []IComponent
@@ -83,7 +83,7 @@ func (s *ComponentM) Clean() {
 	}
 }
 
-func (s *ComponentM) Add(comp IComponent) error {
+func (s *ComponentM) Add(comp IComponent) error {//TODO: da ottimizzare
 	if s == nil {
 		return errors.New("component manager is nil")
 	}
@@ -92,18 +92,15 @@ func (s *ComponentM) Add(comp IComponent) error {
 		return e
 	}
 	for _, baseShape := range shape.getShapes() {
-		finalX, finalY := baseShape.xPos+baseShape.Width, baseShape.yPos+baseShape.Height
-		for i := baseShape.xPos; i < finalX; i++ {
-			for j := baseShape.yPos; j < finalY; j++ {
-				xC, yC := i/s.ChunkSize, j/s.ChunkSize
-				if xC >= s.nChunkX || yC >= s.nChunkY {
-					return errors.New("component out of range")
-				}
+		nChunkX := baseShape.Width / s.ChunkSize+1
+		nChunkY := baseShape.Height / s.ChunkSize+1
+		for i := 0; i < nChunkX; i++ {
+			for j := 0; j < nChunkY; j++ {
 				comp.OnOut(i, j)
-				ele := (*s.Map)[xC][yC]
+				ele := (*s.Map)[i+baseShape.xPos/s.ChunkSize][j+baseShape.yPos/s.ChunkSize]
 				if ele == nil {
 					s.components = append(s.components, comp)
-					(*s.Map)[xC][yC] = &[]IComponent{comp}
+					(*s.Map)[i+baseShape.xPos/s.ChunkSize][j+baseShape.yPos/s.ChunkSize] = &[]IComponent{comp}
 				} else {
 					if (*ele)[len((*ele))-1] != comp {
 						s.components = append(s.components, comp)
