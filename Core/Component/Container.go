@@ -11,19 +11,24 @@ type Container struct {
 	components []IComponent
 	drawing    *Drawing.Container
 }
+
 func CreateContainer(x, y int) *Container {
 	return &Container{
-		active: true,
-		drawing: Drawing.CreateContainer(x, y),
+		active:     true,
+		drawing:    Drawing.CreateContainer(x, y),
 		components: make([]IComponent, 0),
 	}
 }
 func (c *Container) AddComponent(component IComponent) {
-	c.components= append(c.components, component)
+	c.components = append(c.components, component)
 	c.drawing.AddChild(component.GetGraphics())
 }
 
-func (c *Container) GetComponent()[]IComponent {
+func (c *Container) AddDrawing(container Drawing.Container) {
+	c.drawing.AddChild(&container)
+}
+
+func (c *Container) GetComponent() []IComponent {
 	return c.components
 }
 func (c *Container) SetonClick(onClick func()) {
@@ -36,6 +41,7 @@ func (c *Container) SetActivity(active bool) {
 func (c *Container) GetActivity() bool {
 	return c.active
 }
+
 func (c *Container) SetPos(x, y int) {
 	c.drawing.SetPos(x, y)
 }
@@ -67,7 +73,7 @@ func (c *Container) OnRelease(x, y int) {
 	}
 }
 
-func (c *Container) OnHover(x, y int)   {
+func (c *Container) OnHover(x, y int) {
 	if !c.active {
 		return
 	}
@@ -79,7 +85,7 @@ func (c *Container) OnHover(x, y int)   {
 	}
 }
 
-func (c *Container) OnOut(x, y int)   {
+func (c *Container) OnOut(x, y int) {
 	if !c.active {
 		return
 	}

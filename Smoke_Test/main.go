@@ -17,7 +17,7 @@ func main() {
 	xS, yS := 50, 40
 
 	c := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
-	c.SetOnLeave(func() {
+	c.SetOnOut(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
 	})
 	c.SetOnHover(func() {
