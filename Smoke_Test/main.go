@@ -10,12 +10,12 @@ import (
 )
 
 var core *Core.Gtui
-var components []Component.IComponent
-
+var comp Component.IComponent
 func main() {
 	kbr := Keyboard.NewKeyboard()
 	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
+
 	c := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
 	c.SetOnLeave(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
@@ -23,8 +23,19 @@ func main() {
 	c.SetOnHover(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
-	components = append(components, c)
-	if e := core.InsertComponent(c); e != nil {
+
+   b:=Component.CreateButton(70, 0, 5, 3, "test")
+	b.SetOnLeave(func() {
+		b.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
+	})
+	b.SetOnHover(func() {
+		b.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
+	})
+	compComponent:=Component.CreateContainer(0,0)
+	compComponent.AddComponent(b)
+	compComponent.AddComponent(c)
+	comp=compComponent
+	if e := core.InsertComponent(compComponent); e != nil {
 		panic(e)
 	}
 	if e := core.SetCur(1, 1); e != nil {
@@ -48,8 +59,13 @@ func loop(keyb Kd.IKeyBoard) bool {
 		x--
 	}
 
+	if keyb.IsKeySPressed(Kd.KeyCtrlS) {
+		comp.SetPos(x,y)
+		core.RefreshComponents()
+	}
+
 	core.SetCur(x, y)
-	if keyb.IsKeySPressed(Kd.KeyCtrlQ) {
+	if keyb.IsKeySPressed(Kd.KeyEsc) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(Component.IWritableComponent); ok {
 				c.StopTyping()
@@ -81,6 +97,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 			}
 		})
 	}
+
 	if keyb.IsKeySPressed(Kd.KeyCtrlC) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
@@ -90,6 +107,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 			}
 		})
 	}
+
 	if keyb.IsKeySPressed(Kd.KeyCtrlQ) {
 		return false
 	}

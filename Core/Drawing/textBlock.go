@@ -248,6 +248,22 @@ func (t *TextBlock) getWrapperEdges() WrapperEdges {
 		result.endX = t.xStartingWrapping
 		result.endY = t.yStartingWrapping
 	}
+	result.endX=result.endX-t.xRelativeMinSize
+	result.endY=result.endY-t.yRelativeMinSize
+	result.startY=result.startY-t.yRelativeMinSize
+	result.startX=result.startX-t.xRelativeMinSize
+	if result.startX<0{
+		result.startX=0
+	}
+	if result.endX<0{
+		result.endX=0
+	}
+	if result.startY<0{
+		result.startY=0
+	}
+	if result.endY<0{
+		result.endY=0
+	}
 	return result
 }
 
@@ -334,12 +350,12 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 		text = t.parseText(text)
 		edge := t.getWrapperEdges()
 		if t.wrap{
-			if edge.endY == i {
+			if edge.endY==i{
 				text = insertTextToOrigin(text, "\033[m", edge.endX)
 			}
-			if edge.startY == i {
+			if edge.startY==i{
 				text = insertTextToOrigin(text, "\033[100m", edge.startX)
-			} 
+			}	
 		}
 
 		full.WriteString(text)

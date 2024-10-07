@@ -5,12 +5,13 @@ import (
 )
 
 type IComponent interface {
-	OnClick()
-	OnRelease()
-	OnHover()
-	OnLeave()
+	OnClick(int,int)
+	OnRelease(int,int)
+	OnHover(int,int)
+	OnOut(int,int)
 	GetGraphics() Core.IEntity
-	getShape() (InteractiveShape, error)
+	getShape() (IInteractiveShape, error)
+	SetPos(x,y int)
 }
 
 type IWritableComponent interface {

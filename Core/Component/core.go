@@ -10,22 +10,61 @@ type StreamCharacter struct {
 	IChannel int
 	Delete   func()
 }
-type InteractiveShape struct {
+type IInteractiveShape interface {
+	isOn(x, y int) bool
+	getShapes() []BaseInteractiveShape
+}
+type BaseInteractiveShape struct {
 	xPos   int
 	yPos   int
 	Width  int
 	Height int
 }
+
+func (b *BaseInteractiveShape) isOn(x, y int) bool {
+	return x >= b.xPos && x < b.xPos+b.Width && y >= b.yPos && y < b.yPos+b.Height
+}
+
+func (b *BaseInteractiveShape) getShapes() []BaseInteractiveShape {
+	return []BaseInteractiveShape{*b}
+}
+
+type ComplexInteractiveShape struct {
+	shapes []IInteractiveShape
+}
+
+func (c *ComplexInteractiveShape) isOn(x, y int) bool {
+	for _, shape := range c.shapes {
+		if shape.isOn(x, y) {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *ComplexInteractiveShape) getShapes() []BaseInteractiveShape {
+	var shapes []BaseInteractiveShape
+	for _, shape := range c.shapes {
+		shapes = append(shapes, shape.getShapes()...)
+	}
+	return shapes
+}
+
+func (c *ComplexInteractiveShape) addShape(shape IInteractiveShape) {
+	c.shapes = append(c.shapes, shape)
+}
+
 type ComponentM struct {
 	Map       *[][]*[]IComponent
+	components []IComponent
 	ChunkSize int
 	nChunkX   int
 	nChunkY   int
 }
 
 func Create(xSize, ySize, chunkSize int) *ComponentM {
-	xChunk := xSize / chunkSize+1
-	yChunk := ySize / chunkSize+1
+	xChunk := xSize/chunkSize + 1
+	yChunk := ySize/chunkSize + 1
 	matrix := make([][]*[]IComponent, xChunk)
 	for i := range xChunk {
 		matrix[i] = make([]*[]IComponent, yChunk)
@@ -38,6 +77,12 @@ func Create(xSize, ySize, chunkSize int) *ComponentM {
 	}
 }
 
+func (s *ComponentM) Clean() {
+	for i := range s.nChunkX {
+		(*s.Map)[i] = make([]*[]IComponent, s.nChunkY)
+	}
+}
+
 func (s *ComponentM) Add(comp IComponent) error {
 	if s == nil {
 		return errors.New("component manager is nil")
@@ -46,25 +91,34 @@ func (s *ComponentM) Add(comp IComponent) error {
 	if e != nil {
 		return e
 	}
-	finalX, finalY := shape.xPos+shape.Width, shape.yPos+shape.Height
-	for i := shape.xPos; i < finalX; i++ {
-		for j := shape.yPos; j < finalY; j++ {
-			xC, yC := i/s.ChunkSize, j/s.ChunkSize
-			if xC >= s.nChunkX || yC >= s.nChunkY {
-				return errors.New("component out of range")
-			}
-			comp.OnLeave()
-			ele := (*s.Map)[xC][yC]
-			if ele == nil {
-				(*s.Map)[xC][yC] = &[]IComponent{comp}
-			} else {
-				if (*ele)[len((*ele))-1] != comp {
-					(*ele) = append(*ele, comp)
+	for _, baseShape := range shape.getShapes() {
+		finalX, finalY := baseShape.xPos+baseShape.Width, baseShape.yPos+baseShape.Height
+		for i := baseShape.xPos; i < finalX; i++ {
+			for j := baseShape.yPos; j < finalY; j++ {
+				xC, yC := i/s.ChunkSize, j/s.ChunkSize
+				if xC >= s.nChunkX || yC >= s.nChunkY {
+					return errors.New("component out of range")
 				}
+				comp.OnOut(i, j)
+				ele := (*s.Map)[xC][yC]
+				if ele == nil {
+					(*s.Map)[xC][yC] = &[]IComponent{comp}
+				} else {
+					if (*ele)[len((*ele))-1] != comp {
+						(*ele) = append(*ele, comp)
+					}
+				}
+				s.components = append(s.components, comp)
 			}
 		}
 	}
 	return nil
+}
+func (s *ComponentM) Refresh()  {
+	s.Clean()
+	for _,comp:= range s.components{
+       s.Add(comp)
+	}
 }
 
 func (s *ComponentM) Search(x, y int) ([]IComponent, error) {
@@ -93,7 +147,7 @@ func (s *ComponentM) Search(x, y int) ([]IComponent, error) {
 		if e != nil {
 			return nil, e
 		}
-			if x>= shape.xPos && x < shape.xPos+shape.Width && y >= shape.yPos && y < shape.yPos+shape.Height {
+		if shape.isOn(x, y) {
 			res = append(res, ele)
 		}
 	}

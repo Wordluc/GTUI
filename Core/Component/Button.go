@@ -8,13 +8,13 @@ import (
 
 type OnEvent func()
 type Button struct {
-	graphics        *Drawing.Container
-	visibleArea     *Drawing.Rectangle
-	onClick         OnEvent
-	onRelease       OnEvent
-	onHover         OnEvent
-	onLeave         OnEvent
-	isClicked       bool
+	graphics    *Drawing.Container
+	visibleArea *Drawing.Rectangle
+	onClick     OnEvent
+	onRelease   OnEvent
+	onHover     OnEvent
+	onLeave     OnEvent
+	isClicked   bool
 }
 
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
@@ -28,14 +28,21 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont.AddChild(textD)
 	cont.SetPos(x, y)
 	return &Button{
-		graphics:        cont,
-		visibleArea:     rect,
-		isClicked:       false,
+		graphics:    cont,
+		visibleArea: rect,
+		isClicked:   false,
 	}
+}
+
+func (b *Button) SetPos(x, y int) {
+	b.graphics.SetPos(x, y)
 }
 
 func (b *Button) SetOnClick(onClick OnEvent) {
 	b.onClick = onClick
+}
+func (b *Button) SetOnLeave(onLeave OnEvent) {
+	b.onLeave = onLeave
 }
 func (b *Button) SetOnRelease(onRelease OnEvent) {
 	b.onRelease = onRelease
@@ -43,24 +50,23 @@ func (b *Button) SetOnRelease(onRelease OnEvent) {
 func (b *Button) SetOnHover(onHover OnEvent) {
 	b.onHover = onHover
 }
-
-func (b *Button) OnClick() {
+func (b *Button) OnClick(_,_ int) {
 	if !b.isClicked {
-		b.isClicked = true
 		if b.onClick != nil {
-			b.onClick()
+			b.onClick() 
 		}
+		b.isClicked = true
 		b.updateColorByClick()
 	}
 }
-func (b *Button) OnRelease() {
+func (b *Button) OnRelease(_,_ int) {
 	if b.onRelease != nil {
 		b.onRelease()
 	}
-	b.isClicked=false
+	b.isClicked = false
 	b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
-func (b *Button) OnHover() {
+func (b *Button) OnHover(_,_ int) {
 	if !b.isClicked {
 		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 	}
@@ -68,32 +74,35 @@ func (b *Button) OnHover() {
 		b.onHover()
 	}
 }
-func (b *Button) OnLeave() {
+func (b *Button) OnOut(_,_ int) {
 	if !b.isClicked {
-		b.visibleArea.SetColor(Color.GetDefaultColor())
+		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 	}
 	if b.onLeave != nil {
-		b.OnLeave()
+		b.onLeave()
 	}
 }
 func (b *Button) updateColorByClick() {
-   if b.isClicked{
-			b.visibleArea.SetColor(Color.Get(Color.Blue, Color.None))
-	 }else{
-			b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
-	 }
+	if b.isClicked {
+		b.visibleArea.SetColor(Color.Get(Color.Blue, Color.None))
+	} else {
+		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
+	}
 }
 func (b *Button) GetGraphics() Core.IEntity {
 	return b.graphics
 }
-func (b *Button) getShape() (InteractiveShape,error) {
-	x,y:=b.visibleArea.GetPos()
-	xDim,yDim:=b.visibleArea.GetSize()
-	shape:=InteractiveShape{
-      xPos:x+1,
-		yPos:y+1,
-		Width:xDim-1,
-		Height:yDim-1,
+func (b *Button) GetVisibleArea() *Drawing.Rectangle {
+	return b.visibleArea
+}
+func (b *Button) getShape() (IInteractiveShape, error) {
+	x, y := b.visibleArea.GetPos()
+	xDim, yDim := b.visibleArea.GetSize()
+	shape := BaseInteractiveShape{
+		xPos:   x + 1,
+		yPos:   y + 1,
+		Width:  xDim - 1,
+		Height: yDim - 1,
 	}
-	return shape,nil
+	return &shape, nil
 }
