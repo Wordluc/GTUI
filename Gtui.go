@@ -58,26 +58,22 @@ func (c *Gtui) SetCur(x, y int) error {
 	for _, e := range inPostButNotInPre {
 		e.OnHover(x, y)
 	}
-
-	for _, comp := range inPreButNotInPost {
-		comp.OnOut(x, y)
-	}
-
-
-	for i := 0; i < len(inPreButNotInPost); i++ {
+   lenInPreButNotInPost := len(inPreButNotInPost)
+	for i := 0; i < lenInPreButNotInPost; i++ {
+		if ci, ok := inPreButNotInPost[i].(Component.IWritableComponent); ok {
+			if ci.IsTyping() {
+				ci.SetCurrentPosCursor(x, y)
+				return nil
+			} 
+		}	
 		if ci, ok := inPreButNotInPost[i].(*Component.Container); ok {
 			if !ci.GetActivity() {
 				continue
 			}
 			inPreButNotInPost = append(inPreButNotInPost, ci.GetComponent()...)
-		}
-	}
-	for _, comp := range inPreButNotInPost {
-		if ci, ok := comp.(Component.IWritableComponent); ok {
-			if ci.IsTyping() {
-				ci.SetCurrentPosCursor(x, y)
-				return nil
-			} 
+			lenInPreButNotInPost=len(inPreButNotInPost)
+		}else{
+			inPreButNotInPost[i].OnOut(x, y)
 		}
 	}
 
