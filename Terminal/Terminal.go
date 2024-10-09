@@ -23,6 +23,8 @@ func (t *Terminal) Start() error {
 }
 
 func (t *Terminal) Stop() {
+	t.ShowCursor()
+   t.Clear()
 	term.Restore(int(os.Stdin.Fd()), t.term)
 }
 
