@@ -1,8 +1,6 @@
 package Keyboard
 
 import (
-	"time"
-
 	"github.com/atotto/clipboard"
 	"github.com/eiannone/keyboard"
 )
@@ -59,7 +57,7 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 		if v.Key == keyboard.KeyEnter {
 			v.Rune = '\n'
 		}
-		if v.Key == keyboard.KeyBackspace {
+		if v.Key == keyboard.KeyBackspace || v.Key==keyboard.KeyBackspace2 {
 			v.Rune = '\b'
 		}
 		t.key = stateKey{key: Key(v.Key), rune: v.Rune}
@@ -72,9 +70,8 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 				break
 			}
 			b <- string(v.Rune)
+			<-b
 		}
-		time.Sleep(time.Millisecond)//fix for linux
-		//TODO da sistemare
 		if !t.loop(t) {
 			break
 		}
