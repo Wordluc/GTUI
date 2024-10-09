@@ -3,6 +3,7 @@ package Terminal
 import (
 	"os"
 	"strconv"
+
 	"golang.org/x/term"
 )
 
@@ -36,7 +37,7 @@ func (t *Terminal) Print(byte []byte) {
 }
 
 func (t *Terminal) PrintStr(str string) {
-	os.Stdout.Write([]byte(str))
+	os.Stdout.WriteString(str)
 }
 
 func (t *Terminal) Size() (int,int) {
@@ -55,7 +56,4 @@ func (t *Terminal) ShowCursor() {
 }
 func (t *Terminal) SetCursor(x, y int) {
 	t.PrintStr("\033[" + strconv.Itoa(y) + ";" + strconv.Itoa(x) + "H")
-}
-func (t *Terminal) GetSetCursor(x, y int) string {
-	return "\033[" + strconv.Itoa(y) + ";" + strconv.Itoa(x) + "H"
 }

@@ -1,6 +1,7 @@
 package Keyboard
 
 import (
+	"time"
 
 	"github.com/atotto/clipboard"
 	"github.com/eiannone/keyboard"
@@ -72,6 +73,8 @@ func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
 			}
 			b <- string(v.Rune)
 		}
+		time.Sleep(time.Millisecond)//fix for linux
+		//TODO da sistemare
 		if !t.loop(t) {
 			break
 		}
