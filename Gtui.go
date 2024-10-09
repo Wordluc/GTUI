@@ -123,7 +123,6 @@ func (c *Gtui) Start() {
 	c.term.Clear()
 	c.IRefreshAll()
 	c.keyb.Start(c.innerLoop)
-	c.term.Clear()
 	c.term.Stop()
 }
 
