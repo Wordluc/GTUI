@@ -48,6 +48,7 @@ func (b *TextBox) loopTyping() {
 				continue
 			} 
 			b.textBlock.Type(key)
+			break
 		}
 	}
 }
