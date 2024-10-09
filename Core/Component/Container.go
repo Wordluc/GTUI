@@ -86,15 +86,6 @@ func (c *Container) OnHover(x, y int) {
 }
 
 func (c *Container) OnOut(x, y int) {
-	if !c.active {
-		return
-	}
-	for _, component := range c.components {
-		shape, _ := component.getShape()
-		if !shape.isOn(x, y) {
-			component.OnOut(x, y)
-		}
-	}
 }
 
 func (c *Container) GetGraphics() Core.IEntity {
