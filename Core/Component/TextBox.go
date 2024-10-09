@@ -50,6 +50,7 @@ func (b *TextBox) loopTyping() {
 			b.textBlock.Type(key)
 			break
 		}
+		channel<-""
 	}
 }
 
