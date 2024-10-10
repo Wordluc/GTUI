@@ -22,7 +22,7 @@ type BaseInteractiveShape struct {
 }
 
 func (b *BaseInteractiveShape) isOn(x, y int) bool {
-	return x >= b.xPos && x < b.xPos+b.Width && y >= b.yPos && y < b.yPos+b.Height
+	return x >= b.xPos && x < b.xPos+b.Width-1 && y >= b.yPos && y < b.yPos+b.Height
 }
 
 func (b *BaseInteractiveShape) getShapes() []BaseInteractiveShape {
