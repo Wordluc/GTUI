@@ -54,6 +54,10 @@ func (b *TextBox) loopTyping() {
 	}
 }
 
+func (v *TextBox) ClearAll() {
+	v.textBlock.ClearAll()
+}
+
 func (v *TextBox) Paste(text string) {
 	for _,char:=range []rune(text){
 		if char=='\r'{
