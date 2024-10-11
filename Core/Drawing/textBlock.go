@@ -267,6 +267,19 @@ func (t *TextBlock) getWrapperEdges() WrapperEdges {
 	return result
 }
 
+func (t *TextBlock) ClearAll() {
+	t.lines=make([]*lineText, 1)
+	t.lines[0] = CreateLineText(t.initialCapacity)
+	t.xRelativeMinSize = 0
+	t.yRelativeMinSize = 0
+	t.xRelativeMaxSize = t.xSize+1
+	t.yRelativeMaxSize = t.ySize
+	t.currentLine = 0
+	t.totalLine = 1
+	t.absoluteCurrentCharacter = 0
+	t.wrap = false
+	t.isChanged=true
+}
 // delete the selected text
 func (t *TextBlock) deleteWrapping() {
 	defer t.Touch()

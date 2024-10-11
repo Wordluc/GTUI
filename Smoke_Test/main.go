@@ -25,6 +25,9 @@ func main() {
 	})
 
    b:=Component.CreateButton(70, 0, 5, 3, "test")
+	b.SetOnClick(func() {
+		c.ClearAll()
+	})
 	b.SetOnLeave(func() {
 		b.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
 	})
