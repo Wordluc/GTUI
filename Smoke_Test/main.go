@@ -81,7 +81,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 	if keyb.IsKeySPressed(Kd.KeyCtrlS) {
 		core.IClear()
 		comp.SetPos(x,y)
-		core.RefreshComponents()
+		core.RefreshComponents()//TODO:booo scoppia
 	}
 
 	core.SetCur(x, y)

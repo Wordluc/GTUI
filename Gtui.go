@@ -7,7 +7,6 @@ import (
 
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
-	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"github.com/Wordluc/GTUI/Keyboard"
@@ -18,8 +17,8 @@ type Gtui struct {
 	globalColor      Color.Color
 	term             Terminal.ITerminal
 	keyb             Keyboard.IKeyBoard
-	drawingManager   *Drawing.DrawingManager
-	componentManager *Component.ComponentM
+	drawingManager   *Core.TreeManager[Core.IEntity]
+	componentManager *Core.TreeManager[Component.IComponent]
 	xCursor          int
 	yCursor          int
 	xSize            int
@@ -30,15 +29,14 @@ type Gtui struct {
 
 func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
 	xSize, ySize := term.Size()
-	componentManager := Component.Create(xSize, ySize, 5)
 	return &Gtui{
 		globalColor:      Color.GetDefaultColor(),
 		cursorVisibility: true,
 		loop:             loop,
 		term:             term,
 		keyb:             keyb,
-		drawingManager:   Drawing.CreateDrawingManager(),
-		componentManager: componentManager,
+		drawingManager:   Core.CreateTreeManager[Core.IEntity](),
+		componentManager: Core.CreateTreeManager[Component.IComponent](),
 		xCursor:          0,
 		yCursor:          0,
 		xSize:            xSize,
@@ -59,21 +57,21 @@ func (c *Gtui) SetCur(x, y int) error {
 	for _, e := range inPostButNotInPre {
 		e.OnHover(x, y)
 	}
-   lenInPreButNotInPost := len(inPreButNotInPost)
+	lenInPreButNotInPost := len(inPreButNotInPost)
 	for i := 0; i < lenInPreButNotInPost; i++ {
 		if ci, ok := inPreButNotInPost[i].(Component.IWritableComponent); ok {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
 				return nil
-			} 
-		}	
+			}
+		}
 		if ci, ok := inPreButNotInPost[i].(*Component.Container); ok {
 			if !ci.GetActivity() {
 				continue
 			}
 			inPreButNotInPost = append(inPreButNotInPost, ci.GetComponent()...)
-			lenInPreButNotInPost=len(inPreButNotInPost)
-		}else{
+			lenInPreButNotInPost = len(inPreButNotInPost)
+		} else {
 			inPreButNotInPost[i].OnOut(x, y)
 		}
 	}
@@ -131,10 +129,18 @@ func (c *Gtui) InsertEntity(entity Core.IEntity) {
 	c.drawingManager.AddElement(entity)
 }
 
-func (c *Gtui) InsertComponent(component Component.IComponent) error {
-	c.drawingManager.AddElement(component.GetGraphics())
-	return c.componentManager.Add(component)
+func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
+	c.drawingManager.AddElement(componentToAdd.GetGraphics())
+	if container, ok := componentToAdd.(*Component.Container); ok {
+		for _, component := range container.GetComponent() {
+			c.componentManager.AddElement(component)
+		}
+	}else{
+		c.componentManager.AddElement(componentToAdd)
+	}
+	return nil
 }
+
 func (c *Gtui) RefreshComponents() {
 	c.drawingManager.Refresh()
 	c.componentManager.Refresh()
@@ -200,29 +206,29 @@ func (c *Gtui) IRefreshAll() {
 	c.SetVisibilityCursor(false)
 	var str strings.Builder
 	var i int
-	cond:=func (node *Drawing.TreeNode){
-		isTouched:=false
-		if i==2{
+	cond := func(node *Core.TreeNode[Core.IEntity]) {
+		isTouched := false
+		if i == 2 {
 		}
 		i++
-		for _,el:=range node.GetElements(){
-			if el.GetVisibility() && el.IsTouched(){
-				isTouched=true
+		for _, el := range node.GetElements() {
+			if el.GetVisibility() && el.IsTouched() {
+				isTouched = true
 				break
 			}
 		}
-		if !isTouched{
+		if !isTouched {
 			return
 		}
-		x,y:=node.GetPos()
-		width,height:=node.GetSize()
-		c.ClearZone(x,y,width,height)
-		for _,el:=range node.GetElements(){
+		x, y := node.GetPos()
+		width, height := node.GetSize()
+		c.ClearZone(x, y, width, height)
+		for _, el := range node.GetElements() {
 			str.WriteString(el.GetAnsiCode(c.globalColor))
 			str.WriteString(c.globalColor.GetAnsiColor())
 		}
 	}
-   c.drawingManager.Execute(cond)
+	c.drawingManager.Execute(cond)
 	c.term.PrintStr(str.String())
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	c.SetVisibilityCursor(true)

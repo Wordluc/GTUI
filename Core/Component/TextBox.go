@@ -43,6 +43,9 @@ func (b *TextBox) GetSize() (int, int) {
 func (b *TextBox) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
 }
+func (b *TextBox) GetPos() (int, int) {
+	return b.graphics.GetPos()
+}
 func (b *TextBox) loopTyping() {
 	channel := b.streamText.Get()
 	var key rune

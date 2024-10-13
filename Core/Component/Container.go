@@ -50,6 +50,10 @@ func (c *Container) SetPos(x, y int) {
 	c.drawing.SetPos(x, y)
 }
 
+func (c *Container) GetPos() (int, int) {
+	return c.drawing.GetPos()
+}
+
 func (c *Container) OnClick(x, y int) {
 	if !c.active {
 		return
