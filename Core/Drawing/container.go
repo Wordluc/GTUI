@@ -1,9 +1,11 @@
 package Drawing
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
-	"strings"
 )
 
 type Container struct {
@@ -27,16 +29,43 @@ func (c *Container) GetChildren() []Core.IEntity {
 	return c.children
 }
 
-func (c *Container) AddChild(child Core.IEntity) {
-	c.children = append(c.children, child)
+func (c *Container) GetSize()(int,int) {
+
+	var xSize,ySize int
+	for _, child := range c.children {
+		xSizeChild,ySizeChild:=child.GetSize()
+		xPosChild,yPosChild:=child.GetPos()
+		
+		if (xPosChild+xSizeChild)>c.xPos+xSize{
+			xSize=xPosChild+xSizeChild-c.xPos
+		}
+		if (yPosChild+ySizeChild)>c.yPos+ySize{
+			ySize=yPosChild+ySizeChild-c.yPos
+		}
+	}
+	return xSize,ySize
 }
 
+func (c *Container) AddChild(child Core.IEntity) error {//TODO: controllare se l'errare è gestito dai caller
+	if x,y:=child.GetPos();x<c.xPos||y<c.yPos{
+		return fmt.Errorf("child is not in the container,x=%d,y=%d,c.xPos=%d,c.yPos=%d",x,y,c.xPos,c.yPos)
+	}
+	c.children = append(c.children, child)
+	return nil
+}
 func (c *Container) Touch() {
 	for _, child := range c.children {
 		child.Touch()
 	}
 }
-
+func (c *Container) IsTouched() (bool) {
+	for _, child := range c.children {
+		if child.IsTouched(){
+			return true
+		}
+	}
+	return false
+}
 func (c *Container) SetVisibility(visible bool) {
 	c.visible = visible
 }

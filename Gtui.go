@@ -2,21 +2,23 @@ package GTUI
 
 import (
 	"errors"
+	"strings"
+	"time"
+
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
+	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"github.com/Wordluc/GTUI/Keyboard"
 	"github.com/Wordluc/GTUI/Terminal"
-	"strings"
-	"time"
 )
 
 type Gtui struct {
 	globalColor      Color.Color
 	term             Terminal.ITerminal
 	keyb             Keyboard.IKeyBoard
-	buff             []Core.IEntity
+	drawingManager   *Drawing.DrawingManager
 	componentManager *Component.ComponentM
 	xCursor          int
 	yCursor          int
@@ -35,8 +37,7 @@ func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITermina
 		loop:             loop,
 		term:             term,
 		keyb:             keyb,
-		buff: make([]Core.IEntity,
-		0),
+		drawingManager:   Drawing.CreateDrawingManager(),
 		componentManager: componentManager,
 		xCursor:          0,
 		yCursor:          0,
@@ -127,14 +128,15 @@ func (c *Gtui) Start() {
 }
 
 func (c *Gtui) InsertEntity(entity Core.IEntity) {
-	c.buff = append(c.buff, entity)
+	c.drawingManager.AddElement(entity)
 }
 
 func (c *Gtui) InsertComponent(component Component.IComponent) error {
-	c.buff = append(c.buff, component.GetGraphics())
+	c.drawingManager.AddElement(component.GetGraphics())
 	return c.componentManager.Add(component)
 }
 func (c *Gtui) RefreshComponents() {
+	c.drawingManager.Refresh()
 	c.componentManager.Refresh()
 }
 func (c *Gtui) EventOn(x, y int, event func(Component.IComponent)) error {
@@ -197,10 +199,30 @@ func (c *Gtui) AllineCursor() {
 func (c *Gtui) IRefreshAll() {
 	c.SetVisibilityCursor(false)
 	var str strings.Builder
-	for _, b := range c.buff {
-		str.WriteString(b.GetAnsiCode(c.globalColor))
-		str.WriteString(c.globalColor.GetAnsiColor())
+	var i int
+	cond:=func (node *Drawing.TreeNode){
+		isTouched:=false
+		if i==2{
+		}
+		i++
+		for _,el:=range node.GetElements(){
+			if el.GetVisibility() && el.IsTouched(){
+				isTouched=true
+				break
+			}
+		}
+		if !isTouched{
+			return
+		}
+		x,y:=node.GetPos()
+		width,height:=node.GetSize()
+		c.ClearZone(x,y,width,height)
+		for _,el:=range node.GetElements(){
+			str.WriteString(el.GetAnsiCode(c.globalColor))
+			str.WriteString(c.globalColor.GetAnsiColor())
+		}
 	}
+   c.drawingManager.Execute(cond)
 	c.term.PrintStr(str.String())
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	c.SetVisibilityCursor(true)
@@ -214,7 +236,6 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	if !c.loop(c.keyb) {
 		return false
 	}
-	c.IClear()
 	c.IRefreshAll()
 	return true
 }

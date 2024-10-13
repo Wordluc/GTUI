@@ -40,6 +40,11 @@ func (s *TextField) SetText(text string) {
 	s.text.WriteString(text)
 	s.Touch()
 }
+
+func (s *TextField) GetSize() (int,int) {
+	return s.text.Len(),1
+}
+
 func (s *TextField) GetAnsiCode(defaultColor Color.Color) string {
 	if !s.visible {
 		return ""
@@ -50,7 +55,6 @@ func (s *TextField) GetAnsiCode(defaultColor Color.Color) string {
 	}
 	return s.ansiCode
 }
-
 func (s *TextField) SetPos(x, y int) {
 	s.XPos = x
 	s.YPos = y
@@ -86,4 +90,7 @@ func (s *TextField) getAnsiTextField(defaultColor Color.Color) string {
 
 func (s *TextField) Touch() {
 	s.isChanged = true
+}
+func (s *TextField) IsTouched() bool {
+	return s.isChanged
 }
