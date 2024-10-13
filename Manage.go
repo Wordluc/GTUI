@@ -3,7 +3,7 @@ package GTUI
 import (
 	"strings"
 
-	"github.com/Wordluc/GTUI/Core/Drawing"
+	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -11,8 +11,7 @@ import (
 func (c *Gtui) ISetGlobalColor(color Color.Color) {
 	c.globalColor = color
 	c.IRefreshAll()
-	c.IClear()
-	c.drawingManager.Execute(func(node *Drawing.TreeNode){
+	c.drawingManager.Execute(func(node *Core.TreeNode[Core.IEntity]) {
 		for _, child := range node.GetElements() {
 			child.Touch()
 		}
@@ -46,8 +45,8 @@ func (c *Gtui) ClearZone(x, y, xSize, ySize int) {
 	whiteLine:=strings.Repeat(" ",xSize)
 	r:=strings.Builder{}
 	for i:=0;i<ySize;i++{
-		r.WriteString(whiteLine)
 		r.WriteString(Utils.GetAnsiMoveTo(x,y+i))
+		r.WriteString(whiteLine)
 	}
 	c.term.PrintStr(r.String())
 }

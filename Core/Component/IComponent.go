@@ -12,6 +12,8 @@ type IComponent interface {
 	GetGraphics() Core.IEntity
 	getShape() (IInteractiveShape, error)
 	SetPos(x,y int)
+	GetPos() (int,int)
+	GetSize() (int,int)
 }
 
 type IWritableComponent interface {
