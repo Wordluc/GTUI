@@ -34,7 +34,9 @@ func CreateRectangle(x, y, width, height int) *Rectangle {
 func (r *Rectangle) Touch() {
 	r.isChanged = true
 }
-
+func (r *Rectangle) IsTouched() bool {
+	return r.isChanged
+}
 func (r *Rectangle) GetAnsiCode(defaultColor Color.Color) string {
 	if !r.visible {
 		return ""
@@ -50,6 +52,10 @@ func (l *Rectangle) SetPos(x, y int) {
 	l.xPos = x
 	l.yPos = y
 	l.Touch()
+}
+
+func (l *Rectangle) GetSize() (int, int) {
+	return l.width, l.height
 }
 
 func (l *Rectangle) SetSize(x, y int) error {
@@ -69,10 +75,6 @@ func (c *Rectangle) SetColor(color Color.Color) {
 
 func (l *Rectangle) GetPos() (int, int) {
 	return l.xPos, l.yPos
-}
-
-func (l *Rectangle) GetSize() (int, int) {
-	return l.width, l.height
 }
 
 func (s *Rectangle) SetVisibility(visible bool) {

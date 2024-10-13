@@ -1,10 +1,12 @@
 package Drawing
 
 import (
-	"github.com/Wordluc/GTUI/Core/Utils/Color"
-	U "github.com/Wordluc/GTUI/Core/Utils"
 	"errors"
+	"math"
 	"strings"
+
+	U "github.com/Wordluc/GTUI/Core/Utils"
+	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 
 type Line struct {
@@ -34,7 +36,19 @@ func CreateLine(x, y, len int, angle int16) *Line {
 func (r *Line) Touch() {
 	r.isChanged = true
 }
-
+func (r *Line) IsTouched() bool {
+	return r.isChanged
+}
+func (r *Line) GetSize() (int, int) {
+   switch(r.angle){
+		case 0:return r.Len,1
+		case 45:
+			var x = int(math.Sqrt(float64(r.Len^2)+float64(r.Len^2)))
+			return x,x
+		case 90:return 1,r.Len
+		default:return 0,0
+   }
+}
 func (r *Line) GetAnsiCode(defaultColor Color.Color) string {
 	if !r.visible {
 		return ""
@@ -48,7 +62,7 @@ func (r *Line) GetAnsiCode(defaultColor Color.Color) string {
 
 func (r *Line) SetAngle(angle int16) {
 	switch angle {
-	case 0, 45, 90, 270:
+	case 0, 45, 90:
 		r.angle = angle
 	default:
 		return
