@@ -51,7 +51,7 @@ func TestTree2(t *testing.T) {
 	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(7,7,10,10,"test2"))
 	tree.AddElement(createMockElementTree(5,5,10,10,"test1"))
-//	testElement(6,6,t,tree,"seconda verifica 0","test1")
-//	testElement(8,8,t,tree,"seconda verifica 1","test2","test1")
+	testElement(6,6,t,tree,"seconda verifica 0","test1")
+	testElement(8,8,t,tree,"seconda verifica 1","test2","test1")
 	testElement(16,16,t,tree,"seconda verifica 2","test2")
 }
