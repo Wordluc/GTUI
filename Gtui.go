@@ -74,14 +74,6 @@ func (c *Gtui) SetCur(x, y int) error {
 	c.yCursor = y
 	c.xCursor = x
 
-	for i := 0; i < len(compsPostSet); i++ {
-		if ci, ok := compsPostSet[i].(*Component.Container); ok {
-			if !ci.GetActivity() {
-				continue
-			}
-			compsPostSet = append(compsPostSet, ci.GetComponents()...)
-		}
-	}
 	for _, comp := range compsPostSet {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
 			if ci.IsTyping() {
