@@ -202,8 +202,9 @@ func (d *TreeManager[T]) Refresh() {
 	d.root.executeForAll(func(node *TreeNode[T]) {
 		if newRoot == nil {
 			newRoot = node
-		}
+		}else{
 		newRoot.addNodes(node.GetElements())
+		}
 	})
 	d.root = newRoot
 }

@@ -63,14 +63,9 @@ func (c *Gtui) SetCur(x, y int) error {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
 				return nil
+			} else {
+				inPreButNotInPost[i].OnOut(x, y)
 			}
-		}
-		if ci, ok := inPreButNotInPost[i].(*Component.Container); ok {
-			if !ci.GetActivity() {
-				continue
-			}
-			inPreButNotInPost = append(inPreButNotInPost, ci.GetComponents()...)
-			lenInPreButNotInPost = len(inPreButNotInPost)
 		} else {
 			inPreButNotInPost[i].OnOut(x, y)
 		}
@@ -133,12 +128,12 @@ func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
 	if container, ok := componentToAdd.(*Component.Container); ok {
 		for _, component := range container.GetComponents() {
 			c.componentManager.AddElement(component)
-			component.OnOut(0,0)
+			component.OnOut(0, 0)
 			c.drawingManager.AddElement(component.GetGraphics())
 		}
 	} else {
 		c.drawingManager.AddElement(componentToAdd.GetGraphics())
-			componentToAdd.OnOut(0,0)
+		componentToAdd.OnOut(0, 0)
 		c.componentManager.AddElement(componentToAdd)
 	}
 	return nil
@@ -183,14 +178,6 @@ func (c *Gtui) AllineCursor() {
 	c.SetVisibilityCursor(false)
 	x, y := c.GetCur()
 	comps, _ := c.componentManager.Search(x, y)
-	for i := 0; i < len(comps); i++ {
-		if ci, ok := comps[i].(*Component.Container); ok {
-			if !ci.GetActivity() {
-				continue
-			}
-			comps = append(comps, ci.GetComponents()...)
-		}
-	}
 	for _, comp := range comps {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
 			if ci.IsTyping() {
