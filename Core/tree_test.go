@@ -30,7 +30,7 @@ func testElement(x,y int,t *testing.T,tree *TreeManager[mockElementTree] ,namete
 		return
 	}
 	if len(result) != len(expected) {
-		t.Error(nametest,":Expected 1, got ",len(result))
+		t.Error(nametest,"Expected ",len(expected), ":got ",len(result))
 		return
 	}
 	for i := 0; i < len(expected); i++ {
@@ -54,4 +54,37 @@ func TestTree2(t *testing.T) {
 	testElement(6,6,t,tree,"seconda verifica 0","test1")
 	testElement(8,8,t,tree,"seconda verifica 1","test2","test1")
 	testElement(16,16,t,tree,"seconda verifica 2","test2")
+}
+func TestTreeSeparatedComponents1(t *testing.T) {
+	tree := CreateTreeManager[mockElementTree]()
+	tree.AddElement(createMockElementTree(5,5,10,10,"test1"))
+	tree.AddElement(createMockElementTree(17,17,10,10,"test2"))
+	testElement(6,6,t,tree,"terza verifica 0","test1")
+	testElement(8,8,t,tree,"terza verifica 1","test1",)
+	testElement(18,18,t,tree,"terza verifica 2","test2")
+}
+func TestTreeSeparatedComponents2(t *testing.T) {
+	tree := CreateTreeManager[mockElementTree]()
+	tree.AddElement(createMockElementTree(17,17,10,10,"test2"))
+	tree.AddElement(createMockElementTree(0,0,10,10,"test1"))
+	testElement(6,6,t,tree,"quarta verifica 0","test1")
+	testElement(8,8,t,tree,"quarta verifica 1","test1",)
+	testElement(18,18,t,tree,"quarta verifica 2","test2")
+}
+func TestTreeMixedCase1(t *testing.T) {
+	tree := CreateTreeManager[mockElementTree]()
+	tree.AddElement(createMockElementTree(17,17,10,10,"test2"))
+	tree.AddElement(createMockElementTree(20,20,10,10,"test3"))
+	tree.AddElement(createMockElementTree(0,0,10,10,"test1"))
+	testElement(2,2,t,tree,"quinta verifica 0","test1")
+	testElement(8,8,t,tree,"quinta verifica 1","test1",)
+	testElement(18,18,t,tree,"quinta verifica 2","test2")
+	testElement(21,21,t,tree,"quinta verifica 3","test2","test3")
+}
+func TestTreeMixedCase2(t *testing.T) {
+	tree := CreateTreeManager[mockElementTree]()
+	tree.AddElement(createMockElementTree(70,0,20,30,"button"))
+	tree.AddElement(createMockElementTree(0,0,50,60,"textBox"))
+	tree.AddElement(createMockElementTree(85,0,10,10,"button1"))
+	testElement(1,1,t,tree,"sesta verifica 0","textBox")
 }

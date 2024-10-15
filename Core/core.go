@@ -3,7 +3,6 @@ package Core
 import (
 	"errors"
 )
-
 type typeTreeNode bool
 
 const (
@@ -58,9 +57,9 @@ func (t *TreeNode[T]) isCollidingWithGroup(x, y int,width,height int) bool {
 func (t *TreeNode[T]) returnCollidingElements(x, y int) []T {
 	var result []T
 	for _, element := range t.element {
-		xSize, ySize := element.GetSize()
+		width, height := element.GetSize()
 		xPos, yPos := element.GetPos()
-		if x > xPos && x < xPos+xSize && y > yPos && y < yPos+ySize {
+		if x >xPos && x<xPos+width && y > yPos && y < yPos+height {
 			result = append(result, element)
 		}
 	}
@@ -80,16 +79,16 @@ func (t *TreeNode[T]) addNode(element T) {
 	width, height := element.GetSize()
 	if !t.isCollidingWithGroup(xPos, yPos, width, height) {
 		if t.nodeType == ByX {
-			if yPos < t.yPos {
-				addElement(&t.smaller, element, ByY)
-			} else {
+			if yPos > t.yPos {
 				addElement(&t.bigger, element, ByY)
+			} else {
+				addElement(&t.smaller, element, ByY)
 			}
 		} else //if t.nodeType == ByY
-		if xPos < t.xPos {
-			addElement(&t.smaller, element, ByX)
-		} else {
+		if xPos > t.xPos {
 			addElement(&t.bigger, element, ByX)
+		} else {
+			addElement(&t.smaller, element, ByX)
 		}
 		return
 	}
