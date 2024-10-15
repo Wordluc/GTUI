@@ -2,8 +2,6 @@ package Core
 
 import (
 	"errors"
-	"fmt"
-	"reflect"
 )
 
 type typeTreeNode bool
@@ -41,9 +39,20 @@ func CreateNode[T ElementTree](element T, typeNode typeTreeNode) *TreeNode[T] {
 	}
 }
 
-func (t *TreeNode[T]) isCollidingWithGroup(x, y int) bool {
-	//fmt.Printf("x: %d, y: %d, pos: (%d,%d) ; size: (%d,%d)\n", x, y,t.xPos, t.yPos, t.width, t.height)
-	return x > t.xPos && x < t.xPos+t.width && y > t.yPos && y < t.yPos+t.height
+func (t *TreeNode[T]) isCollidingWithGroup(x, y int,width,height int) bool {
+	if x >t.xPos && x<t.xPos+t.width && y > t.yPos && y < t.yPos+t.height {
+		return true
+	}
+	if x + width>t.xPos && x<t.xPos+t.width && y > t.yPos && y < t.yPos+t.height {
+		return true
+	}
+	if x >t.xPos && x<t.xPos+t.width && y+height > t.yPos && y +height< t.yPos+t.height {
+		return true
+	}
+	if x + width>t.xPos && x<t.xPos+t.width && y+height > t.yPos && y +height< t.yPos+t.height {
+		return true
+	}
+	return false
 }
 
 func (t *TreeNode[T]) returnCollidingElements(x, y int) []T {
@@ -61,14 +70,15 @@ func (t *TreeNode[T]) returnCollidingElements(x, y int) []T {
 func addElement[T ElementTree](destination **TreeNode[T], element T, _type typeTreeNode) {
 	if *destination == nil {
 		*destination = CreateNode(element, _type)
+		return
 	}
-	print("\a")
 	(*destination).addNode(element)
 }
 
 func (t *TreeNode[T]) addNode(element T) {
 	xPos, yPos := element.GetPos()
-	if !t.isCollidingWithGroup(element.GetPos()) {
+	width, height := element.GetSize()
+	if !t.isCollidingWithGroup(xPos, yPos, width, height) {
 		if t.nodeType == ByX {
 			if yPos < t.yPos {
 				addElement(&t.smaller, element, ByY)
@@ -87,10 +97,15 @@ func (t *TreeNode[T]) addNode(element T) {
 	xSize, ySize := element.GetSize()
 	if (xPos + xSize) > t.xPos+t.width {
 		t.width = xPos + xSize - t.xPos
+	}else {
+		t.width = t.xPos+t.width-xPos  
 	}
-	if (yPos + ySize) > t.yPos+t.width {
+	if (yPos + ySize) > t.yPos+t.height {
 		t.height = yPos + ySize - t.yPos
+	}else {
+		t.height = t.yPos+t.height-yPos  
 	}
+
 	if xPos < t.xPos {
 		t.xPos = xPos
 	}
@@ -104,43 +119,33 @@ func (d *TreeNode[T]) addNodes(elements []T) {
 	}
 }
 func (d *TreeNode[T]) search(x, y int) []T {
-	if d.isCollidingWithGroup(x, y) {
+	if d.isCollidingWithGroup(x, y,0,0) {
 		if r := d.returnCollidingElements(x, y); len(r) > 0 {
 			return r
 		}
 	}
-	var result []T
 	if d.nodeType == ByX {
 		if x > d.xPos {
 			if d.bigger != nil {
-				if r := d.bigger.search(x, y); r != nil {
-					result = append(result, r...)
-				}
+				return d.bigger.search(x, y)
 			}
 		} else {
 			if d.smaller != nil {
-				if r := d.smaller.search(x, y); r != nil {
-					result = append(result, r...)
-				}
+				return d.smaller.search(x, y)
 			}
 		}
 	} else {
 		if y > d.yPos {
 			if d.bigger != nil {
-				if r := d.bigger.search(x, y); r != nil {
-					result = append(result, r...)
-				}
+				return d.bigger.search(x, y)
 			}
 		} else {
 			if d.smaller != nil {
-				if r := d.smaller.search(x, y); r != nil {
-					result = append(result, r...)
-				}
+				return d.smaller.search(x, y)
 			}
 		}
 	}
-	return result
-
+	return nil
 }
 func (d *TreeNode[T]) executeForAll(do func(node *TreeNode[T])) *TreeNode[T] { //TODO:auto adjust tree structure
 	do(d)
@@ -174,9 +179,9 @@ func CreateTreeManager[T ElementTree]() *TreeManager[T] {
 }
 
 func (d *TreeManager[T]) AddElement(element T) {
-	fmt.Printf("adding element %v\n", reflect.TypeOf(element).String())
 	if d.root == nil {
 		d.root = CreateNode(element, ByX)
+		return
 	}
 	d.root.addNode(element)
 }

@@ -36,14 +36,16 @@ func main() {
 	b.SetOnHover(func() {
 		b.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
-	compComponent:=Component.CreateContainer(0,0)
-	if e := compComponent.AddComponent(b); e != nil {
-		panic(e)
-	}
-	if e := compComponent.AddComponent(c); e != nil {
-		panic(e)
-	}
-	comp=compComponent
+//	compComponent:=Component.CreateContainer(0,0)
+//	if e := compComponent.AddComponent(b); e != nil {
+//		panic(e)
+//	}
+//	if e := compComponent.AddComponent(c); e != nil {
+//		panic(e)
+//	}
+//	comp=compComponent
+core.InsertComponent(c)
+	core.InsertComponent(b)
 	button1:=Component.CreateButton(85,0,10,10,"test")
 	button1.SetOnLeave(func() {
 		button1.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
@@ -51,10 +53,10 @@ func main() {
 	button1.SetOnHover(func() {
 		button1.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
+//	if e := core.InsertComponent(compComponent); e != nil {
+//		panic(e)
+//	}
 	if e:=core.InsertComponent(button1);e!=nil{
-		panic(e)
-	}
-	if e := core.InsertComponent(compComponent); e != nil {
 		panic(e)
 	}
 	if e := core.SetCur(1, 1); e != nil {
