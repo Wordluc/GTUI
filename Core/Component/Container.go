@@ -19,16 +19,20 @@ func CreateContainer(x, y int) *Container {
 		components: make([]IComponent, 0),
 	}
 }
-func (c *Container) AddComponent(component IComponent) {
+func (c *Container) AddComponent(component IComponent)error {
 	c.components = append(c.components, component)
-	c.drawing.AddChild(component.GetGraphics())
+	return c.drawing.AddChild(component.GetGraphics())
 }
 
-func (c *Container) AddDrawing(container Drawing.Container) {
-	c.drawing.AddChild(&container)
+func (c *Container) AddDrawing(container Drawing.Container)error {
+	return c.drawing.AddChild(&container)
 }
 
-func (c *Container) GetComponent() []IComponent {
+func (c *Container) GetSize() (int,int) {
+	return c.drawing.GetSize()
+}
+
+func (c *Container) GetComponents() []IComponent {
 	return c.components
 }
 func (c *Container) SetonClick(onClick func()) {
@@ -44,6 +48,10 @@ func (c *Container) GetActivity() bool {
 
 func (c *Container) SetPos(x, y int) {
 	c.drawing.SetPos(x, y)
+}
+
+func (c *Container) GetPos() (int, int) {
+	return c.drawing.GetPos()
 }
 
 func (c *Container) OnClick(x, y int) {
@@ -86,6 +94,15 @@ func (c *Container) OnHover(x, y int) {
 }
 
 func (c *Container) OnOut(x, y int) {
+	if !c.active {
+		return
+	}
+	for _, component := range c.components {
+		shape, _ := component.getShape()
+		if !shape.isOn(x, y) {
+			component.OnOut(x, y)
+		}
+	}
 }
 
 func (c *Container) GetGraphics() Core.IEntity {

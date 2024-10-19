@@ -17,12 +17,16 @@ type TextBox struct {
 	onHover     func()
 }
 
-func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox {
+func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox, error) {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
-	textBox := Drawing.CreateTextBlock(1, 1, sizeX-2, sizeY-2,  10)
-	cont.AddChild(rect)
-	cont.AddChild(textBox)
+	textBox := Drawing.CreateTextBlock(1, 1, sizeX-2, sizeY-2, 10)
+	if e := cont.AddChild(rect); e != nil {
+		return nil, e
+	}
+	if e := cont.AddChild(textBox); e != nil {
+		return nil, e
+	}
 	cont.SetPos(x, y)
 	return &TextBox{
 		graphics:    cont,
@@ -30,10 +34,17 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) *TextBox 
 		isTyping:    false,
 		streamText:  streamText,
 		textBlock:   textBox,
-	}
+	}, nil
 }
+func (b *TextBox) GetSize() (int, int) {
+	return b.graphics.GetSize()
+}
+
 func (b *TextBox) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
+}
+func (b *TextBox) GetPos() (int, int) {
+	return b.graphics.GetPos()
 }
 func (b *TextBox) loopTyping() {
 	channel := b.streamText.Get()
@@ -42,15 +53,15 @@ func (b *TextBox) loopTyping() {
 		if !b.isTyping {
 			return
 		}
-		for _,key=range []rune(str){
-			if key=='\b'{
+		for _, key = range []rune(str) {
+			if key == '\b' {
 				b.textBlock.Delete()
 				continue
-			} 
+			}
 			b.textBlock.Type(key)
 			break
 		}
-		channel<-""
+		channel <- ""
 	}
 }
 
@@ -59,10 +70,10 @@ func (v *TextBox) ClearAll() {
 }
 
 func (v *TextBox) Paste(text string) {
-	for _,char:=range []rune(text){
-		if char=='\r'{
-       continue
-		}	
+	for _, char := range []rune(text) {
+		if char == '\r' {
+			continue
+		}
 		v.textBlock.Type(char)
 	}
 }
@@ -75,7 +86,7 @@ func (t *TextBox) SetWrap(isOn bool) {
 	t.textBlock.SetWrap(isOn)
 }
 
-func (t *TextBox) GetWrap()bool {
+func (t *TextBox) GetWrap() bool {
 	return t.textBlock.GetWrap()
 }
 func (b *TextBox) StartTyping() {
@@ -91,14 +102,14 @@ func (b *TextBox) StopTyping() {
 	b.isTyping = false
 }
 
-func (b *TextBox) OnClick(_,_ int) {
+func (b *TextBox) OnClick(_, _ int) {
 	if b.onClick != nil {
 		b.onClick()
 	}
 	b.StartTyping()
 }
 
-func (b *TextBox) OnOut(_,_ int) {
+func (b *TextBox) OnOut(_, _ int) {
 	if b.onLeave != nil {
 		b.onLeave()
 	}
@@ -112,9 +123,9 @@ func (b *TextBox) SetOnOut(onLeave func()) {
 func (b *TextBox) SetOnHover(onHover func()) {
 	b.onHover = onHover
 }
-func (b *TextBox) OnRelease(_,_ int) {}
+func (b *TextBox) OnRelease(_, _ int) {}
 
-func (b *TextBox) OnHover(_,_ int) {
+func (b *TextBox) OnHover(_, _ int) {
 	if b.onHover != nil {
 		b.onHover()
 	}
@@ -141,7 +152,7 @@ func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 	diffY = diffY - y
 	return diffX, diffY
 }
-func (b *TextBox) SetCurrentPosCursor(x, y int)(int,int) {
+func (b *TextBox) SetCurrentPosCursor(x, y int) (int, int) {
 	return b.textBlock.SetCursor_Relative(x, y)
 }
 func (b *TextBox) getShape() (IInteractiveShape, error) {

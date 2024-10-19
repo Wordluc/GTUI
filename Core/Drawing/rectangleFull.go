@@ -37,6 +37,10 @@ func (r *RectangleFull) Touch() {
 	r.isChanged = true
 	r.border.Touch()
 }
+
+func (r *RectangleFull) IsTouched() bool {
+	return r.isChanged||r.border.IsTouched()
+}
 func (r *RectangleFull) GetAnsiCode(defaultColor Color.Color) string {
 	if !r.visible {
 		return ""
@@ -82,6 +86,10 @@ func (r *RectangleFull) SetSize(x, y int) {
 	r.Height = y
 	r.border.SetSize(x, y)
 	r.Touch()
+}
+
+func (r *RectangleFull) GetSize() (int, int) {
+	return r.Width, r.Height
 }
 
 func (s *RectangleFull) SetVisibility(visible bool) {

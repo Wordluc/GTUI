@@ -16,15 +16,17 @@ func main() {
 	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
 
-	c := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
+	c,e := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
+	if e != nil {
+		panic(e)
+	}
 	c.SetOnOut(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
 	})
 	c.SetOnHover(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
-
-   b:=Component.CreateButton(70, 0, 5, 3, "test")
+   b:=Component.CreateButton(70, 0, 20, 30, "test")
 	b.SetOnClick(func() {
 		c.ClearAll()
 	})
@@ -35,10 +37,24 @@ func main() {
 		b.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
 	compComponent:=Component.CreateContainer(0,0)
-	compComponent.AddComponent(b)
-	compComponent.AddComponent(c)
+	if e := compComponent.AddComponent(b); e != nil {
+		panic(e)
+	}
+	if e := compComponent.AddComponent(c); e != nil {
+		panic(e)
+	}
 	comp=compComponent
+	button1:=Component.CreateButton(85,0,10,10,"test")
+	button1.SetOnLeave(func() {
+		button1.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
+	})
+	button1.SetOnHover(func() {
+		button1.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
+	})
 	if e := core.InsertComponent(compComponent); e != nil {
+		panic(e)
+	}
+	if e:=core.InsertComponent(button1);e!=nil{
 		panic(e)
 	}
 	if e := core.SetCur(1, 1); e != nil {
@@ -63,6 +79,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 	}
 
 	if keyb.IsKeySPressed(Kd.KeyCtrlS) {
+		core.IClear()
 		comp.SetPos(x,y)
 		core.RefreshComponents()
 	}

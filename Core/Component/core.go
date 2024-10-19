@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 )
-
 type StreamCharacter struct {
 	Get      func() chan string
 	IChannel int
@@ -19,6 +18,12 @@ type BaseInteractiveShape struct {
 	yPos   int
 	Width  int
 	Height int
+}
+func (b BaseInteractiveShape) GetPos() (int, int) {
+	return b.xPos, b.yPos
+}
+func (b BaseInteractiveShape) GetSize() (int, int) {
+	return b.Width, b.Height
 }
 
 func (b *BaseInteractiveShape) isOn(x, y int) bool {
