@@ -51,10 +51,10 @@ func main() {
 	button1.SetOnHover(func() {
 		button1.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
-	if e:=core.InsertComponent(button1);e!=nil{
+	if e := core.InsertComponent(compComponent); e != nil {
 		panic(e)
 	}
-	if e := core.InsertComponent(compComponent); e != nil {
+	if e:=core.InsertComponent(button1);e!=nil{
 		panic(e)
 	}
 	if e := core.SetCur(1, 1); e != nil {
