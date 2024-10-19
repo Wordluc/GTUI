@@ -132,7 +132,9 @@ func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock
 func (t *TextBlock) Touch() {
 	t.isChanged = true
 }
-
+func (t *TextBlock) IsTouched() bool {
+	return t.isChanged
+}
 func (t *TextBlock) GetAnsiCode(defaultColor Color.Color) string {
 	if t.isChanged {
 		t.ansiCode = t.GetText(true)
@@ -278,7 +280,7 @@ func (t *TextBlock) ClearAll() {
 	t.totalLine = 1
 	t.absoluteCurrentCharacter = 0
 	t.wrap = false
-	t.isChanged=true
+	t.Touch()
 }
 // delete the selected text
 func (t *TextBlock) deleteWrapping() {
@@ -296,6 +298,7 @@ func (t *TextBlock) deleteWrapping() {
 
 // Delete the current character
 func (t *TextBlock) Delete() {
+	t.Touch()
 	if t.wrap {
 		t.deleteWrapping()
 		return
@@ -570,6 +573,7 @@ func (t *TextBlock) resetXCursor() {
 
 func (t *TextBlock) Type(char rune) {
 	defer t.Touch()
+	t.Touch()
 	if t.wrap {
 		t.deleteWrapping()
 	}

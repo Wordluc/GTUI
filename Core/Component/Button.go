@@ -33,11 +33,15 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 		isClicked:   false,
 	}
 }
-
 func (b *Button) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
 }
-
+func (b *Button) GetPos() (int, int) {
+	return b.graphics.GetPos()
+}
+func (b *Button) GetSize() (int, int) {
+	return b.graphics.GetSize()
+}
 func (b *Button) SetOnClick(onClick OnEvent) {
 	b.onClick = onClick
 }
