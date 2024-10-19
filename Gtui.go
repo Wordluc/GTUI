@@ -63,14 +63,9 @@ func (c *Gtui) SetCur(x, y int) error {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
 				return nil
+			} else {
+				inPreButNotInPost[i].OnOut(x, y)
 			}
-		}
-		if ci, ok := inPreButNotInPost[i].(*Component.Container); ok {
-			if !ci.GetActivity() {
-				continue
-			}
-			inPreButNotInPost = append(inPreButNotInPost, ci.GetComponent()...)
-			lenInPreButNotInPost = len(inPreButNotInPost)
 		} else {
 			inPreButNotInPost[i].OnOut(x, y)
 		}
@@ -79,14 +74,6 @@ func (c *Gtui) SetCur(x, y int) error {
 	c.yCursor = y
 	c.xCursor = x
 
-	for i := 0; i < len(compsPostSet); i++ {
-		if ci, ok := compsPostSet[i].(*Component.Container); ok {
-			if !ci.GetActivity() {
-				continue
-			}
-			compsPostSet = append(compsPostSet, ci.GetComponent()...)
-		}
-	}
 	for _, comp := range compsPostSet {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
 			if ci.IsTyping() {
@@ -130,12 +117,15 @@ func (c *Gtui) InsertEntity(entity Core.IEntity) {
 }
 
 func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
-	c.drawingManager.AddElement(componentToAdd.GetGraphics())
 	if container, ok := componentToAdd.(*Component.Container); ok {
-		for _, component := range container.GetComponent() {
+		for _, component := range container.GetComponents() {
 			c.componentManager.AddElement(component)
+			component.OnOut(0, 0)
+			c.drawingManager.AddElement(component.GetGraphics())
 		}
-	}else{
+	} else {
+		c.drawingManager.AddElement(componentToAdd.GetGraphics())
+		componentToAdd.OnOut(0, 0)
 		c.componentManager.AddElement(componentToAdd)
 	}
 	return nil
@@ -152,7 +142,7 @@ func (c *Gtui) EventOn(x, y int, event func(Component.IComponent)) error {
 	}
 	for i := 0; i < len(resultArray); i++ {
 		if ci, ok := resultArray[i].(*Component.Container); ok {
-			resultArray = append(resultArray, ci.GetComponent()...)
+			resultArray = append(resultArray, ci.GetComponents()...)
 		}
 	}
 	for i := range resultArray {
@@ -180,14 +170,6 @@ func (c *Gtui) AllineCursor() {
 	c.SetVisibilityCursor(false)
 	x, y := c.GetCur()
 	comps, _ := c.componentManager.Search(x, y)
-	for i := 0; i < len(comps); i++ {
-		if ci, ok := comps[i].(*Component.Container); ok {
-			if !ci.GetActivity() {
-				continue
-			}
-			comps = append(comps, ci.GetComponent()...)
-		}
-	}
 	for _, comp := range comps {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
 			if ci.IsTyping() {

@@ -33,7 +33,6 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 		isClicked:   false,
 	}
 }
-
 func (b *Button) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
 }

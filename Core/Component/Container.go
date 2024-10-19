@@ -32,7 +32,7 @@ func (c *Container) GetSize() (int,int) {
 	return c.drawing.GetSize()
 }
 
-func (c *Container) GetComponent() []IComponent {
+func (c *Container) GetComponents() []IComponent {
 	return c.components
 }
 func (c *Container) SetonClick(onClick func()) {
