@@ -16,10 +16,7 @@ func main() {
 	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
 
-	c,e := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
-	if e != nil {
-		panic(e)
-	}
+	c,_ := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
 	c.SetOnOut(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
 	})
