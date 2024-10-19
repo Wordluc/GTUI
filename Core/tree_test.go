@@ -29,6 +29,9 @@ func testElement(x,y int,t *testing.T,tree *TreeManager[mockElementTree] ,namete
 		t.Error(err)
 		return
 	}
+	for _,e := range result {
+		t.Log(e.name)
+	}
 	if len(result) != len(expected) {
 		t.Error(nametest,"Expected ",len(expected), ":got ",len(result))
 		return
@@ -86,5 +89,13 @@ func TestTreeMixedCase2(t *testing.T) {
 	tree.AddElement(createMockElementTree(70,0,20,30,"button"))
 	tree.AddElement(createMockElementTree(0,0,50,60,"textBox"))
 	tree.AddElement(createMockElementTree(85,0,10,10,"button1"))
+	testElement(1,1,t,tree,"sesta verifica 0","textBox")
+}
+func TestTreeRefresh(t *testing.T) {
+	tree := CreateTreeManager[mockElementTree]()
+	tree.AddElement(createMockElementTree(70,0,20,30,"button"))
+	tree.AddElement(createMockElementTree(0,0,50,60,"textBox"))
+	tree.AddElement(createMockElementTree(85,0,10,10,"button1"))
+	tree.Refresh()
 	testElement(1,1,t,tree,"sesta verifica 0","textBox")
 }
