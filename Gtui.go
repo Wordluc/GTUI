@@ -135,6 +135,7 @@ func (c *Gtui) RefreshComponents() {
 	c.drawingManager.Refresh()
 	c.componentManager.Refresh()
 }
+
 func (c *Gtui) EventOn(x, y int, event func(Component.IComponent)) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
@@ -187,24 +188,23 @@ func (c *Gtui) AllineCursor() {
 func (c *Gtui) IRefreshAll() {
 	c.SetVisibilityCursor(false)
 	var str strings.Builder
-	cond := func(node *Core.TreeNode[Core.IEntity]) {
-		isTouched := false
-		for _, el := range node.GetElements() {
-			if el.GetVisibility() && el.IsTouched() {
-				isTouched = true
-				x, y := el.GetPos()
-				width, height := el.GetSize()
-				c.ClearZone(x, y, width, height)
-				break
-			}
+	var isTouched bool
+	cond := func(node *Core.TreeNode[Core.IEntity]) bool {
+		isTouched = false
+		if el := node.GetElement(); el.IsTouched() {
+			x, y := el.GetPos()
+			width, height := el.GetSize()
+			c.ClearZone(x, y, width, height)
+			isTouched = true
 		}
 		if !isTouched {
-			return
+			return true
 		}
 		for _, el := range node.GetElements() {
 			str.WriteString(el.GetAnsiCode(c.globalColor))
 			str.WriteString(c.globalColor.GetAnsiColor())
 		}
+		return false
 	}
 	c.drawingManager.Execute(cond)
 	c.term.PrintStr(str.String())

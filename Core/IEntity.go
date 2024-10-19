@@ -12,3 +12,8 @@ type IEntity interface {
 	GetVisibility() bool
 	GetSize() (int, int)
 }
+
+//type IEntity interface {
+//	GetPos() (int, int)
+//	GetSize() (int, int)
+//}
