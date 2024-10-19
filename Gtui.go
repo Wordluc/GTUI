@@ -121,13 +121,12 @@ func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
 		for _, component := range container.GetComponents() {
 			c.componentManager.AddElement(component)
 			component.OnOut(0, 0)
-			c.drawingManager.AddElement(component.GetGraphics())
 		}
 	} else {
-		c.drawingManager.AddElement(componentToAdd.GetGraphics())
 		componentToAdd.OnOut(0, 0)
 		c.componentManager.AddElement(componentToAdd)
 	}
+	c.drawingManager.AddElement(componentToAdd.GetGraphics())
 	return nil
 }
 

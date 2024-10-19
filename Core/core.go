@@ -80,7 +80,7 @@ func (t *TreeNode[T]) addNode(element T) {
 	xPos, yPos := element.GetPos()
 	width, height := element.GetSize()
 	if !t.isCollidingWithGroup(xPos, yPos, width, height) {
-		if yPos > t.yPos {
+		if t.nodeType==ByX && yPos >= t.yPos || t.nodeType==ByY && xPos > t.xPos {
 			addElement(&t.bigger, element, !t.nodeType)
 		} else {
 			addElement(&t.smaller, element, !t.nodeType)
@@ -132,8 +132,8 @@ func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
 	if d.collidingElements != nil {
 		d.collidingElements.execute(x, y, do)
 	}
-	if d.nodeType == ByX {
-		if x > d.xPos {
+	if d.nodeType == ByY {
+		if x >= d.xPos {
 			if d.bigger != nil {
 				d.bigger.execute(x, y, do)
 			}
@@ -143,7 +143,7 @@ func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
 			}
 		}
 	} else {
-		if y > d.yPos {
+		if y >= d.yPos {
 			if d.bigger != nil {
 				d.bigger.execute(x, y, do)
 			}

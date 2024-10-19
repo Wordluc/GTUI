@@ -15,7 +15,6 @@ func main() {
 	kbr := Keyboard.NewKeyboard()
 	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
-
 	c,e := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
 	if e != nil {
 		panic(e)
@@ -51,6 +50,7 @@ func main() {
 	button1.SetOnHover(func() {
 		button1.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
+	comp.SetPos(10,10)
 	if e := core.InsertComponent(compComponent); e != nil {
 		panic(e)
 	}
