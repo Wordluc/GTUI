@@ -80,7 +80,7 @@ func (t *TreeNode[T]) addNode(element T) {
 	xPos, yPos := element.GetPos()
 	width, height := element.GetSize()
 	if !t.isCollidingWithGroup(xPos, yPos, width, height) {
-		if t.nodeType==ByX && yPos >= t.yPos || t.nodeType==ByY && xPos > t.xPos {
+		if t.nodeType==ByX && yPos >= t.yPos || t.nodeType==ByY && xPos >= t.xPos {
 			addElement(&t.bigger, element, !t.nodeType)
 		} else {
 			addElement(&t.smaller, element, !t.nodeType)
