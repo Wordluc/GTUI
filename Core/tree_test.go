@@ -30,11 +30,14 @@ func testElement(x,y int,t *testing.T,tree *TreeManager[mockElementTree] ,namete
 		return
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 	for _,e := range result {
 		t.Log(e.name)
 	}
 =======
 >>>>>>> 1c289ca (fix:merge)
+=======
+>>>>>>> 8ca9617 (fix : search element same height)
 	if len(result) != len(expected) {
 		t.Error(nametest,"Expected ",len(expected), ":got ",len(result))
 		return
@@ -101,8 +104,11 @@ func TestTreeRefresh(t *testing.T) {
 	tree.AddElement(createMockElementTree(85,0,10,10,"button1"))
 	tree.Refresh()
 <<<<<<< HEAD
+<<<<<<< HEAD
 	testElement(1,1,t,tree,"sesta verifica 0","textBox")
 =======
+=======
+>>>>>>> 8ca9617 (fix : search element same height)
 	testElement(1,1,t,tree,"settima verifica 0","textBox")
 }
 func TestTreeElementAbove(t *testing.T) {
@@ -111,5 +117,8 @@ func TestTreeElementAbove(t *testing.T) {
 	tree.AddElement(createMockElementTree(40,0,10,10,"textBox"))
 	testElement(41,1,t,tree,"ottava verifica 0","textBox")
 	testElement(41,41,t,tree,"ottava verifica 1","button1")
+<<<<<<< HEAD
 >>>>>>> 1c289ca (fix:merge)
+=======
+>>>>>>> 8ca9617 (fix : search element same height)
 }
