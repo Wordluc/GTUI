@@ -187,24 +187,20 @@ func (c *Gtui) AllineCursor() {
 func (c *Gtui) IRefreshAll() {
 	c.SetVisibilityCursor(false)
 	var str strings.Builder
-	var i int
 	cond := func(node *Core.TreeNode[Core.IEntity]) {
 		isTouched := false
-		if i == 2 {
-		}
-		i++
 		for _, el := range node.GetElements() {
 			if el.GetVisibility() && el.IsTouched() {
 				isTouched = true
+				x, y := el.GetPos()
+				width, height := el.GetSize()
+				c.ClearZone(x, y, width, height)
 				break
 			}
 		}
 		if !isTouched {
 			return
 		}
-		x, y := node.GetPos()
-		width, height := node.GetSize()
-		c.ClearZone(x, y, width, height)
 		for _, el := range node.GetElements() {
 			str.WriteString(el.GetAnsiCode(c.globalColor))
 			str.WriteString(c.globalColor.GetAnsiColor())
