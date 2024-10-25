@@ -30,7 +30,7 @@ func testElement(x,y int,t *testing.T,tree *TreeManager[mockElementTree] ,namete
 		return
 	}
 	if len(result) != len(expected) {
-		t.Error(nametest,"Expected ",len(expected), ":got ",len(result))
+		t.Error(nametest,"Expected ",len(expected), ":got ",len(result),";pos",x,y)
 		return
 	}
 	for i := 0; i < len(expected); i++ {
@@ -103,4 +103,20 @@ func TestTreeElementAbove(t *testing.T) {
 	tree.AddElement(createMockElementTree(40,0,10,10,"textBox"))
 	testElement(41,1,t,tree,"ottava verifica 0","textBox")
 	testElement(41,41,t,tree,"ottava verifica 1","button1")
+}
+func TestTreeElementNextToAnotherElement(t *testing.T) {
+	tree := CreateTreeManager[mockElementTree]()
+	tree.AddElement(createMockElementTree(10,5,10,5,"button1"))
+	tree.AddElement(createMockElementTree(25,0,50,50,"textBox"))
+	if tree.root.element.name!="button1"{
+		t.Error("Expected button1 got ",tree.root.element.name)
+	}
+	if tree.root.smaller.element.name!="textBox"{
+		t.Error("Expected textBox got ",tree.root.smaller.element.name)
+	}
+		testElement(26,11,t,tree,"nona verifica 1","textBox")
+//	for i := 1; i < 50; i=i+10 {
+//		testElement(26,i,t,tree,"nona verifica 1","textBox")
+//		print("---\n")
+//	}
 }
