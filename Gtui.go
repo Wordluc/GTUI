@@ -123,6 +123,7 @@ func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
 			c.drawingManager.AddElement(component.GetGraphics())
 			component.OnOut(0, 0)
 		}
+		c.InsertEntity(container.GetGraphics())
 	} else {
 		componentToAdd.OnOut(0, 0)
 		c.componentManager.AddElement(componentToAdd)

@@ -3,7 +3,7 @@ package main
 import (
 	Core "github.com/Wordluc/GTUI"
 	"github.com/Wordluc/GTUI/Core/Component"
-	"github.com/Wordluc/GTUI/Core/Utils/Color"
+	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Keyboard"
 	Kd "github.com/Wordluc/GTUI/Keyboard"
 	"github.com/Wordluc/GTUI/Terminal"
@@ -14,52 +14,10 @@ var comp Component.IComponent
 func main() {
 	kbr := Keyboard.NewKeyboard()
 	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
-	xS, yS := 50, 40
-	c,e := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
-	if e != nil {
-		panic(e)
-	}
-	c.SetOnOut(func() {
-		c.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
-	})
-	c.SetOnHover(func() {
-		c.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
-	})
-	b:=Component.CreateButton(50, 0, 20, 30, "test")
-	b.SetOnClick(func() {
-		c.ClearAll()
-	})
-	b.SetOnLeave(func() {
-		b.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
-	})
-	b.SetOnHover(func() {
-		b.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
-	})
-	compComponent:=Component.CreateContainer(0,0)
-	if e := compComponent.AddComponent(b); e != nil {
-		panic(e)
-	}
-	if e := compComponent.AddComponent(c); e != nil {
-		panic(e)
-	}
-	comp=compComponent
-	button1:=Component.CreateButton(50,0,10,10,"test")
-	button1.SetOnLeave(func() {
-		button1.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
-	})
-	button1.SetOnHover(func() {
-		button1.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
-	})
-	comp.SetPos(10,10)
-	if e := core.InsertComponent(compComponent); e != nil {
-		panic(e)
-	}
-	if e:=core.InsertComponent(button1);e!=nil{
-		panic(e)
-	}
-	if e := core.SetCur(1, 1); e != nil {
-		panic(e)
-	}
+	rect:=Drawing.CreateRectangle(0,0,50,50)
+	button:=Component.CreateButton(20,20,10,10,"test")
+	core.InsertEntity(rect)
+	core.InsertComponent(button)
 	core.Start()
 }
 
