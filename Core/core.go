@@ -126,7 +126,7 @@ func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
 	if d.smaller != nil && ((d.nodeType == ByY && x < xPosElNode) ||(d.nodeType == ByX && y < yPosElNode) || d.smaller.isCollidingWithGroup(x, y, 0, 0)) {
 			d.smaller.execute(x, y, do)
 	}
-	if d.bigger != nil && ((d.nodeType == ByY && x >= xPosElNode) ||(d.nodeType == ByX && y < yPosElNode)|| d.bigger.isCollidingWithGroup(x, y, 0, 0)) {
+	if d.bigger != nil && ((d.nodeType == ByY && x >= xPosElNode) ||(d.nodeType == ByX && y >= yPosElNode)|| d.bigger.isCollidingWithGroup(x, y, 0, 0)) {
 			d.bigger.execute(x, y, do)
 	}
 }
