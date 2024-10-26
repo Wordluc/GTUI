@@ -23,6 +23,7 @@ type TreeNode[T ElementTree] struct {
 	width             int
 	height            int
 	element           T
+	collidingElements []*TreeNode[T]
 	bigger            *TreeNode[T]
 	smaller           *TreeNode[T]
 }
@@ -66,24 +67,29 @@ func (t *TreeNode[T]) isElementColliding(x, y int) bool {
 	return false
 }
 
-func addElement[T ElementTree](destination **TreeNode[T], element T, _type typeTreeNode) {
+func addElement[T ElementTree](destination **TreeNode[T], element T, _type typeTreeNode) *TreeNode[T] {
 	if *destination == nil {
 		*destination = CreateNode(element, _type)
-		return
+		return *destination
 	}
 	(*destination).addNode(element)
+	return nil
 }
 
 func (t *TreeNode[T]) addNode(element T) {
 	xPos, yPos := element.GetPos()
 	width, height := element.GetSize()
 	xPosElNode, yPosElNode := t.element.GetPos()
+	var newNode *TreeNode[T]
 	if (t.nodeType==ByX && yPos >= yPosElNode) || (t.nodeType==ByY && xPos >= xPosElNode) {
-		addElement(&t.bigger, element, !t.nodeType)
+		newNode = addElement(&t.bigger, element, !t.nodeType)
 	} else {
-		addElement(&t.smaller, element, !t.nodeType)
+		newNode = addElement(&t.smaller, element, !t.nodeType)
 	}
 	if t.isCollidingWithGroup(xPos, yPos, width, height) {
+		if newNode != nil {
+			t.collidingElements = append(t.collidingElements, newNode)
+		}
 		xSize, ySize := element.GetSize()
 		if (xPos + xSize) > t.xPos+t.width {
 			t.width = xPos + xSize - t.xPos
@@ -143,9 +149,21 @@ func (d *TreeNode[T]) executeForAll(do func(node *TreeNode[T]) bool) *TreeNode[T
 	}
 	return nil
 }
+
+func (d *TreeNode[T]) GetCollidingElements() []T {
+	var result []T
+	d.executeForAll(func(node *TreeNode[T]) bool{
+		result := make([]T, 0)
+		result = append(result, node.element)
+		return true
+	})
+	return result
+}
+
 func (d *TreeNode[T]) GetElement() T {
 	return d.element
 }
+
 func (d *TreeNode[T]) GetElements() []T {
 	result := make([]T, 0)
 	d.executeForAll(func(node *TreeNode[T]) bool{
@@ -154,6 +172,7 @@ func (d *TreeNode[T]) GetElements() []T {
 	})
 	return result
 }
+
 func Sort[T ElementTree](elements []T, _type typeTreeNode) {
 	sort.Slice(elements, func(i, j int) bool {
 		x1, y1 := elements[i].GetPos()
@@ -164,6 +183,7 @@ func Sort[T ElementTree](elements []T, _type typeTreeNode) {
 		return y1 < y2
 	})
 }
+
 func (d *TreeNode[T]) GetPos() (int, int) {
 	return d.xPos, d.yPos
 }

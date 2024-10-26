@@ -25,7 +25,7 @@ func main() {
 	c.SetOnHover(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
-   b:=Component.CreateButton(70, 0, 20, 30, "test")
+	b:=Component.CreateButton(50, 0, 20, 30, "test")
 	b.SetOnClick(func() {
 		c.ClearAll()
 	})
@@ -43,7 +43,7 @@ func main() {
 		panic(e)
 	}
 	comp=compComponent
-	button1:=Component.CreateButton(85,0,10,10,"test")
+	button1:=Component.CreateButton(50,0,10,10,"test")
 	button1.SetOnLeave(func() {
 		button1.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
 	})

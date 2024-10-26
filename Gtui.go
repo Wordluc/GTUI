@@ -78,8 +78,8 @@ func (c *Gtui) SetCur(x, y int) error {
 		if ci, ok := comp.(Component.IWritableComponent); ok {
 			if ci.IsTyping() {
 				c.xCursor, c.yCursor = ci.SetCurrentPosCursor(x, y)
-				break
 			}
+				break
 		}
 	}
 
@@ -120,13 +120,14 @@ func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
 	if container, ok := componentToAdd.(*Component.Container); ok {
 		for _, component := range container.GetComponents() {
 			c.componentManager.AddElement(component)
+			c.drawingManager.AddElement(component.GetGraphics())
 			component.OnOut(0, 0)
 		}
 	} else {
 		componentToAdd.OnOut(0, 0)
 		c.componentManager.AddElement(componentToAdd)
+		c.drawingManager.AddElement(componentToAdd.GetGraphics())
 	}
-	c.drawingManager.AddElement(componentToAdd.GetGraphics())
 	return nil
 }
 
@@ -187,23 +188,26 @@ func (c *Gtui) AllineCursor() {
 func (c *Gtui) IRefreshAll() {
 	c.SetVisibilityCursor(false)
 	var str strings.Builder
-	var isTouched bool
+	var isChanged bool
 	cond := func(node *Core.TreeNode[Core.IEntity]) bool {
-		isTouched = false
+		isChanged = false
 		if el := node.GetElement(); el.IsTouched() {
 			x, y := el.GetPos()
 			width, height := el.GetSize()
 			c.ClearZone(x, y, width, height)
-			isTouched = true
+			isChanged = true
 		}
-		if !isTouched {
+		if !isChanged {
 			return true
 		}
-		for _, el := range node.GetElements() {
+
+		str.WriteString(node.GetElement().GetAnsiCode(c.globalColor))
+		str.WriteString(c.globalColor.GetAnsiColor())
+		for _, el := range node.GetCollidingElements() {
 			str.WriteString(el.GetAnsiCode(c.globalColor))
 			str.WriteString(c.globalColor.GetAnsiColor())
 		}
-		return false
+		return true
 	}
 	c.drawingManager.Execute(cond)
 	c.term.PrintStr(str.String())
