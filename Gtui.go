@@ -188,25 +188,21 @@ func (c *Gtui) AllineCursor() {
 func (c *Gtui) IRefreshAll() {
 	c.SetVisibilityCursor(false)
 	var str strings.Builder
-	var isChanged bool
 	cond := func(node *Core.TreeNode[Core.IEntity]) bool {
-		isChanged = false
-		if el := node.GetElement(); el.IsTouched() {
-			x, y := el.GetPos()
-			width, height := el.GetSize()
-			c.ClearZone(x, y, width, height)
-			isChanged = true
-		}
-		if !isChanged {
+		var el Core.IEntity
+		if el = node.GetElement(); !el.IsTouched() {
 			return true
 		}
-
+		x, y := el.GetPos()
+		width, height := el.GetSize()
+		c.ClearZone(x, y, width, height)
 		str.WriteString(node.GetElement().GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 		for _, el := range node.GetCollidingElements() {
 			str.WriteString(el.GetAnsiCode(c.globalColor))
 			str.WriteString(c.globalColor.GetAnsiColor())
 		}
+
 		return true
 	}
 	c.drawingManager.Execute(cond)
