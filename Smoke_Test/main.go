@@ -1,7 +1,6 @@
 package main
 
 import (
-	"atomicgo.dev/keyboard/keys"
 	Core "github.com/Wordluc/GTUI"
 	"github.com/Wordluc/GTUI/Core/Component"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
@@ -66,27 +65,27 @@ func main() {
 
 func loop(keyb Kd.IKeyBoard) bool {
 	var x, y = core.GetCur()
-	if keyb.IsKeySPressed(keys.Down) {
+	if keyb.IsKeySPressed(Keyboard.Down) {
 		y++
 	}
-	if keyb.IsKeySPressed(keys.Up) {
+	if keyb.IsKeySPressed(Keyboard.Up) {
 		y--
 	}
-	if keyb.IsKeySPressed(keys.Right) {
+	if keyb.IsKeySPressed(Keyboard.Right) {
 		x++
 	}
-	if keyb.IsKeySPressed(keys.Left) {
+	if keyb.IsKeySPressed(Keyboard.Left) {
 		x--
 	}
 
-	if keyb.IsKeySPressed(keys.CtrlS) {
+	if keyb.IsKeySPressed(Keyboard.CtrlS) {
 		core.IClear()
 		comp.SetPos(x,y)
 		core.RefreshComponents()
 	}
 
 	core.SetCur(x, y)
-	if keyb.IsKeySPressed(keys.Esc) {
+	if keyb.IsKeySPressed(Keyboard.Esc) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(Component.IWritableComponent); ok {
 				c.StopTyping()
@@ -94,11 +93,11 @@ func loop(keyb Kd.IKeyBoard) bool {
 		})
 	}
 
-	if keyb.IsKeySPressed(keys.Enter) {
+	if keyb.IsKeySPressed(Keyboard.Enter) {
 		core.Click(x, y)
 	}
 
-	if keyb.IsKeySPressed(keys.CtrlV) {
+	if keyb.IsKeySPressed(Keyboard.CtrlV) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
@@ -109,7 +108,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 		})
 	}
 
-	if keyb.IsKeySPressed(keys.CtrlA) {
+	if keyb.IsKeySPressed(Keyboard.CtrlA) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
@@ -119,7 +118,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 		})
 	}
 
-	if keyb.IsKeySPressed(keys.CtrlC) {
+	if keyb.IsKeySPressed(Keyboard.CtrlC) {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
@@ -129,7 +128,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 		})
 	}
 
-	if keyb.IsKeySPressed(keys.CtrlQ) {
+	if keyb.IsKeySPressed(Keyboard.CtrlQ) {
 		return false
 	}
 	return true

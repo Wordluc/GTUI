@@ -13,7 +13,7 @@ type Keyboard struct {
 	loop      Loop
 }
 type stateKey struct {
-	key  keys.KeyCode
+	key  Key
 	rune rune
 }
 
@@ -58,10 +58,10 @@ func (t *Keyboard) keyListening(v keys.Key) (bool, error) {
 		v.Code = '\b'
 	}
 	if rune:=v.Runes;len(rune)>0{
-		t.key = stateKey{key: v.Code, rune: rune[0]}
+		t.key = stateKey{key: Key(v.Code), rune: rune[0]}
 	}else
 	{
-		t.key = stateKey{key: v.Code, rune: 0}
+		t.key = stateKey{key: Key(v.Code), rune: 0}
 	}
 	for _, b := range t.GetChannels() {
 		key, e := t.GetKey()
@@ -97,7 +97,7 @@ func (t *Keyboard) GetKey() (byte, error) {
 	return byte(t.key.rune), nil
 }
 
-func (t *Keyboard) IsKeySPressed(key keys.KeyCode) bool {
+func (t *Keyboard) IsKeySPressed(key Key) bool {
 	return t.key.key == key
 }
 
