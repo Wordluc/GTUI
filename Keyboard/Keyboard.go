@@ -46,16 +46,16 @@ func (t *Keyboard) DeleteChannel(i int) {
 
 func (t *Keyboard) keyListening(v keys.Key) (bool, error) {
 	if v.Code == keys.Space {
-		v.Code = ' '
+		v.Runes =[]rune{' '}
 	}
 	if v.Code == keys.Tab {
-		v.Code = '	'
+		v.Runes = []rune{'	'}
 	}
-	if v.Code == keys.Tab {
-		v.Code = '\n'
+	if v.Code == keys.Enter {
+		v.Runes = []rune{'\n'}
 	}
 	if v.Code == keys.Backspace {
-		v.Code = '\b'
+		v.Runes = []rune{'\b'}
 	}
 	if rune:=v.Runes;len(rune)>0{
 		t.key = stateKey{key: Key(v.Code), rune: rune[0]}
