@@ -1,8 +1,9 @@
 package Keyboard
 
 import (
+	"atomicgo.dev/keyboard"
+	"atomicgo.dev/keyboard/keys"
 	"github.com/atotto/clipboard"
-	"github.com/eiannone/keyboard"
 )
 
 type Keyboard struct {
@@ -12,20 +13,18 @@ type Keyboard struct {
 	loop      Loop
 }
 type stateKey struct {
-	key  Key
+	key  keys.KeyCode
 	rune rune
 }
+
 func NewKeyboard() *Keyboard {
-	return &Keyboard{ channel: make([]chan string, 0), IsRunning: false}
+	return &Keyboard{channel: make([]chan string, 0), IsRunning: false}
 }
 func (t *Keyboard) Start(Loop Loop) error {
 	t.IsRunning = true
 	t.loop = Loop
-	eventKey, e := keyboard.GetKeys(1)
-	if e != nil {
-		return e
-	}
-	t.keyListening(eventKey)
+
+	keyboard.Listen(t.keyListening)
 	return nil
 }
 func (t *Keyboard) GetChannels() []chan string {
@@ -45,42 +44,46 @@ func (t *Keyboard) DeleteChannel(i int) {
 	t.channel = append(t.channel[:i], t.channel[i+1:]...)
 }
 
-func (t *Keyboard) keyListening(eventKey <-chan keyboard.KeyEvent) {
-	for {
-		v := <-eventKey
-		if v.Key == keyboard.KeySpace {
-			v.Rune = ' '
+func (t *Keyboard) keyListening(v keys.Key) (bool, error) {
+	if v.Code == keys.Space {
+		v.Code = ' '
+	}
+	if v.Code == keys.Tab {
+		v.Code = '	'
+	}
+	if v.Code == keys.Tab {
+		v.Code = '\n'
+	}
+	if v.Code == keys.Backspace {
+		v.Code = '\b'
+	}
+	if rune:=v.Runes;len(rune)>0{
+		t.key = stateKey{key: v.Code, rune: rune[0]}
+	}else
+	{
+		t.key = stateKey{key: v.Code, rune: 0}
+	}
+	for _, b := range t.GetChannels() {
+		key, e := t.GetKey()
+		if e != nil {
+			continue
 		}
-		if v.Key == keyboard.KeyTab {
-			v.Rune = '	'
-		}
-		if v.Key == keyboard.KeyEnter {
-			v.Rune = '\n'
-		}
-		if v.Key == keyboard.KeyBackspace || v.Key==keyboard.KeyBackspace2 {
-			v.Rune = '\b'
-		}
-		t.key = stateKey{key: Key(v.Key), rune: v.Rune}
-		for _, b := range t.GetChannels() {
-			key, e := t.GetKey()
-			if e != nil {
-				continue
-			}
-			if key == 0 {
-				break
-			}
-			b <- string(v.Rune)
-			<-b
-		}
-		if !t.loop(t) {
+		if key == 0 {
 			break
 		}
+		b <- string(v.Runes)
+		<-b
 	}
+	if !t.loop(t) {
+		return true, nil
+	}
+	return false, nil
 }
-func (t *Keyboard) GetClickboard() string{
-	text,e:=clipboard.ReadAll()
-	if e!=nil{
-		text=""
+ 
+func (t *Keyboard) GetClickboard() string {
+	text, e := clipboard.ReadAll()
+	if e != nil {
+		text = ""
 	}
 	return text
 }
@@ -88,14 +91,13 @@ func (t *Keyboard) InsertClickboard(text string) {
 	clipboard.WriteAll(text)
 }
 func (t *Keyboard) Stop() {
-	keyboard.Close()
 }
 
 func (t *Keyboard) GetKey() (byte, error) {
 	return byte(t.key.rune), nil
 }
 
-func (t *Keyboard) IsKeySPressed(key Key) bool {
+func (t *Keyboard) IsKeySPressed(key keys.KeyCode) bool {
 	return t.key.key == key
 }
 
