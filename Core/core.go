@@ -151,9 +151,8 @@ func (d *TreeNode[T]) executeForAll(do func(node *TreeNode[T]) bool) *TreeNode[T
 }
 
 func (d *TreeNode[T]) GetCollidingElements() []T {
-	var result []T
+	var result []T=make([]T, 0)
 	d.executeForAll(func(node *TreeNode[T]) bool{
-		result := make([]T, 0)
 		result = append(result, node.element)
 		return true
 	})
