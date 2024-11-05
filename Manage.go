@@ -36,6 +36,7 @@ func (c *Gtui) SetVisibilityCursor(visibility bool) {
 }
 
 func (c *Gtui) IClear() {
+	c.term.HideCursor()
 	c.term.Clear()
 	if c.cursorVisibility {
 		c.term.ShowCursor()
@@ -45,6 +46,7 @@ func (c *Gtui) IClear() {
 }
 
 func (c *Gtui) ClearZone(x, y, xSize, ySize int) {
+	c.term.HideCursor()
 	whiteLine:=strings.Repeat(" ",xSize)
 	r:=strings.Builder{}
 	for i:=0;i<ySize;i++{
@@ -52,4 +54,9 @@ func (c *Gtui) ClearZone(x, y, xSize, ySize int) {
 		r.WriteString(whiteLine)
 	}
 	c.term.PrintStr(r.String())
+	if c.cursorVisibility {
+		c.term.ShowCursor()
+	}else{
+		c.term.HideCursor()
+	}
 }
