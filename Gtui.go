@@ -48,7 +48,6 @@ func (c *Gtui) SetCur(x, y int) error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
 		return errors.New("cursor out of range")
 	}
-	c.SetVisibilityCursor(true)
 	compPreSet, _ := c.componentManager.Search(c.xCursor, c.yCursor)
 	compsPostSet, _ := c.componentManager.Search(x, y)
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
@@ -84,7 +83,6 @@ func (c *Gtui) SetCur(x, y int) error {
 	}
 
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
-	c.SetVisibilityCursor(false)
 	return nil
 }
 func (c *Gtui) GetCur() (int, int) {
@@ -169,7 +167,6 @@ func (c *Gtui) Click(x, y int) error {
 }
 
 func (c *Gtui) AllineCursor() {
-	c.SetVisibilityCursor(false)
 	x, y := c.GetCur()
 	comps, _ := c.componentManager.Search(x, y)
 	for _, comp := range comps {
@@ -183,11 +180,9 @@ func (c *Gtui) AllineCursor() {
 		}
 	}
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
-	c.SetVisibilityCursor(true)
 }
 
 func (c *Gtui) IRefreshAll() {
-	c.SetVisibilityCursor(false)
 	var str strings.Builder
 	cond := func(node *Core.TreeNode[Core.IEntity]) bool {
 		var el Core.IEntity
@@ -209,7 +204,6 @@ func (c *Gtui) IRefreshAll() {
 	c.drawingManager.Execute(cond)
 	c.term.PrintStr(str.String())
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
-	c.SetVisibilityCursor(true)
 	return
 }
 
