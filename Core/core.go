@@ -17,29 +17,28 @@ type ElementTree interface {
 	GetSize() (int, int)
 }
 type TreeNode[T ElementTree] struct {
-	nodeType          typeTreeNode
-	xPos              int
-	yPos              int
-	width             int
-	height            int
-	element           T
-	collidingElements []*TreeNode[T]
-	bigger            *TreeNode[T]
-	smaller           *TreeNode[T]
+	nodeType typeTreeNode
+	xPos     int
+	yPos     int
+	width    int
+	height   int
+	element  T
+	bigger   *TreeNode[T]
+	smaller  *TreeNode[T]
 }
 
 func CreateNode[T ElementTree](element T, typeNode typeTreeNode) *TreeNode[T] {
 	xPos, yPos := element.GetPos()
 	xSize, ySize := element.GetSize()
 	return &TreeNode[T]{
-		nodeType:          typeNode,
-		bigger:            nil,
-		smaller:           nil,
-		element:           element,
-		xPos:              xPos,
-		yPos:              yPos,
-		width:             xSize,
-		height:            ySize,
+		nodeType: typeNode,
+		bigger:   nil,
+		smaller:  nil,
+		element:  element,
+		xPos:     xPos,
+		yPos:     yPos,
+		width:    xSize,
+		height:   ySize,
 	}
 }
 
@@ -80,16 +79,12 @@ func (t *TreeNode[T]) addNode(element T) {
 	xPos, yPos := element.GetPos()
 	width, height := element.GetSize()
 	xPosElNode, yPosElNode := t.element.GetPos()
-	var newNode *TreeNode[T]
-	if (t.nodeType==ByX && yPos >= yPosElNode) || (t.nodeType==ByY && xPos >= xPosElNode) {
-		newNode = addElement(&t.bigger, element, !t.nodeType)
+	if (t.nodeType == ByX && yPos >= yPosElNode) || (t.nodeType == ByY && xPos >= xPosElNode) {
+		addElement(&t.bigger, element, !t.nodeType)
 	} else {
-		newNode = addElement(&t.smaller, element, !t.nodeType)
+		addElement(&t.smaller, element, !t.nodeType)
 	}
 	if t.isCollidingWithGroup(xPos, yPos, width, height) {
-		if newNode != nil {
-			t.collidingElements = append(t.collidingElements, newNode)
-		}
 		xSize, ySize := element.GetSize()
 		if (xPos + xSize) > t.xPos+t.width {
 			t.width = xPos + xSize - t.xPos
@@ -119,7 +114,7 @@ func (d *TreeNode[T]) search(x, y int) []T {
 	var result []T
 	d.execute(x, y, func(node *TreeNode[T]) {
 		if isColliding := node.isElementColliding(x, y); isColliding {
-			if isColliding{
+			if isColliding {
 				result = append(result, node.element)
 			}
 		}
@@ -129,16 +124,17 @@ func (d *TreeNode[T]) search(x, y int) []T {
 func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
 	do(d)
 	xPosElNode, yPosElNode := d.element.GetPos()
-	if d.smaller != nil && ((d.nodeType == ByY && x < xPosElNode) ||(d.nodeType == ByX && y < yPosElNode) || d.smaller.isCollidingWithGroup(x, y, 0, 0)) {
-			d.smaller.execute(x, y, do)
+	if d.smaller != nil && ((d.nodeType == ByY && x < xPosElNode) || (d.nodeType == ByX && y < yPosElNode) || d.smaller.isCollidingWithGroup(x, y, 0, 0)) {
+		d.smaller.execute(x, y, do)
 	}
-	if d.bigger != nil && ((d.nodeType == ByY && x >= xPosElNode) ||(d.nodeType == ByX && y >= yPosElNode)|| d.bigger.isCollidingWithGroup(x, y, 0, 0)) {
-			d.bigger.execute(x, y, do)
+	if d.bigger != nil && ((d.nodeType == ByY && x >= xPosElNode) || (d.nodeType == ByX && y >= yPosElNode) || d.bigger.isCollidingWithGroup(x, y, 0, 0)) {
+		d.bigger.execute(x, y, do)
 	}
 }
-//Iterate over all over the tree,if the function returns false the iteration stops
+
+// Iterate over all over the tree,if the function returns false the iteration stops
 func (d *TreeNode[T]) executeForAll(do func(node *TreeNode[T]) bool) *TreeNode[T] { //TODO:auto adjust tree structure
-	if !do(d){
+	if !do(d) {
 		return nil
 	}
 	if d.bigger != nil {
@@ -150,22 +146,13 @@ func (d *TreeNode[T]) executeForAll(do func(node *TreeNode[T]) bool) *TreeNode[T
 	return nil
 }
 
-func (d *TreeNode[T]) GetCollidingElements() []T {
-	var result []T=make([]T, 0)
-	d.executeForAll(func(node *TreeNode[T]) bool{
-		result = append(result, node.element)
-		return true
-	})
-	return result
-}
-
 func (d *TreeNode[T]) GetElement() T {
 	return d.element
 }
 
 func (d *TreeNode[T]) GetElements() []T {
 	result := make([]T, 0)
-	d.executeForAll(func(node *TreeNode[T]) bool{
+	d.executeForAll(func(node *TreeNode[T]) bool {
 		result = append(result, node.element)
 		return true
 	})
@@ -207,8 +194,8 @@ func (d *TreeManager[T]) AddElement(element T) {
 	d.root.addNode(element)
 }
 
-//Iterate over all nodes, if return false, it will stop iteration
-func (d *TreeManager[T]) Execute(cond func(node *TreeNode[T])bool) {
+// Iterate over all nodes, if return false, it will stop iteration
+func (d *TreeManager[T]) Execute(cond func(node *TreeNode[T]) bool) {
 	d.root.executeForAll(cond)
 }
 
@@ -222,7 +209,7 @@ func (d *TreeManager[T]) Search(x, y int) ([]T, error) {
 }
 func (d *TreeManager[T]) Refresh() {
 	var newRoot *TreeNode[T]
-	d.root.executeForAll(func(node *TreeNode[T])bool {
+	d.root.executeForAll(func(node *TreeNode[T]) bool {
 		if newRoot == nil {
 			newRoot = CreateNode(node.element, ByX)
 		} else {

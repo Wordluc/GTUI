@@ -193,21 +193,15 @@ func (c *Gtui) IRefreshAll() {
 	cond := func(node *Core.TreeNode[Core.IEntity]) bool {
 		var el Core.IEntity
 		if el = node.GetElement(); !el.IsTouched() {
+			str.WriteString(el.GetAnsiCode(c.globalColor))
+			str.WriteString(c.globalColor.GetAnsiColor())
 			return true
 		}
 		x, y := el.GetPos()
 		width, height := el.GetSize()
-		c.ClearZone(x+1, y+1, width-2, height-2)
-		str.WriteString(node.GetElement().GetAnsiCode(c.globalColor))
+		c.ClearZone(x, y, width, height)
+		str.WriteString(el.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
-		for _, el := range node.GetCollidingElements() {
-			if el.IsTouched() {
-				continue
-			}
-			str.WriteString(el.GetAnsiCode(c.globalColor))
-			str.WriteString(c.globalColor.GetAnsiColor())
-		}
-
 		return true
 	}
 	c.drawingManager.Execute(cond)
