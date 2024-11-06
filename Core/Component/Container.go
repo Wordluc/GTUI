@@ -27,9 +27,9 @@ func (c *Container) AddComponent(component IComponent)error {
 func (c *Container) AddDrawing(container *Drawing.Container)error {
 	return c.drawing.AddChild(container)
 }
-
+//DO NOT USE
 func (c *Container) GetSize() (int,int) {
-	return c.drawing.GetSize()
+	panic("mustn't be called")
 }
 
 func (c *Container) GetComponents() []IComponent {
