@@ -114,7 +114,7 @@ func (c *Gtui) Start() {
 func (c *Gtui) InsertEntity(entityToAdd Core.IEntity) {
 	if container, ok := entityToAdd.(*Drawing.Container); ok {
 		for _, entity := range container.GetChildren() {
-			c.drawingManager.AddElement(entity)
+			c.InsertEntity(entity)
 		}
 		return
 	}
@@ -131,7 +131,7 @@ func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
 	} else {
 		componentToAdd.OnOut(0, 0)
 		c.componentManager.AddElement(componentToAdd)
-		c.drawingManager.AddElement(componentToAdd.GetGraphics())
+		c.InsertEntity(componentToAdd.GetGraphics())
 	}
 	return nil
 }
