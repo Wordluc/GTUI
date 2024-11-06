@@ -150,7 +150,7 @@ func (t *TextBlock) SetPos(x, y int) {
 }
 
 func (t *TextBlock) GetSize() (int, int) {
-	return t.xSize, t.ySize
+	return t.xSize-1, t.ySize
 }
 
 func (t *TextBlock) GetPos() (int, int) {
