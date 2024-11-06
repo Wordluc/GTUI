@@ -66,10 +66,10 @@ func (t *TreeNode[T]) isElementColliding(x, y int) bool {
 	return false
 }
 
-func addElement[T ElementTree](destination **TreeNode[T], element T, _type typeTreeNode)  {
+func addElement[T ElementTree](destination **TreeNode[T], element T, _type typeTreeNode) {
 	if *destination == nil {
 		*destination = CreateNode(element, _type)
-		return 
+		return
 	}
 	(*destination).addNode(element)
 }
@@ -85,19 +85,17 @@ func (t *TreeNode[T]) addNode(element T) {
 		addElement(&t.smaller, element, !t.nodeType)
 	}
 	if t.isCollidingWithGroup(xPos, yPos, width, height) {
-
 		if xPos < t.xPos {
 			t.xPos = xPos
 		}
 		if yPos < t.yPos {
 			t.yPos = yPos
 		}
-		xSize, ySize := element.GetSize()
-		if (xPos + xSize) > xPosElNode+xSizeElNode{
-			t.width = xPos + xSize + xPosElNode+ xSizeElNode - t.xPos*2
-		} 	
-		if (yPos + ySize) > yPosElNode+ySizeElNode {
-			t.height = yPos + ySize + yPosElNode + ySizeElNode - t.yPos*2
+		if (xPos + width) > xPosElNode+xSizeElNode {
+			t.width = xPos + width + xPosElNode + xSizeElNode - t.xPos*2
+		}
+		if (yPos + height) > yPosElNode+ySizeElNode {
+			t.height = yPos + height + yPosElNode + ySizeElNode - t.yPos*2
 		}
 	}
 }
@@ -180,13 +178,13 @@ type collisionChache[T ElementTree] struct {
 }
 
 type TreeManager[T ElementTree] struct {
-	root *TreeNode[T]
+	root             *TreeNode[T]
 	chachedCollision [5]collisionChache[T]
-	nextIndexToCache        int
+	nextIndexToCache int
 }
 
 func CreateTreeManager[T ElementTree]() *TreeManager[T] {
-	
+
 	return &TreeManager[T]{chachedCollision: [5]collisionChache[T]{}, nextIndexToCache: 0}
 }
 
@@ -220,14 +218,13 @@ func (d *TreeManager[T]) GetCollidingElement(elementWhichCollides *TreeNode[T]) 
 		}
 	}
 	d.root.executeForAll(func(node *TreeNode[T]) bool {
-		x,y := node.element.GetPos()
+		x, y := node.element.GetPos()
 		xSize, ySize := node.element.GetSize()
 		if elementWhichCollides.isCollidingWithGroup(x, y, xSize, ySize) {
 			result = append(result, node.element)
 		}
 		return true
 	})
-			print("\a")
 	d.nextIndexToCache = (d.nextIndexToCache + 1) % len(d.chachedCollision)
 	d.chachedCollision[d.nextIndexToCache] = collisionChache[T]{node: elementWhichCollides, collisionElement: result}
 	return result
