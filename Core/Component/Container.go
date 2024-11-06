@@ -24,8 +24,8 @@ func (c *Container) AddComponent(component IComponent)error {
 	return c.drawing.AddChild(component.GetGraphics())
 }
 
-func (c *Container) AddDrawing(container Drawing.Container)error {
-	return c.drawing.AddChild(&container)
+func (c *Container) AddDrawing(container *Drawing.Container)error {
+	return c.drawing.AddChild(container)
 }
 
 func (c *Container) GetSize() (int,int) {
