@@ -40,7 +40,7 @@ func (b *Button) GetPos() (int, int) {
 	return b.graphics.GetPos()
 }
 func (b *Button) GetSize() (int, int) {
-	return b.graphics.GetSize()
+	return b.visibleArea.GetSize()
 }
 func (b *Button) SetOnClick(onClick OnEvent) {
 	b.onClick = onClick

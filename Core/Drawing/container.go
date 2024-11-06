@@ -1,7 +1,6 @@
 package Drawing
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/Wordluc/GTUI/Core"
@@ -11,8 +10,6 @@ import (
 type Container struct {
 	xPos     int
 	yPos     int
-	xSize    int
-	ySize    int
 	children []Core.IEntity
 	color    Color.Color
 	visible  bool
@@ -30,23 +27,12 @@ func CreateContainer( x, y int) *Container {
 func (c *Container) GetChildren() []Core.IEntity {
 	return c.children
 }
-
+//DO NOT USE
 func (c *Container) GetSize()(int,int) {
-	return c.xSize, c.ySize
+	panic("must't be called")
 }
 
 func (c *Container) AddChild(child Core.IEntity) error {//TODO: controllare se l'errare è gestito dai caller
-	if x,y:=child.GetPos();x<c.xPos||y<c.yPos{
-		return fmt.Errorf("child is not in the container,x=%d,y=%d,c.xPos=%d,c.yPos=%d",x,y,c.xPos,c.yPos)
-	}
-	xSize,ySize:=child.GetSize()
-	xPos,yPos:=child.GetPos()
-	if xPos+c.xPos+xSize>c.xPos+c.xSize{
-		c.xSize=xPos+c.xPos+xSize
-	}
-	if yPos+c.yPos+ySize>c.yPos+c.ySize{
-		c.ySize=yPos+c.yPos+ySize
-	}
 	c.children = append(c.children, child)
 	return nil
 }
