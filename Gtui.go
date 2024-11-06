@@ -191,7 +191,7 @@ func (c *Gtui) IRefreshAll() {
 		}
 		x, y := el.GetPos()
 		width, height := el.GetSize()
-		c.ClearZone(x+1, y+1, width-2, height-2)
+		c.ClearZone(x, y, width-1, height-1)
 		str.WriteString(node.GetElement().GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 		for _, el := range node.GetCollidingElements() {
