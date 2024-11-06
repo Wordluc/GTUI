@@ -29,7 +29,7 @@ func (c *Container) GetChildren() []Core.IEntity {
 }
 //DO NOT USE
 func (c *Container) GetSize()(int,int) {
-	panic("must't be called")
+	panic("mustn't be called")
 }
 
 func (c *Container) AddChild(child Core.IEntity) error {//TODO: controllare se l'errare è gestito dai caller
@@ -94,6 +94,7 @@ func (c *Container) SetPos(x, y int) {
 }
 
 func (c *Container) GetPos() (int, int) {
+
 	return c.xPos, c.yPos
 }
 
