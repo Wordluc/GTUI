@@ -202,6 +202,9 @@ func (c *Gtui) IRefreshAll() {
 		str.WriteString(c.globalColor.GetAnsiColor())
 		for _, child := range c.drawingManager.GetCollidingElement(node) {
 			if child.IsTouched() {
+				str.WriteString(child.GetAnsiCode(c.globalColor))
+				str.WriteString(c.globalColor.GetAnsiColor())
+				child.Touch()
 				continue
 			}
 			str.WriteString(child.GetAnsiCode(c.globalColor))
