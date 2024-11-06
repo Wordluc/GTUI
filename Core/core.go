@@ -178,12 +178,20 @@ func (d *TreeNode[T]) GetSize() (int, int) {
 	return d.width, d.height
 }
 
+type collisionChache[T ElementTree] struct {
+	collisionElement []T
+	node             *TreeNode[T]
+}
+
 type TreeManager[T ElementTree] struct {
 	root *TreeNode[T]
+	chachedCollision [5]collisionChache[T]
+	nextIndexToCache        int
 }
 
 func CreateTreeManager[T ElementTree]() *TreeManager[T] {
-	return &TreeManager[T]{}
+	
+	return &TreeManager[T]{chachedCollision: [5]collisionChache[T]{}, nextIndexToCache: 0}
 }
 
 func (d *TreeManager[T]) AddElement(element T) {
@@ -206,6 +214,27 @@ func (d *TreeManager[T]) Search(x, y int) ([]T, error) {
 	}
 	result = d.root.search(x, y)
 	return result, nil
+}
+
+func (d *TreeManager[T]) GetCollidingElement(elementWhichCollides *TreeNode[T]) []T {
+	var result []T
+	for i := range d.chachedCollision {
+		if d.chachedCollision[i].node == elementWhichCollides {
+			return d.chachedCollision[i].collisionElement
+		}
+	}
+	d.root.executeForAll(func(node *TreeNode[T]) bool {
+		x,y := node.element.GetPos()
+		xSize, ySize := node.element.GetSize()
+		if elementWhichCollides.isCollidingWithGroup(x, y, xSize, ySize) {
+			result = append(result, node.element)
+		}
+		return true
+	})
+			print("\a")
+	d.nextIndexToCache = (d.nextIndexToCache + 1) % len(d.chachedCollision)
+	d.chachedCollision[d.nextIndexToCache] = collisionChache[T]{node: elementWhichCollides, collisionElement: result}
+	return result
 }
 func (d *TreeManager[T]) Refresh() {
 	var newRoot *TreeNode[T]
