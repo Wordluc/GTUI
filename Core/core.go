@@ -66,42 +66,38 @@ func (t *TreeNode[T]) isElementColliding(x, y int) bool {
 	return false
 }
 
-func addElement[T ElementTree](destination **TreeNode[T], element T, _type typeTreeNode) *TreeNode[T] {
+func addElement[T ElementTree](destination **TreeNode[T], element T, _type typeTreeNode)  {
 	if *destination == nil {
 		*destination = CreateNode(element, _type)
-		return *destination
+		return 
 	}
 	(*destination).addNode(element)
-	return nil
 }
 
 func (t *TreeNode[T]) addNode(element T) {
 	xPos, yPos := element.GetPos()
 	width, height := element.GetSize()
 	xPosElNode, yPosElNode := t.element.GetPos()
+	xSizeElNode, ySizeElNode := t.element.GetSize()
 	if (t.nodeType == ByX && yPos >= yPosElNode) || (t.nodeType == ByY && xPos >= xPosElNode) {
 		addElement(&t.bigger, element, !t.nodeType)
 	} else {
 		addElement(&t.smaller, element, !t.nodeType)
 	}
 	if t.isCollidingWithGroup(xPos, yPos, width, height) {
-		xSize, ySize := element.GetSize()
-		if (xPos + xSize) > t.xPos+t.width {
-			t.width = xPos + xSize - t.xPos
-		} else {
-			t.width = t.xPos + t.width - xPos
-		}
-		if (yPos + ySize) > t.yPos+t.height {
-			t.height = yPos + ySize - t.yPos
-		} else {
-			t.height = t.yPos + t.height - yPos
-		}
 
 		if xPos < t.xPos {
 			t.xPos = xPos
 		}
 		if yPos < t.yPos {
 			t.yPos = yPos
+		}
+		xSize, ySize := element.GetSize()
+		if (xPos + xSize) > xPosElNode+xSizeElNode{
+			t.width = xPos + xSize + xPosElNode+ xSizeElNode - t.xPos*2
+		} 	
+		if (yPos + ySize) > yPosElNode+ySizeElNode {
+			t.height = yPos + ySize + yPosElNode + ySizeElNode - t.yPos*2
 		}
 	}
 }
