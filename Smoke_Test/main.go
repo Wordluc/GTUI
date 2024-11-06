@@ -16,7 +16,7 @@ func main() {
 	kbr := Keyboard.NewKeyboard()
 	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
-	c,e := Component.CreateTextBox(5, 5, 20, 10, core.CreateStreamingCharacter())
+	c,e := Component.CreateTextBox(30, 5, 20, 10, core.CreateStreamingCharacter())
 	if e != nil {
 		panic(e)
 	}
