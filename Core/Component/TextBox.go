@@ -37,14 +37,14 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox
 	}, nil
 }
 func (b *TextBox) GetSize() (int, int) {
-	return b.graphics.GetSize()
+	return b.visibleArea.GetSize()
 }
 
 func (b *TextBox) SetPos(x, y int) {
-	b.graphics.SetPos(x, y)
+	b.visibleArea.SetPos(x, y)
 }
 func (b *TextBox) GetPos() (int, int) {
-	return b.graphics.GetPos()
+	return b.visibleArea.GetPos()
 }
 func (b *TextBox) loopTyping() {
 	channel := b.streamText.Get()
