@@ -45,18 +45,12 @@ func (c *Gtui) IClear() {
 	}
 }
 
-func (c *Gtui) ClearZone(x, y, xSize, ySize int) {
-	c.term.HideCursor()
+func (c *Gtui) ClearZone(x, y, xSize, ySize int) string {
 	whiteLine:=strings.Repeat(" ",xSize)
 	r:=strings.Builder{}
 	for i:=0;i<ySize;i++{
 		r.WriteString(Utils.GetAnsiMoveTo(x,y+i))
 		r.WriteString(whiteLine)
 	}
-	c.term.PrintStr(r.String())
-	if c.cursorVisibility {
-		c.term.ShowCursor()
-	}else{
-		c.term.HideCursor()
-	}
+	return r.String()
 }
