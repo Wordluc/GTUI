@@ -16,7 +16,7 @@ func main() {
 	kbr := Keyboard.NewKeyboard()
 	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
-	c,e := Component.CreateTextBox(5, 5, xS, yS, core.CreateStreamingCharacter())
+	c,e := Component.CreateTextBox(5, 5, 20, 10, core.CreateStreamingCharacter())
 	if e != nil {
 		panic(e)
 	}
@@ -27,8 +27,10 @@ func main() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
 	rect:=Drawing.CreateRectangle(2,2,xS-1,yS-1)
+	rect1:=Drawing.CreateRectangle(16,26,10,10)
 	contDraw:=Drawing.CreateContainer(0,0)
 	contDraw.AddChild(rect)
+	contDraw.AddChild(rect1)
 	compComponent:=Component.CreateContainer(0,0)
 	compComponent.AddDrawing(contDraw)
 	if e := compComponent.AddComponent(c); e != nil {
