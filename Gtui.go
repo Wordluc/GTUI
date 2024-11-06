@@ -193,8 +193,6 @@ func (c *Gtui) IRefreshAll() {
 	cond := func(node *Core.TreeNode[Core.IEntity]) bool {
 		var el Core.IEntity
 		if el = node.GetElement(); !el.IsTouched() {
-			str.WriteString(el.GetAnsiCode(c.globalColor))
-			str.WriteString(c.globalColor.GetAnsiColor())
 			return true
 		}
 		x, y := el.GetPos()
@@ -202,6 +200,13 @@ func (c *Gtui) IRefreshAll() {
 		c.ClearZone(x, y, width, height)
 		str.WriteString(el.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
+		for _, child := range c.drawingManager.GetCollidingElement(node) {
+			if child.IsTouched() {
+				continue
+			}
+			str.WriteString(child.GetAnsiCode(c.globalColor))
+			str.WriteString(c.globalColor.GetAnsiColor())
+		}
 		return true
 	}
 	c.drawingManager.Execute(cond)
@@ -212,7 +217,7 @@ func (c *Gtui) IRefreshAll() {
 
 func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	//Keyboard
-	c.IRefreshAll()
+//	c.IRefreshAll()
 	c.AllineCursor()
 	if !c.loop(c.keyb) {
 		return false

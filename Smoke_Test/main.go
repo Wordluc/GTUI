@@ -3,6 +3,7 @@ package main
 import (
 	Core "github.com/Wordluc/GTUI"
 	"github.com/Wordluc/GTUI/Core/Component"
+	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"github.com/Wordluc/GTUI/Keyboard"
 	Kd "github.com/Wordluc/GTUI/Keyboard"
@@ -15,7 +16,7 @@ func main() {
 	kbr := Keyboard.NewKeyboard()
 	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
-	c,e := Component.CreateTextBox(0, 0, xS, yS, core.CreateStreamingCharacter())
+	c,e := Component.CreateTextBox(5, 5, xS, yS, core.CreateStreamingCharacter())
 	if e != nil {
 		panic(e)
 	}
@@ -25,20 +26,11 @@ func main() {
 	c.SetOnHover(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
-   b:=Component.CreateButton(70, 0, 20, 30, "test")
-	b.SetOnClick(func() {
-		c.ClearAll()
-	})
-	b.SetOnLeave(func() {
-		b.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
-	})
-	b.SetOnHover(func() {
-		b.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
-	})
+	rect:=Drawing.CreateRectangle(2,2,xS-1,yS-1)
+	contDraw:=Drawing.CreateContainer(0,0)
+	contDraw.AddChild(rect)
 	compComponent:=Component.CreateContainer(0,0)
-	if e := compComponent.AddComponent(b); e != nil {
-		panic(e)
-	}
+	compComponent.AddDrawing(contDraw)
 	if e := compComponent.AddComponent(c); e != nil {
 		panic(e)
 	}
@@ -49,6 +41,9 @@ func main() {
 	})
 	button1.SetOnHover(func() {
 		button1.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
+	})
+	button1.SetOnClick(func() {
+		rect.SetColor(Color.Get(Color.Red, Color.None))
 	})
 	comp.SetPos(10,10)
 	if e := core.InsertComponent(compComponent); e != nil {
