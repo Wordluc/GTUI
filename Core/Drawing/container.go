@@ -11,6 +11,8 @@ import (
 type Container struct {
 	xPos     int
 	yPos     int
+	xSize    int
+	ySize    int
 	children []Core.IEntity
 	color    Color.Color
 	visible  bool
@@ -30,25 +32,20 @@ func (c *Container) GetChildren() []Core.IEntity {
 }
 
 func (c *Container) GetSize()(int,int) {
-
-	var xSize,ySize int
-	for _, child := range c.children {
-		xSizeChild,ySizeChild:=child.GetSize()
-		xPosChild,yPosChild:=child.GetPos()
-		
-		if (xPosChild+xSizeChild)>c.xPos+xSize{
-			xSize=xPosChild+xSizeChild-c.xPos
-		}
-		if (yPosChild+ySizeChild)>c.yPos+ySize{
-			ySize=yPosChild+ySizeChild-c.yPos
-		}
-	}
-	return xSize,ySize
+	return c.xSize, c.ySize
 }
 
 func (c *Container) AddChild(child Core.IEntity) error {//TODO: controllare se l'errare è gestito dai caller
 	if x,y:=child.GetPos();x<c.xPos||y<c.yPos{
 		return fmt.Errorf("child is not in the container,x=%d,y=%d,c.xPos=%d,c.yPos=%d",x,y,c.xPos,c.yPos)
+	}
+	xSize,ySize:=child.GetSize()
+	xPos,yPos:=child.GetPos()
+	if xPos+c.xPos+xSize>c.xPos+c.xSize{
+		c.xSize=xPos+c.xPos+xSize
+	}
+	if yPos+c.yPos+ySize>c.yPos+c.ySize{
+		c.ySize=yPos+c.yPos+ySize
 	}
 	c.children = append(c.children, child)
 	return nil

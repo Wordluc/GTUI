@@ -4,8 +4,10 @@ import (
 	"errors"
 	"strings"
 	"time"
+
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
+	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"github.com/Wordluc/GTUI/Keyboard"
@@ -109,18 +111,23 @@ func (c *Gtui) Start() {
 	c.term.Stop()
 }
 
-func (c *Gtui) InsertEntity(entity Core.IEntity) {
-	c.drawingManager.AddElement(entity)
+func (c *Gtui) InsertEntity(entityToAdd Core.IEntity) {
+	if container, ok := entityToAdd.(*Drawing.Container); ok {
+		for _, entity := range container.GetChildren() {
+			c.drawingManager.AddElement(entity)
+		}
+		return
+	}
+	c.drawingManager.AddElement(entityToAdd)
 }
 
 func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
 	if container, ok := componentToAdd.(*Component.Container); ok {
 		for _, component := range container.GetComponents() {
 			c.componentManager.AddElement(component)
-			c.drawingManager.AddElement(component.GetGraphics())
 			component.OnOut(0, 0)
 		}
-		c.InsertEntity(container.GetGraphics())
+		c.InsertEntity(componentToAdd.GetGraphics())
 	} else {
 		componentToAdd.OnOut(0, 0)
 		c.componentManager.AddElement(componentToAdd)
