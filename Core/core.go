@@ -76,27 +76,11 @@ func addElement[T ElementTree](destination **TreeNode[T], element T, _type typeT
 
 func (t *TreeNode[T]) addNode(element T) {
 	xPos, yPos := element.GetPos()
-	width, height := element.GetSize()
 	xPosElNode, yPosElNode := t.element.GetPos()
-	xSizeElNode, ySizeElNode := t.element.GetSize()
 	if (t.nodeType == ByX && yPos >= yPosElNode) || (t.nodeType == ByY && xPos >= xPosElNode) {
 		addElement(&t.bigger, element, !t.nodeType)
 	} else {
 		addElement(&t.smaller, element, !t.nodeType)
-	}
-	if t.isCollidingWithGroup(xPos, yPos, width, height) {
-		if xPos < t.xPos {
-			t.xPos = xPos
-		}
-		if yPos < t.yPos {
-			t.yPos = yPos
-		}
-		if (xPos + width) > xPosElNode+xSizeElNode {
-			t.width = xPos + width + xPosElNode + xSizeElNode - t.xPos*2
-		}
-		if (yPos + height) > yPosElNode+ySizeElNode {
-			t.height = yPos + height + yPosElNode + ySizeElNode - t.yPos*2
-		}
 	}
 }
 func (d *TreeNode[T]) addNodes(elements []T) {
