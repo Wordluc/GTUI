@@ -46,13 +46,13 @@ func (t *TreeNode[T]) isCollidingWithGroup(x, y int, width, height int) bool {
 	if x > t.xPos && x < t.xPos+t.width && y > t.yPos && y < t.yPos+t.height {
 		return true
 	}
-	if x+width > t.xPos && x < t.xPos+t.width && y > t.yPos && y < t.yPos+t.height {
+	if x+width > t.xPos && x+width < t.xPos+t.width && y > t.yPos && y < t.yPos+t.height {
 		return true
 	}
 	if x > t.xPos && x < t.xPos+t.width && y+height > t.yPos && y+height < t.yPos+t.height {
 		return true
 	}
-	if x+width > t.xPos && x < t.xPos+t.width && y+height > t.yPos && y+height < t.yPos+t.height {
+	if x+width > t.xPos && x+width < t.xPos+t.width && y+height > t.yPos && y+height < t.yPos+t.height {
 		return true
 	}
 	return false
