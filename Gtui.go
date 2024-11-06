@@ -4,7 +4,6 @@ import (
 	"errors"
 	"strings"
 	"time"
-
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
 	"github.com/Wordluc/GTUI/Core/Utils"
