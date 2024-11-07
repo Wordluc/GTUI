@@ -54,7 +54,12 @@ func (c *Gtui) SetCur(x, y int) error {
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
 	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
 
-	for _, e := range inPostButNotInPre {
+	for i, e := range inPostButNotInPre {
+		if ci, ok := inPostButNotInPre[i].(Component.IWritableComponent); ok {
+			if ci.IsTyping() {
+				continue
+			}
+		}
 		e.OnHover(x, y)
 	}
 	lenInPreButNotInPost := len(inPreButNotInPost)
@@ -79,7 +84,7 @@ func (c *Gtui) SetCur(x, y int) error {
 			if ci.IsTyping() {
 				c.xCursor, c.yCursor = ci.SetCurrentPosCursor(x, y)
 			}
-				break
+			break
 		}
 	}
 
@@ -220,7 +225,7 @@ func (c *Gtui) IRefreshAll() {
 
 func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	//Keyboard
-//	c.IRefreshAll()
+	//	c.IRefreshAll()
 	c.AllineCursor()
 	if !c.loop(c.keyb) {
 		return false
