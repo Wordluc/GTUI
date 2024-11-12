@@ -49,8 +49,10 @@ func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITermina
 func (c *Gtui) initializeEventManager() {
 	eventsForRefresh := []EventManager.EventType{EventManager.OnClick, EventManager.OnHover, EventManager.OnLeave, EventManager.OnRelease}
 	for _, e := range eventsForRefresh {
-		EventManager.Subscribe(e, func(_ Core.IComponent) {
-			c.IRefreshAll()
+		EventManager.Subscribe(e, func(comp Core.IComponent) {
+			if comp.GetGraphics().IsTouched() {
+				c.IRefreshAll()
+			}
 		})
 	}
 }
