@@ -3,7 +3,6 @@ package Component
 import (
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
-	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 
 type OnEvent func()
@@ -60,7 +59,6 @@ func (b *Button) OnClick(_,_ int) {
 			b.onClick() 
 		}
 		b.isClicked = true
-		b.updateColorByClick()
 	}
 }
 func (b *Button) OnRelease(_,_ int) {
@@ -68,29 +66,15 @@ func (b *Button) OnRelease(_,_ int) {
 		b.onRelease()
 	}
 	b.isClicked = false
-	b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 }
 func (b *Button) OnHover(_,_ int) {
-	if !b.isClicked {
-		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
-	}
 	if b.onHover != nil {
 		b.onHover()
 	}
 }
 func (b *Button) OnOut(_,_ int) {
-	if !b.isClicked {
-		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
-	}
 	if b.onLeave != nil {
 		b.onLeave()
-	}
-}
-func (b *Button) updateColorByClick() {
-	if b.isClicked {
-		b.visibleArea.SetColor(Color.Get(Color.Blue, Color.None))
-	} else {
-		b.visibleArea.SetColor(Color.Get(Color.Gray, Color.None))
 	}
 }
 func (b *Button) GetGraphics() Core.IEntity {
