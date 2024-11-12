@@ -3,6 +3,7 @@ package Component
 import (
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 )
 
 type Button struct {
@@ -53,28 +54,33 @@ func (b *Button) SetOnHover(onHover Core.OnEvent) {
 	b.onHover = onHover
 }
 func (b *Button) OnClick() {
-	if !b.isClicked {
-		if b.onClick != nil {
-			b.onClick() 
-		}
-		b.isClicked = true
+	if b.isClicked {
+		return
 	}
+	if b.onClick != nil {
+		b.onClick()
+	}
+	b.isClicked = true
+	EventManager.Call(EventManager.OnClick, b)
 }
 func (b *Button) OnRelease() {
 	if b.onRelease != nil {
-		b.onRelease()
 	}
 	b.isClicked = false
+	b.onRelease()
+	EventManager.Call(EventManager.OnRelease, b)
 }
 func (b *Button) OnHover() {
 	if b.onHover != nil {
 		b.onHover()
 	}
+	EventManager.Call(EventManager.OnHover, b)
 }
 func (b *Button) OnLeave() {
 	if b.onLeave != nil {
 		b.onLeave()
 	}
+	EventManager.Call(EventManager.OnLeave, b)
 }
 func (b *Button) GetGraphics() Core.IEntity {
 	return b.graphics
