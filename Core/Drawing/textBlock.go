@@ -13,7 +13,7 @@ type lineText struct {
 	totalChar       int
 }
 
-func CreateLineText(initialCapacity int) *lineText {
+func createLineText(initialCapacity int) *lineText {
 	return &lineText{
 		line:            make([]rune, initialCapacity),
 		initialCapacity: initialCapacity,
@@ -69,11 +69,11 @@ func (t *lineText) merge(add *lineText) {
 
 func (t *lineText) split(i int) *lineText {
 	if i >= t.totalChar {
-		return CreateLineText(t.initialCapacity)
+		return createLineText(t.initialCapacity)
 	}
 	splited := t.line[i:t.totalChar]
 	t.line = t.line[:i]
-	newLine := CreateLineText(t.initialCapacity)
+	newLine := createLineText(t.initialCapacity)
 	newLine.totalChar = t.totalChar - i
 	newLine.line = splited
 	t.totalChar = i
@@ -106,7 +106,7 @@ type TextBlock struct {
 
 func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock {
 	lines := make([]*lineText, 1)
-	lines[0] = CreateLineText(initialCapacity)
+	lines[0] = createLineText(initialCapacity)
 	return &TextBlock{
 		visible:                  true,
 		ansiCode:                 "",
@@ -271,7 +271,7 @@ func (t *TextBlock) getWrapperEdges() WrapperEdges {
 
 func (t *TextBlock) ClearAll() {
 	t.lines=make([]*lineText, 1)
-	t.lines[0] = CreateLineText(t.initialCapacity)
+	t.lines[0] = createLineText(t.initialCapacity)
 	t.xRelativeMinSize = 0
 	t.yRelativeMinSize = 0
 	t.xRelativeMaxSize = t.xSize+1
@@ -326,7 +326,7 @@ func (t *TextBlock) Delete() {
 		t.lines = slices.Concat(t.lines[:t.currentLine], t.lines[t.currentLine+1:])
 		t.setYCursor_Relative(t.getYCursor_Relative() - 1)
 		if t.totalLine == 0 {
-			t.lines = []*lineText{CreateLineText(t.initialCapacity)}
+			t.lines = []*lineText{createLineText(t.initialCapacity)}
 			t.currentLine = 0 //Reset y and min max
 			t.totalLine = 1
 			t.resetXCursor()
@@ -517,7 +517,7 @@ func (t *TextBlock) setYCursor_Absolute(y int) {
 		return
 	}
 	if t.lines[t.currentLine] == nil {
-		t.lines[t.currentLine] = CreateLineText(t.initialCapacity)
+		t.lines[t.currentLine] = createLineText(t.initialCapacity)
 	}
 }
 
@@ -596,5 +596,12 @@ func (t *TextBlock) Type(char rune) {
 			t.setXCursor_Relative(t.getXCursor_Relative() + 1)
 			t.preLenght = t.absoluteCurrentCharacter
 		}
+	}
+}
+
+func (t *TextBlock) SetText(s string) {
+	t.ClearAll()
+	for _, char := range s {
+		t.Type(char)
 	}
 }
