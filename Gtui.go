@@ -60,7 +60,7 @@ func (c *Gtui) SetCur(x, y int) error {
 				continue
 			}
 		}
-		e.OnHover(x, y)
+		e.OnHover()
 	}
 	lenInPreButNotInPost := len(inPreButNotInPost)
 	for i := 0; i < lenInPreButNotInPost; i++ {
@@ -69,10 +69,10 @@ func (c *Gtui) SetCur(x, y int) error {
 				ci.SetCurrentPosCursor(x, y)
 				return nil
 			} else {
-				inPreButNotInPost[i].OnOut(x, y)
+				inPreButNotInPost[i].OnLeave()
 			}
 		} else {
-			inPreButNotInPost[i].OnOut(x, y)
+			inPreButNotInPost[i].OnLeave()
 		}
 	}
 
@@ -130,11 +130,11 @@ func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
 	if container, ok := componentToAdd.(*Component.Container); ok {
 		for _, component := range container.GetComponents() {
 			c.componentManager.AddElement(component)
-			component.OnOut(0, 0)
+			component.OnLeave()
 		}
 		c.InsertEntity(componentToAdd.GetGraphics())
 	} else {
-		componentToAdd.OnOut(0, 0)
+		componentToAdd.OnLeave()
 		c.componentManager.AddElement(componentToAdd)
 		c.InsertEntity(componentToAdd.GetGraphics())
 	}
@@ -168,9 +168,9 @@ func (c *Gtui) Click(x, y int) error {
 		return e
 	}
 	for i := range resultArray {
-		resultArray[i].OnClick(x, y)
+		resultArray[i].OnClick()
 		time.AfterFunc(time.Millisecond*1000, func() {
-			resultArray[i].OnRelease(x, y)
+			resultArray[i].OnRelease()
 			c.IRefreshAll()
 		})
 	}

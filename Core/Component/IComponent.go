@@ -4,11 +4,12 @@ import (
 	"github.com/Wordluc/GTUI/Core"
 )
 
+type OnEvent func()
 type IComponent interface {
-	OnClick(int,int)
-	OnRelease(int,int)
-	OnHover(int,int)
-	OnOut(int,int)
+	OnClick()
+	OnRelease()
+	OnHover()
+	OnLeave()
 	GetGraphics() Core.IEntity
 	getShape() (IInteractiveShape, error)
 	SetPos(x,y int)

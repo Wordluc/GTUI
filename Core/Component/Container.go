@@ -54,55 +54,20 @@ func (c *Container) GetPos() (int, int) {
 	return c.drawing.GetPos()
 }
 
-func (c *Container) OnClick(x, y int) {
-	if !c.active {
-		return
-	}
-	if c.onClick != nil {
-		c.onClick()
-	}
-	for _, component := range c.components {
-		shape, _ := component.getShape()
-		if shape.isOn(x, y) {
-			component.OnClick(x, y)
-		}
-	}
+func (c *Container) OnClick() {
+	panic("mustn't be called")
 }
 
-func (c *Container) OnRelease(x, y int) {
-	if !c.active {
-		return
-	}
-	for _, component := range c.components {
-		shape, _ := component.getShape()
-		if shape.isOn(x, y) {
-			component.OnRelease(x, y)
-		}
-	}
+func (c *Container) OnRelease() {
+	panic("mustn't be called")
 }
 
-func (c *Container) OnHover(x, y int) {
-	if !c.active {
-		return
-	}
-	for _, component := range c.components {
-		shape, _ := component.getShape()
-		if shape.isOn(x, y) {
-			component.OnHover(x, y)
-		}
-	}
+func (c *Container) OnHover() {
+	panic("mustn't be called")
 }
 
-func (c *Container) OnOut(x, y int) {
-	if !c.active {
-		return
-	}
-	for _, component := range c.components {
-		shape, _ := component.getShape()
-		if !shape.isOn(x, y) {
-			component.OnOut(x, y)
-		}
-	}
+func (c *Container) OnLeave() {
+	panic("mustn't be called")
 }
 
 func (c *Container) GetGraphics() Core.IEntity {

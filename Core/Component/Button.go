@@ -5,7 +5,6 @@ import (
 	"github.com/Wordluc/GTUI/Core/Drawing"
 )
 
-type OnEvent func()
 type Button struct {
 	graphics    *Drawing.Container
 	visibleArea *Drawing.Rectangle
@@ -53,7 +52,7 @@ func (b *Button) SetOnRelease(onRelease OnEvent) {
 func (b *Button) SetOnHover(onHover OnEvent) {
 	b.onHover = onHover
 }
-func (b *Button) OnClick(_,_ int) {
+func (b *Button) OnClick() {
 	if !b.isClicked {
 		if b.onClick != nil {
 			b.onClick() 
@@ -61,18 +60,18 @@ func (b *Button) OnClick(_,_ int) {
 		b.isClicked = true
 	}
 }
-func (b *Button) OnRelease(_,_ int) {
+func (b *Button) OnRelease() {
 	if b.onRelease != nil {
 		b.onRelease()
 	}
 	b.isClicked = false
 }
-func (b *Button) OnHover(_,_ int) {
+func (b *Button) OnHover() {
 	if b.onHover != nil {
 		b.onHover()
 	}
 }
-func (b *Button) OnOut(_,_ int) {
+func (b *Button) OnLeave() {
 	if b.onLeave != nil {
 		b.onLeave()
 	}
