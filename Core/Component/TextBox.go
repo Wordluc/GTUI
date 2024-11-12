@@ -82,7 +82,7 @@ func (v *TextBox) GetSelectedText() string {
 	return v.textBlock.GetSelectedText()
 }
 
-func (t *TextBox) GetText(x, y int) {
+func (t *TextBox) GetText() {
 	t.textBlock.GetText(false)
 }
 
