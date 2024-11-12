@@ -571,10 +571,7 @@ func (t *TextBlock) resetXCursor() {
 	t.xRelativeMaxSize = t.xSize
 	t.preLenght = 0
 }
-
-func (t *TextBlock) Type(char rune) {
-	defer t.Touch()
-	t.Touch()
+func (t *TextBlock) typeSilent(char rune) {
 	if t.wrap {
 		t.deleteWrapping()
 	}
@@ -598,10 +595,15 @@ func (t *TextBlock) Type(char rune) {
 		}
 	}
 }
+func (t *TextBlock) Type(char rune) {
+	defer t.Touch()
+	t.typeSilent(char)
+}
 
 func (t *TextBlock) SetText(s string) {
 	t.ClearAll()
 	for _, char := range s {
-		t.Type(char)
+		t.typeSilent(char)
 	}
+	t.Touch()
 }
