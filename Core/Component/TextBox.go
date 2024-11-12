@@ -78,15 +78,19 @@ func (v *TextBox) Paste(text string) {
 	}
 }
 
-func (v *TextBox) Copy() string {
+func (v *TextBox) GetSelectedText() string {
 	return v.textBlock.GetSelectedText()
+}
+
+func (t *TextBox) GetText(x, y int) {
+	t.textBlock.GetText(false)
 }
 
 func (t *TextBox) SetWrap(isOn bool) {
 	t.textBlock.SetWrap(isOn)
 }
 
-func (t *TextBox) GetWrap() bool {
+func (t *TextBox) IsInSelectingMode() bool {
 	return t.textBlock.GetWrap()
 }
 func (b *TextBox) StartTyping() {
