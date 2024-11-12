@@ -132,7 +132,7 @@ func TestComeBackTyping(t *testing.T) {
 }
 
 func TestDeleteTextline(t *testing.T) {
-	textLine := CreateLineText(10)
+	textLine := createLineText(10)
 	textLine.digit('1', 0)
 	textLine.digit('t', 1)
 	textLine.digit('2', 2)
