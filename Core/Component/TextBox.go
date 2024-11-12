@@ -82,8 +82,8 @@ func (v *TextBox) GetSelectedText() string {
 	return v.textBlock.GetSelectedText()
 }
 
-func (t *TextBox) GetText() {
-	t.textBlock.GetText(false)
+func (t *TextBox) GetText()string {
+	return t.textBlock.GetText(false)
 }
 
 func (t *TextBox) SetWrap(isOn bool) {
