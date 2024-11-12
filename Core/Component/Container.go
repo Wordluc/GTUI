@@ -8,7 +8,7 @@ import (
 type Container struct {
 	onClick    func()
 	active     bool
-	components []IComponent
+	components []Core.IComponent
 	drawing    *Drawing.Container
 }
 
@@ -16,10 +16,10 @@ func CreateContainer(x, y int) *Container {
 	return &Container{
 		active:     true,
 		drawing:    Drawing.CreateContainer(x, y),
-		components: make([]IComponent, 0),
+		components: make([]Core.IComponent, 0),
 	}
 }
-func (c *Container) AddComponent(component IComponent)error {
+func (c *Container) AddComponent(component Core.IComponent)error {
 	c.components = append(c.components, component)
 	return c.drawing.AddChild(component.GetGraphics())
 }
@@ -32,7 +32,7 @@ func (c *Container) GetSize() (int,int) {
 	panic("mustn't be called")
 }
 
-func (c *Container) GetComponents() []IComponent {
+func (c *Container) GetComponents() []Core.IComponent {
 	return c.components
 }
 func (c *Container) SetonClick(onClick func()) {
@@ -74,14 +74,14 @@ func (c *Container) GetGraphics() Core.IEntity {
 	return c.drawing
 }
 
-func (c *Container) getShape() (IInteractiveShape, error) {
-	complexShape := &ComplexInteractiveShape{}
+func (c *Container) GetShape() (Core.IInteractiveShape, error) {
+	complexShape := &Core.ComplexInteractiveShape{}
 	for _, component := range c.components {
-		shape, err := component.getShape()
+		shape, err := component.GetShape()
 		if err != nil {
-			return &BaseInteractiveShape{}, err
+			return &Core.BaseInteractiveShape{}, err
 		}
-		complexShape.addShape(shape)
+		complexShape.AddShape(shape)
 	}
 	return complexShape, nil
 }

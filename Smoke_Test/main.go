@@ -1,7 +1,8 @@
 package main
 
 import (
-	Core "github.com/Wordluc/GTUI"
+	"github.com/Wordluc/GTUI"
+	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
 	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
@@ -10,11 +11,11 @@ import (
 	"github.com/Wordluc/GTUI/Terminal"
 )
 
-var core *Core.Gtui
-var comp Component.IComponent
+var core *GTUI.Gtui
+var comp Core.IComponent
 func main() {
 	kbr := Keyboard.NewKeyboard()
-	core, _ = Core.NewGtui(loop, kbr, &Terminal.Terminal{})
+	core, _ = GTUI.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
 	c,e := Component.CreateTextBox(30, 5, 20, 10, core.CreateStreamingCharacter())
 	if e != nil {
@@ -83,8 +84,8 @@ func loop(keyb Kd.IKeyBoard) bool {
 
 	core.SetCur(x, y)
 	if keyb.IsKeySPressed(Keyboard.Esc) {
-		core.EventOn(x, y, func(c Component.IComponent) {
-			if c, ok := c.(Component.IWritableComponent); ok {
+		core.EventOn(x, y, func(c Core.IComponent) {
+			if c, ok := c.(Core.IWritableComponent); ok {
 				c.StopTyping()
 			}
 		})
@@ -95,7 +96,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 	}
 
 	if keyb.IsKeySPressed(Keyboard.CtrlV) {
-		core.EventOn(x, y, func(c Component.IComponent) {
+		core.EventOn(x, y, func(c Core.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
 					c.Paste(keyb.GetClickboard())
@@ -106,7 +107,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 	}
 
 	if keyb.IsKeySPressed(Keyboard.CtrlA) {
-		core.EventOn(x, y, func(c Component.IComponent) {
+		core.EventOn(x, y, func(c Core.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
 					c.SetWrap(!c.IsInSelectingMode())
@@ -116,7 +117,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 	}
 
 	if keyb.IsKeySPressed(Keyboard.CtrlC) {
-		core.EventOn(x, y, func(c Component.IComponent) {
+		core.EventOn(x, y, func(c Core.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
 					keyb.InsertClickboard(c.GetSelectedText())

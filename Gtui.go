@@ -19,7 +19,7 @@ type Gtui struct {
 	term             Terminal.ITerminal
 	keyb             Keyboard.IKeyBoard
 	drawingManager   *Core.TreeManager[Core.IEntity]
-	componentManager *Core.TreeManager[Component.IComponent]
+	componentManager *Core.TreeManager[Core.IComponent]
 	xCursor          int
 	yCursor          int
 	xSize            int
@@ -37,7 +37,7 @@ func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITermina
 		term:             term,
 		keyb:             keyb,
 		drawingManager:   Core.CreateTreeManager[Core.IEntity](),
-		componentManager: Core.CreateTreeManager[Component.IComponent](),
+		componentManager: Core.CreateTreeManager[Core.IComponent](),
 		xCursor:          0,
 		yCursor:          0,
 		xSize:            xSize,
@@ -55,7 +55,7 @@ func (c *Gtui) SetCur(x, y int) error {
 	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
 
 	for i, e := range inPostButNotInPre {
-		if ci, ok := inPostButNotInPre[i].(Component.IWritableComponent); ok {
+		if ci, ok := inPostButNotInPre[i].(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
 				continue
 			}
@@ -64,7 +64,7 @@ func (c *Gtui) SetCur(x, y int) error {
 	}
 	lenInPreButNotInPost := len(inPreButNotInPost)
 	for i := 0; i < lenInPreButNotInPost; i++ {
-		if ci, ok := inPreButNotInPost[i].(Component.IWritableComponent); ok {
+		if ci, ok := inPreButNotInPost[i].(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
 				return nil
@@ -80,7 +80,7 @@ func (c *Gtui) SetCur(x, y int) error {
 	c.xCursor = x
 
 	for _, comp := range compsPostSet {
-		if ci, ok := comp.(Component.IWritableComponent); ok {
+		if ci, ok := comp.(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
 				c.xCursor, c.yCursor = ci.SetCurrentPosCursor(x, y)
 			}
@@ -126,7 +126,7 @@ func (c *Gtui) InsertEntity(entityToAdd Core.IEntity) {
 	c.drawingManager.AddElement(entityToAdd)
 }
 
-func (c *Gtui) InsertComponent(componentToAdd Component.IComponent) error {
+func (c *Gtui) InsertComponent(componentToAdd Core.IComponent) error {
 	if container, ok := componentToAdd.(*Component.Container); ok {
 		for _, component := range container.GetComponents() {
 			c.componentManager.AddElement(component)
@@ -146,7 +146,7 @@ func (c *Gtui) RefreshComponents() {
 	c.componentManager.Refresh()
 }
 
-func (c *Gtui) EventOn(x, y int, event func(Component.IComponent)) error {
+func (c *Gtui) EventOn(x, y int, event func(Core.IComponent)) error {
 	resultArray, e := c.componentManager.Search(x, y)
 	if e != nil {
 		return e
@@ -181,7 +181,7 @@ func (c *Gtui) AllineCursor() {
 	x, y := c.GetCur()
 	comps, _ := c.componentManager.Search(x, y)
 	for _, comp := range comps {
-		if ci, ok := comp.(Component.IWritableComponent); ok {
+		if ci, ok := comp.(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
 				deltax, deltay := ci.DiffCurrentToXY(x, y)
 				c.yCursor = y + deltay
