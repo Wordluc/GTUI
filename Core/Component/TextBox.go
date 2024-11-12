@@ -106,14 +106,14 @@ func (b *TextBox) StopTyping() {
 	b.isTyping = false
 }
 
-func (b *TextBox) OnClick(_, _ int) {
+func (b *TextBox) OnClick() {
 	if b.onClick != nil {
 		b.onClick()
 	}
 	b.StartTyping()
 }
 
-func (b *TextBox) OnOut(_, _ int) {
+func (b *TextBox) OnLeave() {
 	if b.onLeave != nil {
 		b.onLeave()
 	}
@@ -121,15 +121,15 @@ func (b *TextBox) OnOut(_, _ int) {
 func (b *TextBox) SetOnClick(onClick func()) {
 	b.onClick = onClick
 }
-func (b *TextBox) SetOnOut(onLeave func()) {
+func (b *TextBox) SetOnLeave(onLeave func()) {
 	b.onLeave = onLeave
 }
 func (b *TextBox) SetOnHover(onHover func()) {
 	b.onHover = onHover
 }
-func (b *TextBox) OnRelease(_, _ int) {}
+func (b *TextBox) OnRelease() {}
 
-func (b *TextBox) OnHover(_, _ int) {
+func (b *TextBox) OnHover() {
 	if b.onHover != nil {
 		b.onHover()
 	}

@@ -20,7 +20,7 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
-	c.SetOnOut(func() {
+	c.SetOnLeave(func() {
 		c.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
 	})
 	c.SetOnHover(func() {
