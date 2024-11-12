@@ -342,6 +342,7 @@ func insertTextToOrigin(origin, text string, pos int) string {
 	}
 	return origin[:pos] + text + origin[pos:]
 }
+// Get the text, if parm == true the ansi code will be added
 func (t *TextBlock) GetText(withAnsiCode bool) string {
 	full := strings.Builder{}
 	y := 0

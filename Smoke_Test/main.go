@@ -109,7 +109,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
-					c.SetWrap(!c.GetWrap())
+					c.SetWrap(!c.IsInSelectingMode())
 				}
 			}
 		})
@@ -119,7 +119,7 @@ func loop(keyb Kd.IKeyBoard) bool {
 		core.EventOn(x, y, func(c Component.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
-					keyb.InsertClickboard(c.Copy())
+					keyb.InsertClickboard(c.GetSelectedText())
 				}
 			}
 		})
