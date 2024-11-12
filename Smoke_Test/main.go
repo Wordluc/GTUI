@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/Wordluc/GTUI"
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
@@ -45,8 +47,14 @@ func main() {
 	button1.SetOnHover(func() {
 		button1.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
 	})
+	button1.SetOnRelease(func() {
+		button1.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
+	})
 	button1.SetOnClick(func() {
-		rect.SetColor(Color.Get(Color.Red, Color.None))
+		button1.GetVisibleArea().SetColor(Color.Get(Color.Red, Color.None))
+		time.AfterFunc(time.Millisecond*1000, func() {
+			button1.OnRelease()
+		})
 	})
 	comp.SetPos(10,10)
 	if e := core.InsertComponent(compComponent); e != nil {

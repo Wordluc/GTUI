@@ -3,6 +3,7 @@ package Component
 import (
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 )
 
 type TextBox struct {
@@ -10,6 +11,7 @@ type TextBox struct {
 	visibleArea *Drawing.Rectangle
 	textBlock   *Drawing.TextBlock
 	isTyping    bool
+	isClicked   bool
 	streamText  StreamCharacter
 	wrap        bool
 	onClick     func()
@@ -32,6 +34,7 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox
 		graphics:    cont,
 		visibleArea: rect,
 		isTyping:    false,
+		isClicked:   false,
 		streamText:  streamText,
 		textBlock:   textBox,
 	}, nil
@@ -107,32 +110,47 @@ func (b *TextBox) StopTyping() {
 }
 
 func (b *TextBox) OnClick() {
+	if b.isClicked {
+		return
+	}
+	b.isClicked = true
 	if b.onClick != nil {
 		b.onClick()
 	}
 	b.StartTyping()
+	EventManager.Call(EventManager.OnClick, b)
 }
 
 func (b *TextBox) OnLeave() {
 	if b.onLeave != nil {
-		b.onLeave()
+		b.onLeave()	
 	}
+	EventManager.Call(EventManager.OnLeave, b)
+	b.StopTyping()
 }
+
 func (b *TextBox) SetOnClick(onClick func()) {
 	b.onClick = onClick
 }
+
 func (b *TextBox) SetOnLeave(onLeave func()) {
 	b.onLeave = onLeave
 }
+
 func (b *TextBox) SetOnHover(onHover func()) {
 	b.onHover = onHover
 }
-func (b *TextBox) OnRelease() {}
+
+func (b *TextBox) OnRelease() {
+	b.isClicked = false
+	EventManager.Call(EventManager.OnRelease, b)
+}
 
 func (b *TextBox) OnHover() {
 	if b.onHover != nil {
-		b.onHover()
+		b.onHover()	
 	}
+	EventManager.Call(EventManager.OnHover, b)
 }
 
 func (b *TextBox) GetGraphics() Core.IEntity {

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"strings"
 	"time"
-
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
 	"github.com/Wordluc/GTUI/Core/Drawing"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 	"github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"github.com/Wordluc/GTUI/Keyboard"
@@ -30,6 +30,7 @@ type Gtui struct {
 
 func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
 	xSize, ySize := term.Size()
+	EventManager.Setup()
 	return &Gtui{
 		globalColor:      Color.GetDefaultColor(),
 		cursorVisibility: true,
@@ -43,6 +44,15 @@ func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITermina
 		xSize:            xSize,
 		ySize:            ySize,
 	}, nil
+}
+
+func (c *Gtui) initializeEventManager() {
+	eventsForRefresh := []EventManager.EventType{EventManager.OnClick, EventManager.OnHover, EventManager.OnLeave, EventManager.OnRelease}
+	for _, e := range eventsForRefresh {
+		EventManager.Subscribe(e, func(_ Core.IComponent) {
+			c.IRefreshAll()
+		})
+	}
 }
 
 func (c *Gtui) SetCur(x, y int) error {
@@ -109,6 +119,7 @@ func (c *Gtui) CreateStreamingCharacter() Component.StreamCharacter {
 }
 
 func (c *Gtui) Start() {
+	c.initializeEventManager()
 	c.term.Start()
 	c.term.Clear()
 	c.IRefreshAll()
@@ -171,7 +182,6 @@ func (c *Gtui) Click(x, y int) error {
 		resultArray[i].OnClick()
 		time.AfterFunc(time.Millisecond*1000, func() {
 			resultArray[i].OnRelease()
-			c.IRefreshAll()
 		})
 	}
 	return nil
