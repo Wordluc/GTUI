@@ -8,10 +8,10 @@ import (
 type Button struct {
 	graphics    *Drawing.Container
 	visibleArea *Drawing.Rectangle
-	onClick     OnEvent
-	onRelease   OnEvent
-	onHover     OnEvent
-	onLeave     OnEvent
+	onClick     Core.OnEvent
+	onRelease   Core.OnEvent
+	onHover     Core.OnEvent
+	onLeave     Core.OnEvent
 	isClicked   bool
 }
 
@@ -40,16 +40,16 @@ func (b *Button) GetPos() (int, int) {
 func (b *Button) GetSize() (int, int) {
 	return b.visibleArea.GetSize()
 }
-func (b *Button) SetOnClick(onClick OnEvent) {
+func (b *Button) SetOnClick(onClick Core.OnEvent) {
 	b.onClick = onClick
 }
-func (b *Button) SetOnLeave(onLeave OnEvent) {
+func (b *Button) SetOnLeave(onLeave Core.OnEvent) {
 	b.onLeave = onLeave
 }
-func (b *Button) SetOnRelease(onRelease OnEvent) {
+func (b *Button) SetOnRelease(onRelease Core.OnEvent) {
 	b.onRelease = onRelease
 }
-func (b *Button) SetOnHover(onHover OnEvent) {
+func (b *Button) SetOnHover(onHover Core.OnEvent) {
 	b.onHover = onHover
 }
 func (b *Button) OnClick() {
@@ -82,12 +82,12 @@ func (b *Button) GetGraphics() Core.IEntity {
 func (b *Button) GetVisibleArea() *Drawing.Rectangle {
 	return b.visibleArea
 }
-func (b *Button) getShape() (IInteractiveShape, error) {
+func (b *Button) GetShape() (Core.IInteractiveShape, error) {
 	x, y := b.visibleArea.GetPos()
 	xDim, yDim := b.visibleArea.GetSize()
-	shape := BaseInteractiveShape{
-		xPos:   x + 1,
-		yPos:   y + 1,
+	shape := Core.BaseInteractiveShape{
+		XPos:   x + 1,
+		YPos:   y + 1,
 		Width:  xDim - 1,
 		Height: yDim - 1,
 	}
