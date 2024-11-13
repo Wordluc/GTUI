@@ -1,5 +1,6 @@
 package Keyboard
 
+
 type Token struct{}
 type Loop func(IKeyBoard) bool
 type IKeyBoard interface {

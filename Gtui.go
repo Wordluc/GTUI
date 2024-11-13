@@ -12,7 +12,7 @@ import (
 	"github.com/Wordluc/GTUI/Keyboard"
 	"github.com/Wordluc/GTUI/Terminal"
 )
-
+type Loop func (Keyboard.IKeyBoard,*Gtui) bool
 type Gtui struct {
 	globalColor      Color.Color
 	term             Terminal.ITerminal
@@ -24,10 +24,9 @@ type Gtui struct {
 	xSize            int
 	ySize            int
 	cursorVisibility bool
-	loop             Keyboard.Loop
+	loop             Loop
 }
-
-func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
+func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
 	xSize, ySize := term.Size()
 	EventManager.Setup()
 	return &Gtui{
@@ -232,7 +231,7 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	//Keyboard
 	//	c.IRefreshAll()
 	c.AllineCursor()
-	if !c.loop(c.keyb) {
+	if !c.loop(c.keyb,c) {
 		return false
 	}
 	c.IRefreshAll()
