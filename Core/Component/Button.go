@@ -1,6 +1,8 @@
 package Component
 
 import (
+	"time"
+
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
@@ -61,26 +63,26 @@ func (b *Button) OnClick() {
 		b.onClick()
 	}
 	b.isClicked = true
-	EventManager.Call(EventManager.OnClick, b)
+	time.AfterFunc(time.Millisecond*1000, func() {
+		b.OnRelease()
+		EventManager.Call(EventManager.Refresh, b)
+	})
 }
 func (b *Button) OnRelease() {
 	if b.onRelease != nil {
 	}
 	b.isClicked = false
 	b.onRelease()
-	EventManager.Call(EventManager.OnRelease, b)
 }
 func (b *Button) OnHover() {
 	if b.onHover != nil {
 		b.onHover()
 	}
-	EventManager.Call(EventManager.OnHover, b)
 }
 func (b *Button) OnLeave() {
 	if b.onLeave != nil {
 		b.onLeave()
 	}
-	EventManager.Call(EventManager.OnLeave, b)
 }
 func (b *Button) GetGraphics() Core.IEntity {
 	return b.graphics
