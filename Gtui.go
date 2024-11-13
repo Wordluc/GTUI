@@ -3,7 +3,6 @@ package GTUI
 import (
 	"errors"
 	"strings"
-	"time"
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
 	"github.com/Wordluc/GTUI/Core/Drawing"
@@ -47,14 +46,11 @@ func NewGtui(loop Keyboard.Loop, keyb Keyboard.IKeyBoard, term Terminal.ITermina
 }
 
 func (c *Gtui) initializeEventManager() {
-	eventsForRefresh := []EventManager.EventType{EventManager.OnClick, EventManager.OnHover, EventManager.OnLeave, EventManager.OnRelease}
-	for _, e := range eventsForRefresh {
-		EventManager.Subscribe(e, func(comp Core.IComponent) {
-			if comp.GetGraphics().IsTouched() {
-				c.IRefreshAll()
-			}
-		})
-	}
+	EventManager.Subscribe(EventManager.Refresh, func(comp Core.IComponent) {
+		if comp.GetGraphics().IsTouched() {
+			c.IRefreshAll()
+		}
+	})
 }
 
 func (c *Gtui) SetCur(x, y int) error {
@@ -182,9 +178,6 @@ func (c *Gtui) Click(x, y int) error {
 	}
 	for i := range resultArray {
 		resultArray[i].OnClick()
-		time.AfterFunc(time.Millisecond*1000, func() {
-			resultArray[i].OnRelease()
-		})
 	}
 	return nil
 }
@@ -217,7 +210,7 @@ func (c *Gtui) IRefreshAll() {
 		str.WriteString(c.ClearZone(x, y, width, height))
 		str.WriteString(el.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
-		for _, child := range c.drawingManager.GetCollidingElement(node) {
+		for _, child := range c.drawingManager.GetCollidingElement(node) {//see if it possible call this at the end,to avoid refresh same elements
 			if child.IsTouched() {
 				str.WriteString(child.GetAnsiCode(c.globalColor))
 				str.WriteString(c.globalColor.GetAnsiColor())

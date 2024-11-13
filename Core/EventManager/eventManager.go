@@ -9,11 +9,8 @@ import (
 type EventType int8
 
 const (
-	OnClick EventType = iota
-	OnRelease
-	OnHover
-	OnLeave
-	Touched
+	//Event to call when a component need an instant screee refresh
+	Refresh EventType = iota
 )
 
 type EventManager struct {

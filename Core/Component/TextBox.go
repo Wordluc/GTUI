@@ -1,6 +1,8 @@
 package Component
 
 import (
+	"time"
+
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
@@ -118,14 +120,16 @@ func (b *TextBox) OnClick() {
 		b.onClick()
 	}
 	b.StartTyping()
-	EventManager.Call(EventManager.OnClick, b)
+	time.AfterFunc(time.Millisecond*1000, func() {
+		b.OnRelease()
+		EventManager.Call(EventManager.Refresh, b)
+	})
 }
 
 func (b *TextBox) OnLeave() {
 	if b.onLeave != nil {
 		b.onLeave()	
 	}
-	EventManager.Call(EventManager.OnLeave, b)
 	b.StopTyping()
 }
 
@@ -143,14 +147,12 @@ func (b *TextBox) SetOnHover(onHover func()) {
 
 func (b *TextBox) OnRelease() {
 	b.isClicked = false
-	EventManager.Call(EventManager.OnRelease, b)
 }
 
 func (b *TextBox) OnHover() {
 	if b.onHover != nil {
 		b.onHover()	
 	}
-	EventManager.Call(EventManager.OnHover, b)
 }
 
 func (b *TextBox) GetGraphics() Core.IEntity {
