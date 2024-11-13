@@ -56,6 +56,11 @@ func (c *Gtui) SetCur(x, y int) error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
 		return errors.New("cursor out of range")
 	}
+	if !c.cursorVisibility{
+		c.xCursor = x
+		c.yCursor = y
+		return nil
+	}
 	compPreSet, _ := c.componentManager.Search(c.xCursor, c.yCursor)
 	compsPostSet, _ := c.componentManager.Search(x, y)
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
