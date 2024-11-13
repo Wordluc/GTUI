@@ -13,11 +13,10 @@ import (
 	"github.com/Wordluc/GTUI/Terminal"
 )
 
-var core *GTUI.Gtui
 var comp Core.IComponent
 func main() {
 	kbr := Keyboard.NewKeyboard()
-	core, _ = GTUI.NewGtui(loop, kbr, &Terminal.Terminal{})
+	core, _ := GTUI.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
 	c,e := Component.CreateTextBox(30, 5, 20, 10, core.CreateStreamingCharacter())
 	if e != nil {
@@ -69,7 +68,7 @@ func main() {
 	core.Start()
 }
 
-func loop(keyb Kd.IKeyBoard) bool {
+func loop(keyb Kd.IKeyBoard,core *GTUI.Gtui) bool {
 	var x, y = core.GetCur()
 	if keyb.IsKeySPressed(Keyboard.Down) {
 		y++
