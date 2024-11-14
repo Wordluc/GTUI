@@ -8,6 +8,6 @@ type ITerminal interface {
 	PrintStr(str string)
 	Size() (int, int)
 	SetCursor(x, y int)
-	HideCursor()
-	ShowCursor()
+	HideCursor() string
+	ShowCursor() string
 }
