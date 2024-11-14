@@ -31,12 +31,11 @@ func (c *Gtui) SetVisibilityCursor(visibility bool) {
 }
 
 func (c *Gtui) IClear() {
-	c.term.HideCursor()
 	c.term.Clear()
 	if c.cursorVisibility {
-		c.term.ShowCursor()
+		c.term.PrintStr(c.term.ShowCursor())
 	}else{
-		c.term.HideCursor()
+		c.term.PrintStr(c.term.HideCursor())
 	}
 }
 
