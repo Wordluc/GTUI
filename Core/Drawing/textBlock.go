@@ -381,7 +381,7 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 		}
 		y++
 	}
-	return full.String()
+	return strings.TrimSuffix(full.String(),"\n")
 }
 func (t *TextBlock) parseText(text string) string {
 	start := 0
