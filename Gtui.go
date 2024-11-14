@@ -232,8 +232,9 @@ func (c *Gtui) IRefreshAll() {
 	}else{
 		str.WriteString(c.term.HideCursor())
 	}
-	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
+	//DO NOT CHANGE ORDER
 	c.term.PrintStr(str.String())
+	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	return
 }
 
