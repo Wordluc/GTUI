@@ -74,6 +74,10 @@ func (v *TextBox) ClearAll() {
 	v.textBlock.ClearAll()
 }
 
+func (v *TextBox) DeleteLastCharacter() {
+	v.textBlock.Delete()
+}
+
 func (v *TextBox) Paste(text string) {
 	for _, char := range []rune(text) {
 		if char == '\r' {
