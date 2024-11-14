@@ -227,6 +227,11 @@ func (c *Gtui) IRefreshAll() {
 		return true
 	}
 	c.drawingManager.Execute(cond)
+	if c.cursorVisibility {
+		str.WriteString(c.term.ShowCursor())
+	}else{
+		str.WriteString(c.term.HideCursor())
+	}
 	c.term.PrintStr(str.String())
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	return
