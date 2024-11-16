@@ -2,22 +2,13 @@ package GTUI
 
 import (
 	"strings"
-	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 
 func (c *Gtui) ISetGlobalColor(color Color.Color) {
 	c.globalColor = color
-	c.IRefreshAll()
-	c.entityTree.Execute(func(node *Core.TreeNode[Core.IEntity])bool {
-		for _, child := range node.GetElements() {
-			if drawing,ok:=child.(Core.IDrawing);ok{
-				drawing.Touch()
-			}
-		}
-		return true
-	})
+	c.refresh(false)
 }
 
 func (c *Gtui) IResetGlobalColor() {

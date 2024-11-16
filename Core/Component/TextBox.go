@@ -47,6 +47,7 @@ func (b *TextBox) GetSize() (int, int) {
 
 func (b *TextBox) SetPos(x, y int) {
 	b.visibleArea.SetPos(x, y)
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
 func (b *TextBox) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
@@ -126,7 +127,7 @@ func (b *TextBox) OnClick() {
 	b.StartTyping()
 	time.AfterFunc(time.Millisecond*1000, func() {
 		b.OnRelease()
-		EventManager.Call(EventManager.Refresh, b)
+		EventManager.Call(EventManager.Refresh, []any{b})
 	})
 }
 

@@ -1,10 +1,12 @@
 package Drawing
 
 import (
-	"github.com/Wordluc/GTUI/Core/Utils/Color"
-	U "github.com/Wordluc/GTUI/Core/Utils"
 	"errors"
 	"strings"
+
+	"github.com/Wordluc/GTUI/Core/EventManager"
+	U "github.com/Wordluc/GTUI/Core/Utils"
+	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 
 type Rectangle struct {
@@ -52,6 +54,7 @@ func (l *Rectangle) SetPos(x, y int) {
 	l.xPos = x
 	l.yPos = y
 	l.Touch()
+	EventManager.Call(EventManager.ReorganizeElements,[]any{l})
 }
 
 func (l *Rectangle) GetSize() (int, int) {

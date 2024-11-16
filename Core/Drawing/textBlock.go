@@ -1,10 +1,12 @@
 package Drawing
 
 import (
-	U "github.com/Wordluc/GTUI/Core/Utils"
-	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"slices"
 	"strings"
+
+	"github.com/Wordluc/GTUI/Core/EventManager"
+	U "github.com/Wordluc/GTUI/Core/Utils"
+	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 
 type lineText struct {
@@ -147,6 +149,7 @@ func (t *TextBlock) SetPos(x, y int) {
 	t.xPos = x
 	t.yPos = y
 	t.Touch()
+	EventManager.Call(EventManager.ReorganizeElements,[]any{t})
 }
 
 func (t *TextBlock) GetSize() (int, int) {

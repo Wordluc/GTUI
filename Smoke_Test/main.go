@@ -14,6 +14,7 @@ import (
 )
 
 var comp Core.IComponent
+var button2 *Component.Button
 func main() {
 	kbr := Keyboard.NewKeyboard()
 	core, _ := GTUI.NewGtui(loop, kbr, &Terminal.Terminal{})
@@ -55,11 +56,30 @@ func main() {
 			button1.OnRelease()
 		})
 	})
+	button2=Component.CreateButton(105,0,10,10,"test")
+	button2.SetOnLeave(func() {
+		button2.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
+	})
+	button2.SetOnHover(func() {
+		button2.GetVisibleArea().SetColor(Color.Get(Color.White, Color.None))
+	})
+	button2.SetOnRelease(func() {
+		button2.GetVisibleArea().SetColor(Color.Get(Color.Gray, Color.None))
+	})
+	button2.SetOnClick(func() {
+		button2.GetVisibleArea().SetColor(Color.Get(Color.Red, Color.None))
+		time.AfterFunc(time.Millisecond*1000, func() {
+			button2.OnRelease()
+		})
+	})
 	comp.SetPos(10,10)
 	if e := core.InsertComponent(compComponent); e != nil {
 		panic(e)
 	}
 	if e:=core.InsertComponent(button1);e!=nil{
+		panic(e)
+	}
+	if e:=core.InsertComponent(button2);e!=nil{
 		panic(e)
 	}
 	if e := core.SetCur(1, 1); e != nil {
@@ -84,9 +104,7 @@ func loop(keyb Kd.IKeyBoard,core *GTUI.Gtui) bool {
 	}
 
 	if keyb.IsKeySPressed(Keyboard.CtrlS) {
-		core.IClear()
-		comp.SetPos(x,y)
-		core.RefreshComponents()
+		button2.SetPos(x, y)
 	}
 
 	core.SetCur(x, y)

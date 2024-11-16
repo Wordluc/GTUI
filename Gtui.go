@@ -43,10 +43,14 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 }
 
 func (c *Gtui) initializeEventManager() {
-	EventManager.Subscribe(EventManager.Refresh, func(comp Core.IComponent) {
-		if comp.GetGraphics().IsTouched() {
-			c.IRefreshAll()
-		}
+	EventManager.Subscribe(EventManager.Refresh,100, func(comp []any) {
+		c.refresh(true)
+	})
+
+	EventManager.Subscribe(EventManager.ReorganizeElements,100, func(comp []any) {
+		c.entityTree.Refresh()
+		c.IClear()
+		c.refresh(false)
 	})
 }
 
@@ -129,7 +133,7 @@ func (c *Gtui) Start() {
 	c.initializeEventManager()
 	c.term.Start()
 	c.term.Clear()
-	c.IRefreshAll()
+	c.refresh(false)
 	c.keyb.Start(c.innerLoop)
 	c.term.Stop()
 }
@@ -159,7 +163,7 @@ func (c *Gtui) InsertComponent(componentToAdd Core.IComponent) error {
 	return nil
 }
 
-func (c *Gtui) RefreshComponents() {
+func (c *Gtui) reorganizeTree() {
 	c.entityTree.Refresh()
 }
 
@@ -205,7 +209,7 @@ func (c *Gtui) AllineCursor() {
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 }
 
-func (c *Gtui) IRefreshAll() {
+func (c *Gtui) refresh(onlyTouched bool) {
 	var str strings.Builder
 	var drawing Core.IDrawing
 	var ok bool
@@ -215,7 +219,7 @@ func (c *Gtui) IRefreshAll() {
 		if drawing, ok = node.GetElement().(Core.IDrawing); !ok {
 			return true
 		}
-		if el = drawing; !el.IsTouched() {
+		if el = drawing; !el.IsTouched() && onlyTouched {
 			return true
 		}
 		x, y := el.GetPos()
@@ -246,7 +250,7 @@ func (c *Gtui) IRefreshAll() {
 	}else{
 		str.WriteString(c.term.HideCursor())
 	}
-	//DO NOT CHANGE ORDER
+	//DO NOT CHANGE THE ORDER
 	c.term.PrintStr(str.String())
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	return
@@ -259,6 +263,6 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	if !c.loop(c.keyb,c) {
 		return false
 	}
-	c.IRefreshAll()
+	c.refresh(true)
 	return true
 }
