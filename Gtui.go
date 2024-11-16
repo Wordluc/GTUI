@@ -239,13 +239,13 @@ func (c *Gtui) refresh(onlyTouched bool) {
 		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 	}
+	c.term.PrintStr(str.String())
 	if c.cursorVisibility {
 		str.WriteString(c.term.ShowCursor())
 	}else{
 		str.WriteString(c.term.HideCursor())
 	}
 	//DO NOT CHANGE THE ORDER
-	c.term.PrintStr(str.String())
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 	return
 }
