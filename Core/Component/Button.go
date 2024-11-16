@@ -21,8 +21,7 @@ type Button struct {
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
-	textD := Drawing.CreateTextField(0, 0)
-	textD.Type(text)
+	textD := Drawing.CreateTextField(0, 0,text)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2
 	textD.SetPos(xC, yC)
 	cont.AddChild(rect)

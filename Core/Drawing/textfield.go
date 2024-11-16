@@ -14,37 +14,23 @@ type TextField struct {
 	ansiCode  string
 	XPos      int
 	YPos      int
-	text      strings.Builder
+	text      string
 	visible   bool
 }
 
-func CreateTextField(x, y int) *TextField {
+func CreateTextField(x, y int,text string) *TextField {
 	return &TextField{
 		XPos:      x,
 		YPos:      y,
 		isChanged: true,
 		color:     Color.GetDefaultColor(),
 		visible:   true,
-		text:      strings.Builder{},
+		text:      text,
 	}
-}
-
-func (s *TextField) Type(text string) {
-	if text == "\n" {
-	} else {
-		s.text.WriteString(text)
-	}
-	s.Touch()
-}
-
-func (s *TextField) SetText(text string) {
-	s.text.Reset()
-	s.text.WriteString(text)
-	s.Touch()
 }
 
 func (s *TextField) GetSize() (int,int) {
-	return s.text.Len(),1
+	return len(s.text),1
 }
 
 func (s *TextField) GetAnsiCode(defaultColor Color.Color) string {
@@ -72,10 +58,6 @@ func (s *TextField) SetColor(color Color.Color) {
 	s.color = color
 	s.Touch()
 }
-func (s *TextField) ClearText() {
-	s.text.Reset()
-	s.Touch()
-}
 func (s *TextField) SetVisibility(visible bool) {
 	s.visible = visible
 }
@@ -87,7 +69,7 @@ func (s *TextField) getAnsiTextField(defaultColor Color.Color) string {
 	var str strings.Builder
 	str.WriteString(U.GetAnsiMoveTo(s.XPos, s.YPos))
 	str.WriteString(s.color.GetMixedColor(defaultColor).GetAnsiColor())
-	str.WriteString(s.text.String())
+	str.WriteString(s.text)
 	str.WriteString(Color.GetResetColor())
 	return str.String()
 }
