@@ -39,7 +39,6 @@ func Setup() error {
 	eventManager = &EventManager{subscribers: make(map[EventType]*subscriber), eventpartitions: make(map[EventType]*eventPartioning), mu: sync.Mutex{}}
 	return nil
 }
-
 func Call(typeEvent EventType, caller []any) error {
 	if eventManager == nil {
 		return errors.New("EventManager not setup")
@@ -52,7 +51,8 @@ func Call(typeEvent EventType, caller []any) error {
 	}
 	if partition == nil {
 		eventManager.eventpartitions[typeEvent] = &eventPartioning{caller: caller, subscriber: eventManager.subscribers[typeEvent]}
-		time.AfterFunc(time.Millisecond*100, func() {
+		offset:= eventManager.subscribers[typeEvent].offsetTime
+		time.AfterFunc(time.Millisecond*time.Duration(offset), func() {
 			eventManager.mu.Lock()
 			defer eventManager.mu.Unlock()
 			partition := eventManager.eventpartitions[typeEvent]
@@ -72,7 +72,10 @@ func Subscribe(typeEvent EventType,offsetTime int, f func([]any)) error {
 	if eventManager == nil {
 		return errors.New("EventManager not setup")
 	}
-	if _, ok := eventManager.subscribers[typeEvent]; ok {
+	if v, ok := eventManager.subscribers[typeEvent]; ok {
+		if v == nil {
+			return nil
+		}
 		return errors.New("Event already subscribed")
 	}
 	eventManager.subscribers[typeEvent] = &subscriber{event: f, offsetTime: offsetTime}
