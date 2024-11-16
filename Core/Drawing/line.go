@@ -5,6 +5,7 @@ import (
 	"math"
 	"strings"
 
+	"github.com/Wordluc/GTUI/Core/EventManager"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -74,6 +75,7 @@ func (l *Line) SetPos(x, y int) {
 	l.xPos = x
 	l.yPos = y
 	l.Touch()
+	EventManager.Call(EventManager.ReorganizeElements, []any{l})
 }
 
 func (c *Line) SetColor(color Color.Color) {

@@ -36,6 +36,7 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 }
 func (b *Button) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
 func (b *Button) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
@@ -56,6 +57,7 @@ func (b *Button) SetOnHover(onHover Core.OnEvent) {
 	b.onHover = onHover
 }
 func (b *Button) OnClick() {
+
 	if b.isClicked {
 		return
 	}
@@ -63,9 +65,9 @@ func (b *Button) OnClick() {
 		b.onClick()
 	}
 	b.isClicked = true
-	time.AfterFunc(time.Millisecond*1000, func() {
+	time.AfterFunc(time.Millisecond*500, func() {
 		b.OnRelease()
-		EventManager.Call(EventManager.Refresh, b)
+		EventManager.Call(EventManager.Refresh, []any{b})
 	})
 }
 func (b *Button) OnRelease() {

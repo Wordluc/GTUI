@@ -1,9 +1,11 @@
 package Drawing
 
 import (
+	"strings"
+
+	"github.com/Wordluc/GTUI/Core/EventManager"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
-	"strings"
 )
 
 type TextField struct {
@@ -58,6 +60,8 @@ func (s *TextField) GetAnsiCode(defaultColor Color.Color) string {
 func (s *TextField) SetPos(x, y int) {
 	s.XPos = x
 	s.YPos = y
+	s.Touch()
+	EventManager.Call(EventManager.ReorganizeElements,[]any{s})
 }
 
 func (s *TextField) GetPos() (int, int) {
