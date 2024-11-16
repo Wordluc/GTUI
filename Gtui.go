@@ -236,12 +236,6 @@ func (c *Gtui) refresh(onlyTouched bool) {
 	}
 	c.entityTree.Execute(cond)
 	for drawing := range elementToRefresh {
-		if drawing.IsTouched() {
-			str.WriteString(drawing.GetAnsiCode(c.globalColor))
-			str.WriteString(c.globalColor.GetAnsiColor())
-			drawing.Touch()
-			continue
-		}
 		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 	}
