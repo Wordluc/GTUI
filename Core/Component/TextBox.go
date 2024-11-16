@@ -159,7 +159,7 @@ func (b *TextBox) OnHover() {
 	}
 }
 
-func (b *TextBox) GetGraphics() Core.IEntity {
+func (b *TextBox) GetGraphics() Core.IDrawing {
 	return b.graphics
 }
 

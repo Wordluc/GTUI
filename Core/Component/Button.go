@@ -84,7 +84,7 @@ func (b *Button) OnLeave() {
 		b.onLeave()
 	}
 }
-func (b *Button) GetGraphics() Core.IEntity {
+func (b *Button) GetGraphics() Core.IDrawing {
 	return b.graphics
 }
 func (b *Button) GetVisibleArea() *Drawing.Rectangle {

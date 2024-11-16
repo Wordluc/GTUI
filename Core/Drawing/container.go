@@ -9,7 +9,7 @@ import (
 type Container struct {
 	xPos     int
 	yPos     int
-	children []Core.IEntity
+	children []Core.IDrawing
 	color    Color.Color
 	visible  bool
 }
@@ -23,7 +23,7 @@ func CreateContainer( x, y int) *Container {
 	}
 }
 
-func (c *Container) GetChildren() []Core.IEntity {
+func (c *Container) GetChildren() []Core.IDrawing {
 	return c.children
 }
 //DO NOT USE
@@ -31,7 +31,7 @@ func (c *Container) GetSize()(int,int) {
 	panic("mustn't be called")
 }
 
-func (c *Container) AddChild(child Core.IEntity) error {//TODO: controllare se l'errare è gestito dai caller
+func (c *Container) AddChild(child Core.IDrawing) error {//TODO: controllare se l'errare è gestito dai caller
 	c.children = append(c.children, child)
 	return nil
 }
