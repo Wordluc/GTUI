@@ -91,7 +91,7 @@ func loop(keyb Kd.IKeyBoard,core *GTUI.Gtui) bool {
 
 	core.SetCur(x, y)
 	if keyb.IsKeySPressed(Keyboard.Esc) {
-		core.EventOn(x, y, func(c Core.IComponent) {
+		core.CallEventOn(x, y, func(c Core.IComponent) {
 			if c, ok := c.(Core.IWritableComponent); ok {
 				c.StopTyping()
 			}
@@ -103,7 +103,7 @@ func loop(keyb Kd.IKeyBoard,core *GTUI.Gtui) bool {
 	}
 
 	if keyb.IsKeySPressed(Keyboard.CtrlV) {
-		core.EventOn(x, y, func(c Core.IComponent) {
+		core.CallEventOn(x, y, func(c Core.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
 					c.Paste(keyb.GetClickboard())
@@ -114,7 +114,7 @@ func loop(keyb Kd.IKeyBoard,core *GTUI.Gtui) bool {
 	}
 
 	if keyb.IsKeySPressed(Keyboard.CtrlA) {
-		core.EventOn(x, y, func(c Core.IComponent) {
+		core.CallEventOn(x, y, func(c Core.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
 					c.SetWrap(!c.IsInSelectingMode())
@@ -124,7 +124,7 @@ func loop(keyb Kd.IKeyBoard,core *GTUI.Gtui) bool {
 	}
 
 	if keyb.IsKeySPressed(Keyboard.CtrlC) {
-		core.EventOn(x, y, func(c Core.IComponent) {
+		core.CallEventOn(x, y, func(c Core.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
 					keyb.InsertClickboard(c.GetSelectedText())

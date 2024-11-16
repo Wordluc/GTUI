@@ -10,9 +10,11 @@ import (
 func (c *Gtui) ISetGlobalColor(color Color.Color) {
 	c.globalColor = color
 	c.IRefreshAll()
-	c.drawingManager.Execute(func(node *Core.TreeNode[Core.IEntity])bool {
+	c.entityTree.Execute(func(node *Core.TreeNode[Core.IEntity])bool {
 		for _, child := range node.GetElements() {
-			child.Touch()
+			if drawing,ok:=child.(Core.IDrawing);ok{
+				drawing.Touch()
+			}
 		}
 		return true
 	})

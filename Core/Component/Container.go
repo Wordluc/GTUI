@@ -70,7 +70,7 @@ func (c *Container) OnLeave() {
 	panic("mustn't be called")
 }
 
-func (c *Container) GetGraphics() Core.IEntity {
+func (c *Container) GetGraphics() Core.IDrawing {
 	return c.drawing
 }
 
