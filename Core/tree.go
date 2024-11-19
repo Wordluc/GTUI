@@ -167,16 +167,19 @@ type collisionChache[T ElementTree] struct {
 }
 
 type TreeManager[T ElementTree] struct {
-	root             [5]*TreeNode[T]
+	root             []*TreeNode[T]
 	chachedCollision [5]collisionChache[T]
 	nextIndexToCache int
+	nLayer           Layer
 }
 
-func CreateTreeManager[T ElementTree]() *TreeManager[T] {
+func CreateTreeManager[T ElementTree](nLayer Layer) *TreeManager[T] {
 
 	return &TreeManager[T]{
 		chachedCollision: [5]collisionChache[T]{},
 		nextIndexToCache: 0,
+		root:             make([]*TreeNode[T], nLayer),
+		nLayer:           nLayer,
 	}
 }
 
@@ -204,9 +207,9 @@ func (d *TreeManager[T]) Search(layer Layer, x, y int) ([]T, error) {
 }
 
 func (d *TreeManager[T]) SearchAll(x,y int) ([]T, error) {
-	var results [][]T=make([][]T,5)
+	var results [][]T=make([][]T,d.nLayer)
 	var group sync.WaitGroup=sync.WaitGroup{}
-	for layer := 0; layer < 5; layer++ {
+	for layer := 0; layer < int(d.nLayer); layer++ {
 		if d.root[layer] != nil {
 			group.Add(1)
 			go func (){
@@ -249,8 +252,8 @@ func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *
 }
 
 func (d *TreeManager[T]) Refresh() {
-	newTree := CreateTreeManager[T]()
-	for layer := 0; layer < 5; layer++ {
+	newTree := CreateTreeManager[T](d.nLayer)
+	for layer := 0; layer < int(d.nLayer); layer++ {
 		d._refresh(Layer(layer),newTree)
 	}
 	d.root = newTree.root

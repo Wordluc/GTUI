@@ -34,7 +34,7 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 		loop:             loop,
 		term:             term,
 		keyb:             keyb,
-		entityTree: Core.CreateTreeManager[Core.IEntity](),
+		entityTree: Core.CreateTreeManager[Core.IEntity](Core.LMax),
 		xCursor:          0,
 		yCursor:          0,
 		xSize:            xSize,
@@ -169,7 +169,7 @@ func (c *Gtui) reorganizeTree() {
 }
 
 func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
-	for i:=4;i>=0;i--{
+	for i:=Core.LMax-1;i>=0;i--{
 		if isDone,e:=c._callEventOn(x, y, Core.Layer(i), event);isDone{
 			return e
 		}
@@ -192,7 +192,7 @@ func (c *Gtui) _callEventOn(x, y int,layer Core.Layer, event func(Core.IComponen
 }
 
 func (c *Gtui) Click(x, y int) error {
-	for i:=4;i>=0;i--{
+	for i:=Core.LMax-1;i>=0;i--{
 		if isDone,e:=c._click(x, y, Core.Layer(i));isDone{
 			return e
 		}
@@ -215,7 +215,7 @@ func (c *Gtui) _click(x, y int,layer Core.Layer) (bool,error) {
 }
 
 func (c *Gtui) AllineCursor() {
-	for i:=4;i>=0;i--{
+	for i:=Core.LMax-1;i>=0;i--{
 		if isDone:=c._allineCursor(Core.Layer(i));isDone{
 			break
 		}
@@ -240,7 +240,7 @@ func (c *Gtui) _allineCursor(layer Core.Layer) bool {
 
 func (c *Gtui) refresh(onlyTouched bool)error {//TODO: optimize
 	var str strings.Builder
-	for i:=0;i<5;i++{
+	for i:=0;i<int(Core.LMax);i++{
 		s:=c._refresh(Core.Layer(i),false);
 		str.WriteString(s.String())
 	}
@@ -265,9 +265,10 @@ func (c *Gtui) _refresh(layer Core.Layer,onlyTouched bool)(strings.Builder) {
 		if drawing, ok = node.GetElement().(Core.IDrawing); !ok {
 			return true
 		}
-		if el = drawing; !el.IsTouched() && onlyTouched {
-			return true
-		}
+		el = drawing
+//		if el = drawing; !el.IsTouched() && onlyTouched {
+//			return true
+//		}
 		x, y := el.GetPos()
 		width, height := el.GetSize()
 		str.WriteString(c.ClearZone(x, y, width, height))

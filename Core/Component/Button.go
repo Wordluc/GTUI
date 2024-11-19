@@ -46,6 +46,9 @@ func (b *Button) GetLayer() Core.Layer {
 	return b.graphics.GetLayer()
 }
 func (b *Button) SetLayer(layer Core.Layer) {
+	if layer>Core.LMax{
+		layer=Core.LMax
+	}
 	b.graphics.SetLayer(layer)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
