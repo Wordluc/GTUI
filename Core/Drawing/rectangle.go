@@ -75,8 +75,8 @@ func (l *Rectangle) SetSize(x, y int) error {
 
 func (b *Rectangle) SetLayer(layer Core.Layer) {
 	b.layer = layer
-	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
 	b.Touch()
+	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
 }
 
 func (c *Rectangle) GetLayer() Core.Layer {

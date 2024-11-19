@@ -3,6 +3,7 @@ package Component
 import (
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 )
 
 type Container struct {
@@ -39,6 +40,7 @@ func (b *Container) SetLayer(layer Core.Layer) {
 	}
 	b.drawing.SetLayer(b.drawing.GetLayer()+diff)
 	b.layer = layer
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
 func (c *Container) GetLayer() Core.Layer {
 	return c.layer
@@ -59,6 +61,7 @@ func (c *Container) GetActivity() bool {
 
 func (c *Container) SetPos(x, y int) {
 	c.drawing.SetPos(x, y)
+	EventManager.Call(EventManager.ReorganizeElements, []any{c})
 }
 
 func (c *Container) GetPos() (int, int) {

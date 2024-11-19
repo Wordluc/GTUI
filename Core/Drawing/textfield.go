@@ -53,6 +53,7 @@ func (s *TextField) SetPos(x, y int) {
 }
 func (s *TextField) SetLayer(layer Core.Layer) {
 	s.layer = layer
+	s.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{s})
 }
 func (s *TextField) GetLayer() Core.Layer {
