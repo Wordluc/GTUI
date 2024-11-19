@@ -2,7 +2,6 @@ package Core
 
 import (
 	"errors"
-	"sort"
 	"sync"
 )
 
@@ -18,6 +17,7 @@ type ElementTree interface {
 	GetSize() (int, int)
 	GetLayer() Layer
 }
+
 type TreeNode[T ElementTree] struct {
 	nodeType typeTreeNode
 	xPos     int
@@ -77,11 +77,13 @@ func (t *TreeNode[T]) addNode(element T) {
 		addElement(&t.smaller, element, !t.nodeType)
 	}
 }
+
 func (d *TreeNode[T]) addNodes(elements []T) {
 	for _, e := range elements {
 		d.addNode(e)
 	}
 }
+
 func (d *TreeNode[T]) search(x, y int) []T {
 	var result []T
 	d.execute(x, y, func(node *TreeNode[T]) {
@@ -93,6 +95,7 @@ func (d *TreeNode[T]) search(x, y int) []T {
 	})
 	return result
 }
+
 func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
 	do(d)
 	xPosElNode, yPosElNode := d.element.GetPos()
@@ -132,25 +135,6 @@ func (d *TreeNode[T]) GetElements() []T {
 		return true
 	})
 	return result
-}
-
-func Sort[T ElementTree](elements []T, _type typeTreeNode) {
-	sort.Slice(elements, func(i, j int) bool {
-		x1, y1 := elements[i].GetPos()
-		x2, y2 := elements[j].GetPos()
-		if _type == ByX {
-			return x1 < x2
-		}
-		return y1 < y2
-	})
-}
-
-func (d *TreeNode[T]) GetPos() (int, int) {
-	return d.xPos, d.yPos
-}
-
-func (d *TreeNode[T]) GetSize() (int, int) {
-	return d.width, d.height
 }
 
 type collisionChache[T ElementTree] struct {
@@ -224,11 +208,18 @@ func (d *TreeManager[T]) SearchAll(x, y int) ([]T, error) {
 
 func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *TreeNode[T]) []T {
 	var result []T
+	defer func (){
+		d.nextIndexToCache = (d.nextIndexToCache + 1) % len(d.chachedCollision)
+		d.chachedCollision[d.nextIndexToCache] = collisionChache[T]{node: elementWhichCollides, collisionElement: result}
+	}()
+
 	for i := range d.chachedCollision {
 		if d.chachedCollision[i].node == elementWhichCollides {
-			return d.chachedCollision[i].collisionElement
+			result = d.chachedCollision[i].collisionElement
+			return result
 		}
 	}
+
 	d.root[layer].executeForAll(func(node *TreeNode[T]) bool {
 		x, y := node.element.GetPos()
 		xSize, ySize := node.element.GetSize()
@@ -237,8 +228,6 @@ func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *
 		}
 		return true
 	})
-	d.nextIndexToCache = (d.nextIndexToCache + 1) % len(d.chachedCollision)
-	d.chachedCollision[d.nextIndexToCache] = collisionChache[T]{node: elementWhichCollides, collisionElement: result}
 	return result
 }
 
@@ -249,6 +238,7 @@ func (d *TreeManager[T]) Refresh() {
 	}
 	(*d)=(*newTree) //deep copy
 }
+
 func (d *TreeManager[T]) _refresh(layer Layer, tree *TreeManager[T]) {
 	d.root[layer].executeForAll(func(node *TreeNode[T]) bool {
 		tree.AddElement(node.element)
