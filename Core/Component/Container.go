@@ -10,6 +10,7 @@ type Container struct {
 	active     bool
 	components []Core.IComponent
 	drawing    *Drawing.Container
+	layer      Core.Layer
 }
 
 func CreateContainer(x, y int) *Container {
@@ -31,7 +32,17 @@ func (c *Container) AddDrawing(container *Drawing.Container)error {
 func (c *Container) GetSize() (int,int) {
 	panic("mustn't be called")
 }
-
+func (b *Container) SetLayer(layer Core.Layer) {
+	diff:= layer - b.layer
+	for _,comp:=range b.components {
+		comp.SetLayer(comp.GetLayer()+diff)
+	}
+	b.drawing.SetLayer(b.drawing.GetLayer()+diff)
+	b.layer = layer
+}
+func (c *Container) GetLayer() Core.Layer {
+	return c.layer
+}
 func (c *Container) GetComponents() []Core.IComponent {
 	return c.components
 }

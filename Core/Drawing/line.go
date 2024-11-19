@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Wordluc/GTUI/Core/EventManager"
+	"github.com/Wordluc/GTUI/Core"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -19,6 +20,7 @@ type Line struct {
 	Len       int
 	angle     int16
 	visible   bool
+	layer     Core.Layer
 }
 
 func CreateLine(x, y, len int, angle int16) *Line {
@@ -78,6 +80,14 @@ func (l *Line) SetPos(x, y int) {
 	EventManager.Call(EventManager.ReorganizeElements, []any{l})
 }
 
+func (b *Line) SetLayer(layer Core.Layer) {
+	b.layer = layer
+	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	b.Touch()
+}
+func (c *Line) GetLayer() Core.Layer {
+	return c.layer
+}
 func (c *Line) SetColor(color Color.Color) {
 	c.color = color
 	c.Touch()

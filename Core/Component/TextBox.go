@@ -52,6 +52,12 @@ func (b *TextBox) SetPos(x, y int) {
 func (b *TextBox) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
 }
+func (b *TextBox) SetLayer(layer Core.Layer) {
+	b.graphics.SetLayer(layer)
+}
+func (b *TextBox) GetLayer() Core.Layer {
+	return b.graphics.GetLayer()
+}
 func (b *TextBox) loopTyping() {
 	channel := b.streamText.Get()
 	var key rune

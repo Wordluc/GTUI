@@ -10,7 +10,7 @@ import (
 
 type Button struct {
 	graphics    *Drawing.Container
-	visibleArea *Drawing.Rectangle
+	visibleArea *Drawing.RectangleFull
 	onClick     Core.OnEvent
 	onRelease   Core.OnEvent
 	onHover     Core.OnEvent
@@ -20,8 +20,10 @@ type Button struct {
 
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont := Drawing.CreateContainer(0, 0)
-	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
+	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
 	textD := Drawing.CreateTextField(0, 0,text)
+	textD.SetLayer(Core.L2)
+	rect.SetLayer(Core.L1)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2
 	textD.SetPos(xC, yC)
 	cont.AddChild(rect)
@@ -39,6 +41,12 @@ func (b *Button) SetPos(x, y int) {
 }
 func (b *Button) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
+}
+func (b *Button) GetLayer() Core.Layer {
+	return b.graphics.GetLayer()
+}
+func (b *Button) SetLayer(layer Core.Layer) {
+	b.graphics.SetLayer(layer)
 }
 func (b *Button) GetSize() (int, int) {
 	return b.visibleArea.GetSize()
@@ -88,7 +96,7 @@ func (b *Button) OnLeave() {
 func (b *Button) GetGraphics() Core.IDrawing {
 	return b.graphics
 }
-func (b *Button) GetVisibleArea() *Drawing.Rectangle {
+func (b *Button) GetVisibleArea() *Drawing.RectangleFull {
 	return b.visibleArea
 }
 func (b *Button) GetShape() (Core.IInteractiveShape, error) {
