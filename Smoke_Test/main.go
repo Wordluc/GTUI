@@ -20,7 +20,7 @@ func main() {
 	core, _ := GTUI.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
 	c,e := Component.CreateTextBox(30, 5, 20, 10, core.CreateStreamingCharacter())
-	c.SetLayer(Core.L3)
+	c.SetLayer(Core.L2)
 	if e != nil {
 		panic(e)
 	}
@@ -60,7 +60,7 @@ func main() {
 		})
 	})
 	button2=Component.CreateButton(105,0,10,10,"test")
-	button2.SetLayer(Core.L3)
+	button2.SetLayer(Core.L4)
 	button2.GetVisibleArea().SetInsideColor(Color.Blue)
 	button2.SetOnLeave(func() {
 		button2.GetVisibleArea().SetBorderColor(Color.Get(Color.Gray, Color.None))

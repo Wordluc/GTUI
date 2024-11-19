@@ -53,6 +53,9 @@ func (b *TextBox) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
 }
 func (b *TextBox) SetLayer(layer Core.Layer) {
+	if layer>Core.LMax{
+		layer=Core.LMax
+	}
 	b.graphics.SetLayer(layer)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }

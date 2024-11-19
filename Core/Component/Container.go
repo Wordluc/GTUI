@@ -34,6 +34,9 @@ func (c *Container) GetSize() (int,int) {
 	panic("mustn't be called")
 }
 func (b *Container) SetLayer(layer Core.Layer) {
+	if layer>Core.LMax{
+		layer=Core.LMax
+	}
 	diff:= layer - b.layer
 	for _,comp:=range b.components {
 		comp.SetLayer(comp.GetLayer()+diff)

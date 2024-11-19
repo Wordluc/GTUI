@@ -74,6 +74,9 @@ func (l *Rectangle) SetSize(x, y int) error {
 }
 
 func (b *Rectangle) SetLayer(layer Core.Layer) {
+	if layer>Core.LMax{
+		layer=Core.LMax
+	}
 	b.layer = layer
 	b.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
