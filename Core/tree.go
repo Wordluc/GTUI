@@ -213,11 +213,10 @@ func (d *TreeManager[T]) SearchAll(x,y int) ([]T, error) {
 		if d.root[layer] != nil {
 			group.Add(1)
 			go func (){
-				d.root[layer].executeForAll(func(node *TreeNode[T]) bool {
+				d.root[layer].execute(x,y,func(node *TreeNode[T]){
 					if node.isCollidingWithGroup(x,y,0,0){
 						results[layer]=append(results[layer],node.element)
 					}
-					return true
 				})
 				group.Done()
 			}()
