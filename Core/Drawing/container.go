@@ -2,7 +2,9 @@ package Drawing
 
 import (
 	"strings"
+
 	"github.com/Wordluc/GTUI/Core"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 
@@ -12,6 +14,7 @@ type Container struct {
 	children []Core.IDrawing
 	color    Color.Color
 	visible  bool
+	layer    Core.Layer
 }
 
 func CreateContainer( x, y int) *Container {
@@ -20,6 +23,7 @@ func CreateContainer( x, y int) *Container {
 		yPos:  y,
 		color: Color.GetNoneColor(),
 		visible: true,
+		layer: Core.L1,
 	}
 }
 
@@ -89,14 +93,26 @@ func (c *Container) SetPos(x, y int) {
 		xChild, yChild := child.GetPos()
 		child.SetPos(xChild+deltaX, yChild+deltaY)
 	}
+	EventManager.Call(EventManager.ReorganizeElements,[]any{c})
 	c.Touch()
 }
 
 func (c *Container) GetPos() (int, int) {
-
 	return c.xPos, c.yPos
 }
 
+func (b *Container) SetLayer(layer Core.Layer) {
+	diff := layer - b.layer
+	for _,comp:=range b.children {
+		comp.SetLayer(comp.GetLayer()+diff)
+	}
+	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	b.layer = layer
+}
+
+func (c *Container) GetLayer() Core.Layer {
+	return c.layer
+}
 func (c *Container) SetColor(color Color.Color) {
 	c.color = color
 	c.Touch()

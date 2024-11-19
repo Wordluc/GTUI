@@ -1,6 +1,19 @@
 package Core
 
 type OnEvent func()
+type IComponent interface {
+	OnClick()
+	OnRelease()
+	OnHover()
+	OnLeave()
+	GetGraphics() IDrawing
+	GetShape() (IInteractiveShape, error)
+	SetPos(x,y int)
+	GetPos() (int,int)
+	GetSize() (int,int)
+	GetLayer() Layer
+	SetLayer(layer Layer)
+}
 
 type IWritableComponent interface {
 	IsTyping() bool

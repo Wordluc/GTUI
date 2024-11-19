@@ -3,8 +3,8 @@ package Drawing
 import (
 	"slices"
 	"strings"
-
 	"github.com/Wordluc/GTUI/Core/EventManager"
+	"github.com/Wordluc/GTUI/Core"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -104,6 +104,7 @@ type TextBlock struct {
 	preLenght                int
 	tabSize                  int
 	wrap                     bool
+	layer                    Core.Layer
 }
 
 func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock {
@@ -150,6 +151,16 @@ func (t *TextBlock) SetPos(x, y int) {
 	t.yPos = y
 	t.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{t})
+}
+
+func (b *TextBlock) SetLayer(layer Core.Layer) {
+	b.layer = layer
+	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	b.Touch()
+}
+
+func (c *TextBlock) GetLayer() Core.Layer {
+	return c.layer
 }
 
 func (t *TextBlock) GetSize() (int, int) {

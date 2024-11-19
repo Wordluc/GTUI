@@ -2,8 +2,8 @@ package Drawing
 
 import (
 	"strings"
-
 	"github.com/Wordluc/GTUI/Core/EventManager"
+	"github.com/Wordluc/GTUI/Core"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -18,6 +18,7 @@ type RectangleFull struct {
 	Width       int
 	Height      int
 	visible     bool
+	layer       Core.Layer
 }
 
 func CreateRectangleFull(x, y, width, height int) *RectangleFull {
@@ -61,7 +62,11 @@ func (r *RectangleFull) GetAnsiCode(defaultColor Color.Color) string {
 func (r *RectangleFull) SetInsideColor(color Color.ColorValue) {
 	r.insideColor = Color.Get(Color.None, color)
 	r.Touch()
-	r.border.Touch()
+}
+
+func (r *RectangleFull) SetBorderColor(color Color.Color) {
+	r.border.SetColor(color)
+	r.Touch()
 }
 
 func (r *RectangleFull) GetColor() Color.Color {
@@ -84,6 +89,14 @@ func (r *RectangleFull) SetPos(x, y int) {
 	EventManager.Call(EventManager.ReorganizeElements,[]any{r})
 }
 
+func (b *RectangleFull) SetLayer(layer Core.Layer) {
+	b.layer = layer
+	b.Touch()
+	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+}
+func (c *RectangleFull) GetLayer() Core.Layer {
+	return c.layer
+}
 func (r *RectangleFull) SetSize(x, y int) {
 	r.Width = x
 	r.Height = y

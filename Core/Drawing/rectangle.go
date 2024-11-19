@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Wordluc/GTUI/Core/EventManager"
+	"github.com/Wordluc/GTUI/Core"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -18,6 +19,7 @@ type Rectangle struct {
 	width     int
 	height    int
 	visible   bool
+	layer     Core.Layer
 }
 
 func CreateRectangle(x, y, width, height int) *Rectangle {
@@ -69,6 +71,16 @@ func (l *Rectangle) SetSize(x, y int) error {
 	l.height = y
 	l.Touch()
 	return nil
+}
+
+func (b *Rectangle) SetLayer(layer Core.Layer) {
+	b.layer = layer
+	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	b.Touch()
+}
+
+func (c *Rectangle) GetLayer() Core.Layer {
+	return c.layer
 }
 
 func (c *Rectangle) SetColor(color Color.Color) {

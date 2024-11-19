@@ -15,6 +15,7 @@ const (
 type ElementTree interface {
 	GetPos() (int, int)
 	GetSize() (int, int)
+	GetLayer() Layer
 }
 type TreeNode[T ElementTree] struct {
 	nodeType typeTreeNode
@@ -112,6 +113,9 @@ func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
 
 // Iterate over all over the tree,if the function returns false the iteration stops
 func (d *TreeNode[T]) executeForAll(do func(node *TreeNode[T]) bool) *TreeNode[T] { //TODO:auto adjust tree structure
+	if d == nil {
+		return nil
+	}
 	if !do(d) {
 		return nil
 	}
@@ -162,46 +166,50 @@ type collisionChache[T ElementTree] struct {
 }
 
 type TreeManager[T ElementTree] struct {
-	root             *TreeNode[T]
+	root             [5]*TreeNode[T]
 	chachedCollision [5]collisionChache[T]
 	nextIndexToCache int
 }
 
 func CreateTreeManager[T ElementTree]() *TreeManager[T] {
 
-	return &TreeManager[T]{chachedCollision: [5]collisionChache[T]{}, nextIndexToCache: 0}
+	return &TreeManager[T]{
+		chachedCollision: [5]collisionChache[T]{},
+		nextIndexToCache: 0,
+	}
 }
 
 func (d *TreeManager[T]) AddElement(element T) {
-	if d.root == nil {
-		d.root = CreateNode(element, ByX)
+	layer := element.GetLayer()
+	if d.root[layer] == nil {
+		d.root[layer] = CreateNode(element, ByX)
 		return
 	}
-	d.root.addNode(element)
+	d.root[layer].addNode(element)
 }
 
 // Iterate over all nodes, if return false, it will stop iteration
-func (d *TreeManager[T]) Execute(cond func(node *TreeNode[T]) bool) {
-	d.root.executeForAll(cond)
+func (d *TreeManager[T]) Execute(layer Layer, cond func(node *TreeNode[T]) bool) {
+	d.root[layer].executeForAll(cond)
 }
 
-func (d *TreeManager[T]) Search(x, y int) ([]T, error) {
+func (d *TreeManager[T]) Search(layer Layer, x, y int) ([]T, error) {
 	var result []T
-	if d.root == nil {
+	if d.root[layer] == nil {
 		return nil, errors.New("Tree is empty")
 	}
-	result = d.root.search(x, y)
+	result = d.root[layer].search(x, y)
 	return result, nil
 }
 
-func (d *TreeManager[T]) GetCollidingElement(elementWhichCollides *TreeNode[T]) []T {
+func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *TreeNode[T]) []T {
 	var result []T
 	for i := range d.chachedCollision {
 		if d.chachedCollision[i].node == elementWhichCollides {
 			return d.chachedCollision[i].collisionElement
 		}
 	}
-	d.root.executeForAll(func(node *TreeNode[T]) bool {
+	d.root[layer].executeForAll(func(node *TreeNode[T]) bool {
 		x, y := node.element.GetPos()
 		xSize, ySize := node.element.GetSize()
 		if elementWhichCollides.isCollidingWithGroup(x, y, xSize, ySize) {
@@ -213,15 +221,19 @@ func (d *TreeManager[T]) GetCollidingElement(elementWhichCollides *TreeNode[T]) 
 	d.chachedCollision[d.nextIndexToCache] = collisionChache[T]{node: elementWhichCollides, collisionElement: result}
 	return result
 }
+
 func (d *TreeManager[T]) Refresh() {
-	var newRoot *TreeNode[T]
-	d.root.executeForAll(func(node *TreeNode[T]) bool {
-		if newRoot == nil {
-			newRoot = CreateNode(node.element, ByX)
-		} else {
-			newRoot.addNode(node.element)
-		}
+	newTree := CreateTreeManager[T]()
+	for layer := 0; layer < 5; layer++ {
+		d._refresh(Layer(layer),newTree)
+	}
+	d.root = newTree.root
+	d.nextIndexToCache=0
+	d.chachedCollision=newTree.chachedCollision
+}
+func (d *TreeManager[T]) _refresh(layer Layer,tree *TreeManager[T]){
+	d.root[layer].executeForAll(func(node *TreeNode[T]) bool {
+		tree.AddElement(node.element)
 		return true
 	})
-	d.root = newRoot
 }

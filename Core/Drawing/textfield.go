@@ -2,8 +2,8 @@ package Drawing
 
 import (
 	"strings"
-
 	"github.com/Wordluc/GTUI/Core/EventManager"
+	"github.com/Wordluc/GTUI/Core"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -16,6 +16,7 @@ type TextField struct {
 	YPos      int
 	text      string
 	visible   bool
+	layer     Core.Layer
 }
 
 func CreateTextField(x, y int,text string) *TextField {
@@ -26,6 +27,7 @@ func CreateTextField(x, y int,text string) *TextField {
 		color:     Color.GetDefaultColor(),
 		visible:   true,
 		text:      text,
+		layer:     Core.L1,
 	}
 }
 
@@ -49,7 +51,13 @@ func (s *TextField) SetPos(x, y int) {
 	s.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{s})
 }
-
+func (s *TextField) SetLayer(layer Core.Layer) {
+	s.layer = layer
+	EventManager.Call(EventManager.ReorganizeElements,[]any{s})
+}
+func (s *TextField) GetLayer() Core.Layer {
+	return s.layer
+}
 func (s *TextField) GetPos() (int, int) {
 	return s.XPos, s.YPos
 }
