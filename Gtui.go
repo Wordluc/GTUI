@@ -34,7 +34,7 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 		loop:             loop,
 		term:             term,
 		keyb:             keyb,
-		entityTree: Core.CreateTreeManager[Core.IEntity](Core.LMax, xSize, ySize, 4),
+		entityTree: Core.CreateTreeManager[Core.IEntity](Core.LMax, xSize, ySize, 3),
 		xCursor:          0,
 		yCursor:          0,
 		xSize:            xSize,

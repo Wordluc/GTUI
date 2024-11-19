@@ -27,16 +27,16 @@ type ElementTree interface {
 func isCollidingWithElement[T elementToCompare](x, y int, width, height int, t T) bool {
 	xEl, yEl := t.GetPos()
 	widthEl, heightEl := t.GetSize()
-	if x >= xEl && x < xEl+widthEl && y >= yEl && y <yEl+heightEl {
+	if x > xEl && x < xEl+widthEl && y >= yEl && y <yEl+heightEl {
 		return true
 	}
-	if x+width >= xEl && x+width < xEl+widthEl && y >= yEl && y < yEl+heightEl {
+	if x+width > xEl && x+width < xEl+widthEl && y >= yEl && y < yEl+heightEl {
 		return true
 	}
-	if x >= xEl && x < xEl+widthEl && y+height >= yEl && y+height < yEl+heightEl {
+	if x > xEl && x < xEl+widthEl && y+height >= yEl && y+height < yEl+heightEl {
 		return true
 	}
-	if x+width >= xEl && x+width < xEl+widthEl && y+height >= yEl && y+height < yEl+heightEl {
+	if x+width > xEl && x+width < xEl+widthEl && y+height >= yEl && y+height < yEl+heightEl {
 		return true
 	}
 	return false
@@ -278,11 +278,10 @@ func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides T
 			return result
 		}
 	}
-	//da sistemare!!!//da sistemare!!!
 	x, y := elementWhichCollides.GetPos()
 	width, height := elementWhichCollides.GetSize()
 	for _, el := range d.elements {
-		if isCollidingWithElement(x, y, width, height, el) {
+		if el.GetLayer()==layer && isCollidingWithElement(x, y, width, height, el) {
 			result = append(result, el)
 		}
 	}

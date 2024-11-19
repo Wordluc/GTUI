@@ -25,6 +25,7 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
 	textBox := Drawing.CreateTextBlock(1, 1, sizeX-2, sizeY-2, 10)
+	textBox.SetLayer(Core.L2)
 	if e := cont.AddChild(rect); e != nil {
 		return nil, e
 	}
