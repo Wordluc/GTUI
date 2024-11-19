@@ -54,6 +54,7 @@ func (b *TextBox) GetPos() (int, int) {
 }
 func (b *TextBox) SetLayer(layer Core.Layer) {
 	b.graphics.SetLayer(layer)
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
 func (b *TextBox) GetLayer() Core.Layer {
 	return b.graphics.GetLayer()

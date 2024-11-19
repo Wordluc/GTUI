@@ -22,8 +22,8 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
 	textD := Drawing.CreateTextField(0, 0,text)
-	textD.SetLayer(Core.L2)
 	rect.SetLayer(Core.L1)
+	textD.SetLayer(Core.L2)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2
 	textD.SetPos(xC, yC)
 	cont.AddChild(rect)
@@ -47,6 +47,7 @@ func (b *Button) GetLayer() Core.Layer {
 }
 func (b *Button) SetLayer(layer Core.Layer) {
 	b.graphics.SetLayer(layer)
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
 func (b *Button) GetSize() (int, int) {
 	return b.visibleArea.GetSize()

@@ -155,8 +155,8 @@ func (t *TextBlock) SetPos(x, y int) {
 
 func (b *TextBlock) SetLayer(layer Core.Layer) {
 	b.layer = layer
-	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
 	b.Touch()
+	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
 }
 
 func (c *TextBlock) GetLayer() Core.Layer {

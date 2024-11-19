@@ -82,8 +82,8 @@ func (l *Line) SetPos(x, y int) {
 
 func (b *Line) SetLayer(layer Core.Layer) {
 	b.layer = layer
-	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
 	b.Touch()
+	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
 }
 func (c *Line) GetLayer() Core.Layer {
 	return c.layer

@@ -93,8 +93,8 @@ func (c *Container) SetPos(x, y int) {
 		xChild, yChild := child.GetPos()
 		child.SetPos(xChild+deltaX, yChild+deltaY)
 	}
-	EventManager.Call(EventManager.ReorganizeElements,[]any{c})
 	c.Touch()
+	EventManager.Call(EventManager.ReorganizeElements, []any{c})
 }
 
 func (c *Container) GetPos() (int, int) {
@@ -106,8 +106,9 @@ func (b *Container) SetLayer(layer Core.Layer) {
 	for _,comp:=range b.children {
 		comp.SetLayer(comp.GetLayer()+diff)
 	}
-	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
 	b.layer = layer
+	b.Touch()
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
 
 func (c *Container) GetLayer() Core.Layer {
