@@ -55,33 +55,16 @@ func (c *Gtui) initializeEventManager() {
 }
 
 func (c *Gtui) SetCur(x, y int) error {
-	var setPos,keepGoing bool
-	var e error
-	for i:=4;i>=0;i--{
-		if keepGoing,setPos,e=c._setCur(x, y, Core.Layer(i));!keepGoing{
-			return e
-		}
-	}
-	if(!setPos){
-		return nil
-	}
-	c.yCursor = y
-	c.xCursor = x
-	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
-	return nil
-}
-
-func (c *Gtui) _setCur(x, y int,layer Core.Layer) (bool,bool,error) {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
-		return false,false,errors.New("cursor out of range")
+		return errors.New("cursor out of range")
 	}
 	if !c.cursorVisibility{
 		c.xCursor = x
 		c.yCursor = y
-		return false,false,nil
+		return nil
 	}
-	compPreSet, _ := c.entityTree.Search(layer,c.xCursor, c.yCursor)
-	compsPostSet, _ := c.entityTree.Search(layer,x, y)
+	compPreSet, _ := c.entityTree.SearchAll(c.xCursor, c.yCursor)
+	compsPostSet, _ := c.entityTree.SearchAll(x, y)
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
 	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
 	var comp Core.IComponent
@@ -105,7 +88,7 @@ func (c *Gtui) _setCur(x, y int,layer Core.Layer) (bool,bool,error) {
 		if ci, ok := inPreButNotInPost[i].(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
-				return false,false,nil
+				return nil
 			} else {
 				comp.OnLeave()
 			}
@@ -118,13 +101,16 @@ func (c *Gtui) _setCur(x, y int,layer Core.Layer) (bool,bool,error) {
 		if ci, ok := comp.(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
 				c.xCursor, c.yCursor = ci.SetCurrentPosCursor(x, y)
-				return false,false,nil
+				return nil
 			}
 			break
 		}
 	}
 
-	return true,true,nil
+	c.yCursor = y
+	c.xCursor = x
+	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
+	return nil
 }
 
 func (c *Gtui) GetCur() (int, int) {
@@ -166,7 +152,7 @@ func (c *Gtui) InsertEntity(entityToAdd Core.IDrawing) {
 func (c *Gtui) InsertComponent(componentToAdd Core.IComponent) error {
 	if container, ok := componentToAdd.(*Component.Container); ok {
 		for _, component := range container.GetComponents() {
-			c.entityTree.AddElement(component)
+			c.InsertComponent(component)
 			component.OnLeave()
 		}
 		c.InsertEntity(componentToAdd.GetGraphics())
@@ -252,17 +238,27 @@ func (c *Gtui) _allineCursor(layer Core.Layer) bool {
 	return false
 }
 
-func (c *Gtui) refresh(onlyTouched bool) {//TODO: optimize
+func (c *Gtui) refresh(onlyTouched bool)error {//TODO: optimize
+	var str strings.Builder
 	for i:=0;i<5;i++{
-		c._refresh(Core.Layer(i),onlyTouched);
+		s:=c._refresh(Core.Layer(i),false);
+		str.WriteString(s.String())
 	}
+	if c.cursorVisibility {
+		str.WriteString(c.term.ShowCursor())
+	}else{
+		str.WriteString(c.term.HideCursor())
+	}
+	//DO NOT CHANGE THE ORDER
+	c.term.PrintStr(str.String())
+	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
+	return nil
 }
 
-func (c *Gtui) _refresh(layer Core.Layer,onlyTouched bool)bool {
+func (c *Gtui) _refresh(layer Core.Layer,onlyTouched bool)(strings.Builder) {
 	var str strings.Builder
 	var drawing Core.IDrawing
 	var ok bool
-	var drawn bool
 	var elementToRefresh map[Core.IDrawing]struct{} = make(map[Core.IDrawing]struct{})
 	cond := func(node *Core.TreeNode[Core.IEntity]) bool {
 		var el Core.IDrawing
@@ -277,7 +273,6 @@ func (c *Gtui) _refresh(layer Core.Layer,onlyTouched bool)bool {
 		str.WriteString(c.ClearZone(x, y, width, height))
 		str.WriteString(el.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
-		drawn = true
 		for _, child := range c.entityTree.GetCollidingElement(layer,node) {
 			if drawing, ok = child.(Core.IDrawing); ok {
 				elementToRefresh[drawing] = struct{}{}
@@ -290,15 +285,7 @@ func (c *Gtui) _refresh(layer Core.Layer,onlyTouched bool)bool {
 		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 	}
-	if c.cursorVisibility {
-		str.WriteString(c.term.ShowCursor())
-	}else{
-		str.WriteString(c.term.HideCursor())
-	}
-	//DO NOT CHANGE THE ORDER
-	c.term.PrintStr(str.String())
-	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
-	return drawn
+	return str
 }
 
 func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
