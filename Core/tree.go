@@ -3,6 +3,7 @@ package Core
 import (
 	"errors"
 	"sort"
+	"sync"
 )
 
 type typeTreeNode bool
@@ -199,6 +200,27 @@ func (d *TreeManager[T]) Search(layer Layer, x, y int) ([]T, error) {
 		return nil, errors.New("Tree is empty")
 	}
 	result = d.root[layer].search(x, y)
+	return result, nil
+}
+
+func (d *TreeManager[T]) SearchAll(x,y int) ([]T, error) {
+	var results [][]T=make([][]T,5)
+	var group sync.WaitGroup=sync.WaitGroup{}
+	for layer := 0; layer < 5; layer++ {
+		if d.root[layer] != nil {
+			group.Add(1)
+			go func (){
+				res:=d.root[layer].search(x, y)
+				results[layer]=res
+				group.Done()
+			}()
+		}
+	}
+	group.Wait()
+	var result []T
+	for _,res:=range results{
+		result = append(result, res...)
+	}
 	return result, nil
 }
 
