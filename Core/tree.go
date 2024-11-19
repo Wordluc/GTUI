@@ -44,7 +44,7 @@ func CreateNode[T ElementTree](element T, typeNode typeTreeNode) *TreeNode[T] {
 	}
 }
 
-func (t *TreeNode[T]) isCollidingWithGroup(x, y int, width, height int) bool {
+func (t *TreeNode[T]) isCollidingWithNode(x, y int, width, height int) bool {
 	if x > t.xPos && x < t.xPos+t.width && y > t.yPos && y < t.yPos+t.height {
 		return true
 	}
@@ -55,14 +55,6 @@ func (t *TreeNode[T]) isCollidingWithGroup(x, y int, width, height int) bool {
 		return true
 	}
 	if x+width > t.xPos && x+width < t.xPos+t.width && y+height > t.yPos && y+height < t.yPos+t.height {
-		return true
-	}
-	return false
-}
-func (t *TreeNode[T]) isElementColliding(x, y int) bool {
-	width, height := t.element.GetSize()
-	xPos, yPos := t.element.GetPos()
-	if x > xPos && x < xPos+width && y > yPos && y < yPos+height {
 		return true
 	}
 	return false
@@ -93,7 +85,7 @@ func (d *TreeNode[T]) addNodes(elements []T) {
 func (d *TreeNode[T]) search(x, y int) []T {
 	var result []T
 	d.execute(x, y, func(node *TreeNode[T]) {
-		if isColliding := node.isElementColliding(x, y); isColliding {
+		if isColliding := node.isCollidingWithNode(x, y, 0, 0); isColliding {
 			if isColliding {
 				result = append(result, node.element)
 			}
@@ -104,10 +96,10 @@ func (d *TreeNode[T]) search(x, y int) []T {
 func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
 	do(d)
 	xPosElNode, yPosElNode := d.element.GetPos()
-	if d.smaller != nil && ((d.nodeType == ByY && x < xPosElNode) || (d.nodeType == ByX && y < yPosElNode) || d.smaller.isCollidingWithGroup(x, y, 0, 0)) {
+	if d.smaller != nil && ((d.nodeType == ByY && x < xPosElNode) || (d.nodeType == ByX && y < yPosElNode) || d.smaller.isCollidingWithNode(x, y, 0, 0)) {
 		d.smaller.execute(x, y, do)
 	}
-	if d.bigger != nil && ((d.nodeType == ByY && x >= xPosElNode) || (d.nodeType == ByX && y >= yPosElNode) || d.bigger.isCollidingWithGroup(x, y, 0, 0)) {
+	if d.bigger != nil && ((d.nodeType == ByY && x >= xPosElNode) || (d.nodeType == ByX && y >= yPosElNode) || d.bigger.isCollidingWithNode(x, y, 0, 0)) {
 		d.bigger.execute(x, y, do)
 	}
 }
@@ -214,7 +206,7 @@ func (d *TreeManager[T]) SearchAll(x, y int) ([]T, error) {
 			group.Add(1)
 			go func() {
 				d.root[layer].execute(x, y, func(node *TreeNode[T]) {
-					if node.isCollidingWithGroup(x, y, 0, 0) {
+					if node.isCollidingWithNode(x, y, 0, 0) {
 						results[layer] = append(results[layer], node.element)
 					}
 				})
@@ -240,7 +232,7 @@ func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *
 	d.root[layer].executeForAll(func(node *TreeNode[T]) bool {
 		x, y := node.element.GetPos()
 		xSize, ySize := node.element.GetSize()
-		if elementWhichCollides.isCollidingWithGroup(x, y, xSize, ySize) {
+		if elementWhichCollides.isCollidingWithNode(x, y, xSize, ySize) {
 			result = append(result, node.element)
 		}
 		return true
