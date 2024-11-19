@@ -112,7 +112,7 @@ func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
 	}
 }
 
-// Iterate over all over the tree,if the function returns false the iteration stops
+// Iterate over all over the tree,if the function returns false the iteration will stop
 func (d *TreeNode[T]) executeForAll(do func(node *TreeNode[T]) bool) *TreeNode[T] { //TODO:auto adjust tree structure
 	if d == nil {
 		return nil
@@ -210,8 +210,12 @@ func (d *TreeManager[T]) SearchAll(x,y int) ([]T, error) {
 		if d.root[layer] != nil {
 			group.Add(1)
 			go func (){
-				res:=d.root[layer].search(x, y)
-				results[layer]=res
+				d.root[layer].executeForAll(func(node *TreeNode[T]) bool {
+					if node.isCollidingWithGroup(x,y,0,0){
+						results[layer]=append(results[layer],node.element)
+					}
+					return true
+				})
 				group.Done()
 			}()
 		}
