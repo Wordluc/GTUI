@@ -261,23 +261,21 @@ func (c *Gtui) _refresh(layer Core.Layer,onlyTouched bool)(strings.Builder,bool)
 	var str strings.Builder
 	var drawing Core.IDrawing
 	var ok bool
-	var draw bool
+	var drew bool
 	var elementToRefresh map[Core.IDrawing]struct{} = make(map[Core.IDrawing]struct{})
 	cond := func(node *Core.TreeNode[Core.IEntity]) bool {
-		var el Core.IDrawing
 		if drawing, ok = node.GetElement().(Core.IDrawing); !ok {
 			return true
 		}
-		el = drawing
-		if el = drawing; !el.IsTouched() && onlyTouched {
+		if !drawing.IsTouched() && onlyTouched {
 			return true
 		}
-		x, y := el.GetPos()
-		width, height := el.GetSize()
+		x, y := drawing.GetPos()
+		width, height := drawing.GetSize()
 		str.WriteString(c.ClearZone(x, y, width, height))
-		str.WriteString(el.GetAnsiCode(c.globalColor))
+		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
-		draw = true
+		drew = true
 		for _, child := range c.entityTree.GetCollidingElement(layer,node) {
 			if drawing, ok = child.(Core.IDrawing); ok {
 				elementToRefresh[drawing] = struct{}{}
@@ -290,7 +288,7 @@ func (c *Gtui) _refresh(layer Core.Layer,onlyTouched bool)(strings.Builder,bool)
 		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 	}
-	return str,draw
+	return str,drew
 }
 
 func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
