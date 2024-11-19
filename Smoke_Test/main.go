@@ -42,7 +42,7 @@ func main() {
 	}
 	comp=compComponent
 	button1:=Component.CreateButton(100,0,10,10,"test")
-	button1.SetLayer(Core.L2)
+	button1.SetLayer(Core.L4)
 	button1.GetVisibleArea().SetInsideColor(Color.White)
 	button1.SetOnLeave(func() {
 		button1.GetVisibleArea().SetBorderColor(Color.Get(Color.Gray, Color.None))
