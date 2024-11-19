@@ -80,8 +80,7 @@ func (c *Gtui) SetCur(x, y int) error {
 		}
 		comp.OnHover()
 	}
-	lenInPreButNotInPost := len(inPreButNotInPost)
-	for i := 0; i < lenInPreButNotInPost; i++ {
+	for i := 0; i < len(inPreButNotInPost); i++ {
 		if comp, ok = inPreButNotInPost[i].(Core.IComponent); !ok {
 			continue
 		}
@@ -164,10 +163,6 @@ func (c *Gtui) InsertComponent(componentToAdd Core.IComponent) error {
 	return nil
 }
 
-func (c *Gtui) reorganizeTree() {
-	c.entityTree.Refresh()
-}
-
 func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
 	for i:=Core.LMax-1;i>=0;i--{
 		if isDone,e:=c._callEventOn(x, y, Core.Layer(i), event);isDone{
@@ -176,6 +171,7 @@ func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
 	}
 	return nil
 }
+
 func (c *Gtui) _callEventOn(x, y int,layer Core.Layer, event func(Core.IComponent)) (bool,error) {
 	resultArray, e := c.entityTree.Search(layer,x, y)
 	if e != nil {
