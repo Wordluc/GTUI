@@ -206,16 +206,16 @@ func (d *TreeManager[T]) Search(layer Layer, x, y int) ([]T, error) {
 	return result, nil
 }
 
-func (d *TreeManager[T]) SearchAll(x,y int) ([]T, error) {
-	var results [][]T=make([][]T,d.nLayer)
-	var group sync.WaitGroup=sync.WaitGroup{}
+func (d *TreeManager[T]) SearchAll(x, y int) ([]T, error) {
+	var results [][]T = make([][]T, d.nLayer)
+	var group sync.WaitGroup = sync.WaitGroup{}
 	for layer := 0; layer < int(d.nLayer); layer++ {
 		if d.root[layer] != nil {
 			group.Add(1)
-			go func (){
-				d.root[layer].execute(x,y,func(node *TreeNode[T]){
-					if node.isCollidingWithGroup(x,y,0,0){
-						results[layer]=append(results[layer],node.element)
+			go func() {
+				d.root[layer].execute(x, y, func(node *TreeNode[T]) {
+					if node.isCollidingWithGroup(x, y, 0, 0) {
+						results[layer] = append(results[layer], node.element)
 					}
 				})
 				group.Done()
@@ -224,7 +224,7 @@ func (d *TreeManager[T]) SearchAll(x,y int) ([]T, error) {
 	}
 	group.Wait()
 	var result []T
-	for _,res:=range results{
+	for _, res := range results {
 		result = append(result, res...)
 	}
 	return result, nil
@@ -253,13 +253,11 @@ func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *
 func (d *TreeManager[T]) Refresh() {
 	newTree := CreateTreeManager[T](d.nLayer)
 	for layer := 0; layer < int(d.nLayer); layer++ {
-		d._refresh(Layer(layer),newTree)
+		d._refresh(Layer(layer), newTree)
 	}
-	d.root = newTree.root
-	d.nextIndexToCache=0
-	d.chachedCollision=newTree.chachedCollision
+	*(&(*d))=(*newTree) //deep copy
 }
-func (d *TreeManager[T]) _refresh(layer Layer,tree *TreeManager[T]){
+func (d *TreeManager[T]) _refresh(layer Layer, tree *TreeManager[T]) {
 	d.root[layer].executeForAll(func(node *TreeNode[T]) bool {
 		tree.AddElement(node.element)
 		return true
