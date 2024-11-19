@@ -255,7 +255,7 @@ func (d *TreeManager[T]) Refresh() {
 	for layer := 0; layer < int(d.nLayer); layer++ {
 		d._refresh(Layer(layer), newTree)
 	}
-	*(&(*d))=(*newTree) //deep copy
+	(*d)=(*newTree) //deep copy
 }
 func (d *TreeManager[T]) _refresh(layer Layer, tree *TreeManager[T]) {
 	d.root[layer].executeForAll(func(node *TreeNode[T]) bool {
