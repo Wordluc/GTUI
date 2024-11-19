@@ -34,7 +34,7 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 		loop:             loop,
 		term:             term,
 		keyb:             keyb,
-		entityTree: Core.CreateTreeManager[Core.IEntity](Core.LMax, xSize, ySize, 10),
+		entityTree: Core.CreateTreeManager[Core.IEntity](Core.LMax, xSize, ySize, 4),
 		xCursor:          0,
 		yCursor:          0,
 		xSize:            xSize,
@@ -260,21 +260,23 @@ func (c *Gtui) _refresh(layer Core.Layer,onlyTouched bool)(strings.Builder,bool)
 	var drew bool
 	var elementToRefresh map[Core.IDrawing]struct{} = make(map[Core.IDrawing]struct{})
 	cond := func(node *Core.TreeNode[Core.IEntity]) bool {
-		if drawing, ok = node.GetElement().(Core.IDrawing); !ok {
-			return true
-		}
-		if !drawing.IsTouched() && onlyTouched {
-			return true
-		}
-		x, y := drawing.GetPos()
-		width, height := drawing.GetSize()
-		str.WriteString(c.ClearZone(x, y, width, height))
-		str.WriteString(drawing.GetAnsiCode(c.globalColor))
-		str.WriteString(c.globalColor.GetAnsiColor())
-		drew = true
-		for _, child := range c.entityTree.GetCollidingElement(layer,node) {
-			if drawing, ok = child.(Core.IDrawing); ok {
-				elementToRefresh[drawing] = struct{}{}
+		for _,ele := range node.GetElements() {
+			if drawing, ok = ele.(Core.IDrawing); !ok {
+				continue
+			}
+			if !drawing.IsTouched() && onlyTouched {
+				return true
+			}
+			x, y := drawing.GetPos()
+			width, height := drawing.GetSize()
+			str.WriteString(c.ClearZone(x, y, width, height))
+			str.WriteString(drawing.GetAnsiCode(c.globalColor))
+			str.WriteString(c.globalColor.GetAnsiColor())
+			drew = true
+			for _, child := range c.entityTree.GetCollidingElement(layer,ele) {//da sistemare 
+				if drawing, ok = child.(Core.IDrawing); ok {
+					elementToRefresh[drawing] = struct{}{}
+				}
 			}
 		}
 		return true
