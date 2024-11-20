@@ -13,6 +13,20 @@ import (
 	"github.com/Wordluc/GTUI/Terminal"
 )
 
+func setDefaultEventButton(b *Component.Button,idle Color.ColorValue,active Color.ColorValue,click Color.ColorValue) {
+	b.SetOnHover(func() {
+		b.GetVisibleArea().SetBorderColor(Color.Get(active, Color.None))
+	})
+	b.SetOnLeave(func() {
+		b.GetVisibleArea().SetBorderColor(Color.Get(idle, Color.None))
+	})
+	b.SetOnClick(func() {
+		b.GetVisibleArea().SetBorderColor(Color.Get(click, Color.None))
+	})
+	b.SetOnRelease(func() {
+		b.GetVisibleArea().SetBorderColor(Color.Get(idle, Color.None))
+	})
+}
 var comp Core.IComponent
 var button2 *Component.Button
 var modal Core.IComponent
@@ -94,31 +108,9 @@ func main() {
 	cont:=Component.CreateContainer(0,0)
 	cont.AddDrawing(Drawing.CreateTextField(10,0,"modal"))
 	ok:=Component.CreateButton(0,5,10,3,"ok")
-	ok.SetOnClick(func() {
-		ok.GetVisibleArea().SetBorderColor(Color.Get(Color.Red, Color.None))
-	})
-	ok.SetOnRelease(func() {
-		ok.GetVisibleArea().SetBorderColor(Color.Get(Color.Gray, Color.None))
-	})
-	ok.SetOnLeave(func() {
-		ok.GetVisibleArea().SetBorderColor(Color.Get(Color.Gray, Color.None))
-	})
-	ok.SetOnHover(func() {
-		ok.GetVisibleArea().SetBorderColor(Color.Get(Color.White, Color.None))
-	})
+	setDefaultEventButton(ok,Color.Gray,Color.White,Color.Red)
 	esplodi:=Component.CreateButton(18,5,10,3,"esplodi")
-	esplodi.SetOnClick(func() {
-		esplodi.GetVisibleArea().SetBorderColor(Color.Get(Color.Red, Color.None))
-	})
-	esplodi.SetOnRelease(func() {
-		esplodi.GetVisibleArea().SetBorderColor(Color.Get(Color.Gray, Color.None))
-	})
-	esplodi.SetOnLeave(func() {
-		esplodi.GetVisibleArea().SetBorderColor(Color.Get(Color.Gray, Color.None))
-	})
-	esplodi.SetOnHover(func() {
-		esplodi.GetVisibleArea().SetBorderColor(Color.Get(Color.White, Color.None))
-	})
+	setDefaultEventButton(esplodi,Color.Gray,Color.White,Color.Red)
 	cont.AddComponent(esplodi)
 	cont.AddComponent(ok)
 	modal=Component.CreateModal(10,20,30,10,cont)
