@@ -2,7 +2,6 @@ package Component
 
 import (
 	"time"
-
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
@@ -17,7 +16,6 @@ type Button struct {
 	onLeave     Core.OnEvent
 	isClicked   bool
 }
-
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
