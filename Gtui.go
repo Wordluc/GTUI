@@ -148,18 +148,23 @@ func (c *Gtui) InsertEntity(entityToAdd Core.IDrawing) {
 	c.entityTree.AddElement(entityToAdd)
 }
 
+
 func (c *Gtui) InsertComponent(componentToAdd Core.IComponent) error {
 	if container, ok := componentToAdd.(*Component.Container); ok {
 		for _, component := range container.GetComponents() {
-			c.InsertComponent(component)
-			component.OnLeave()
+			c._insertComponent(component)
 		}
 		c.InsertEntity(componentToAdd.GetGraphics())
-	} else {
-		componentToAdd.OnLeave()
-		c.entityTree.AddElement(componentToAdd)
-		c.InsertEntity(componentToAdd.GetGraphics())
+		return nil
 	}
+	c._insertComponent(componentToAdd)
+	return nil
+}
+
+func (c *Gtui) _insertComponent(componentToAdd Core.IComponent) error {
+	c.InsertEntity(componentToAdd.GetGraphics())
+	componentToAdd.OnLeave()
+	c.entityTree.AddElement(componentToAdd)
 	return nil
 }
 

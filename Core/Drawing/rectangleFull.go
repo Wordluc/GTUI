@@ -50,8 +50,8 @@ func (r *RectangleFull) GetAnsiCode(defaultColor Color.Color) string {
 	}
 	if r.isChanged {
 		var str strings.Builder
-		str.WriteString(r.getAnsiRectangle(defaultColor))
 		str.WriteString(r.border.GetAnsiCode(defaultColor))
+		str.WriteString(r.getAnsiRectangle(defaultColor))
 		str.WriteString(Color.GetResetColor())
 		r.ansiCode = str.String()
 		r.isChanged = false
