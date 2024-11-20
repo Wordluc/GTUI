@@ -2,6 +2,9 @@ package GTUI
 
 import (
 	"errors"
+	"strings"
+	"sync"
+
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
 	"github.com/Wordluc/GTUI/Core/Drawing"
@@ -10,7 +13,6 @@ import (
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"github.com/Wordluc/GTUI/Keyboard"
 	"github.com/Wordluc/GTUI/Terminal"
-	"strings"
 )
 
 type Loop func(Keyboard.IKeyBoard, *Gtui) bool
@@ -53,8 +55,17 @@ func (c *Gtui) initializeEventManager() {
 
 	EventManager.Subscribe(EventManager.ReorganizeElements, 100, func(comp []any) {
 		c.IClear()
-		c.drawingTree.Refresh()
-		c.componentTree.Refresh()
+		group:=sync.WaitGroup{}
+		group.Add(2)
+		go func(){
+			c.drawingTree.Refresh()
+			group.Done()
+		}()
+		go func(){
+			c.componentTree.Refresh()
+			group.Done()
+		}()
+		group.Wait()
 		c.refresh(false)
 	})
 }
@@ -259,7 +270,6 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 	cond := func(node *Core.TreeNode[Core.IDrawing]) bool {
 		drawing = node.GetElement()
 		if onlyTouched && !drawing.IsTouched() {
-			print("\a")
 			return true
 		}
 		x, y := drawing.GetPos()
