@@ -20,7 +20,7 @@ func main() {
 	core, _ := GTUI.NewGtui(loop, kbr, &Terminal.Terminal{})
 	xS, yS := 50, 40
 	c,e := Component.CreateTextBox(30, 5, 20, 10, core.CreateStreamingCharacter())
-	c.SetLayer(Core.L2)
+	c.SetLayer(Core.L3)
 	if e != nil {
 		panic(e)
 	}
@@ -78,13 +78,13 @@ func main() {
 		})
 	})
 	comp.SetPos(10,10)
-	if e := core.InsertComponent(compComponent); e != nil {
+	if e := core.AddComponent(compComponent); e != nil {
 		panic(e)
 	}
-	if e:=core.InsertComponent(button1);e!=nil{
+	if e:=core.AddComponent(button1);e!=nil{
 		panic(e)
 	}
-	if e:=core.InsertComponent(button2);e!=nil{
+	if e:=core.AddComponent(button2);e!=nil{
 		panic(e)
 	}
 	if e := core.SetCur(1, 1); e != nil {
