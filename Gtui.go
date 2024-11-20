@@ -48,14 +48,14 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 
 func (c *Gtui) initializeEventManager() {
 	EventManager.Subscribe(EventManager.Refresh, 100, func(comp []any) {
-		c.refresh()
+		c.refresh(true)
 	})
 
 	EventManager.Subscribe(EventManager.ReorganizeElements, 100, func(comp []any) {
 		c.IClear()
 		c.drawingTree.Refresh()
 		c.componentTree.Refresh()
-		c.refresh()
+		c.refresh(false)
 	})
 }
 
@@ -131,7 +131,7 @@ func (c *Gtui) Start() {
 	c.initializeEventManager()
 	c.term.Start()
 	c.term.Clear()
-	c.refresh()
+	c.refresh(true)
 	c.keyb.Start(c.innerLoop)
 	c.term.Stop()
 }
@@ -229,11 +229,15 @@ func (c *Gtui) _allineCursor(layer Core.Layer) bool {
 	return false
 }
 
-func (c *Gtui) refresh() error { //TODO: optimize
+func (c *Gtui) refresh(onlyTouched bool) error { //TODO: optimize
 	var str strings.Builder
 	var s strings.Builder
+	var drew bool
 	for i := 0; i < c.componentTree.GetLayerN(); i++ {
-		s, _ = c.refreshLayer(Core.Layer(i), false)
+		s, drew = c.refreshLayer(Core.Layer(i), onlyTouched)
+		if drew {
+			onlyTouched = false
+		}
 		str.WriteString(s.String())
 	}
 	if c.cursorVisibility {
@@ -254,7 +258,8 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 	var elementToRefresh map[Core.IDrawing]struct{} = make(map[Core.IDrawing]struct{})
 	cond := func(node *Core.TreeNode[Core.IDrawing]) bool {
 		drawing = node.GetElement()
-		if !drawing.IsTouched() && onlyTouched {
+		if onlyTouched && !drawing.IsTouched() {
+			print("\a")
 			return true
 		}
 		x, y := drawing.GetPos()
@@ -283,6 +288,6 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	if !c.loop(c.keyb, c) {
 		return false
 	}
-	c.refresh()
+	c.refresh(true)
 	return true
 }

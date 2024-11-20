@@ -22,6 +22,7 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
 	textD := Drawing.CreateTextField(0, 0,text)
+	rect.SetLayer(Core.L1)
 	textD.SetLayer(Core.L2)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2
 	textD.SetPos(xC, yC)
