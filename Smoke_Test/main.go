@@ -60,7 +60,7 @@ func main() {
 		})
 	})
 	button2=Component.CreateButton(62,15,10,10,"test")
-	button2.SetLayer(Core.L2)
+	button2.SetLayer(Core.L1)
 	button2.GetVisibleArea().SetInsideColor(Color.Blue)
 	button2.SetOnLeave(func() {
 		button2.GetVisibleArea().SetBorderColor(Color.Get(Color.Gray, Color.None))
@@ -88,6 +88,14 @@ func main() {
 		panic(e)
 	}
 	if e := core.SetCur(1, 1); e != nil {
+		panic(e)
+	}
+	cont:=Component.CreateContainer(0,0)
+	cont.AddDrawing(Drawing.CreateTextField(10,0,"modal"))
+	cont.AddComponent(Component.CreateButton(0,5,10,3,"ok"))
+	cont.AddComponent(Component.CreateButton(18,5,10,3,"esplodi"))
+	modal:=Component.CreateModal(10,20,30,10,cont)
+	if e:=core.AddComponent(modal);e!=nil{
 		panic(e)
 	}
 	core.Start()

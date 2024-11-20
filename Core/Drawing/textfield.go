@@ -52,9 +52,6 @@ func (s *TextField) SetPos(x, y int) {
 	EventManager.Call(EventManager.ReorganizeElements,[]any{s})
 }
 func (s *TextField) SetLayer(layer Core.Layer) {
-	if layer>Core.LMax{
-		layer=Core.LMax
-	}
 	s.layer = layer
 	s.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{s})

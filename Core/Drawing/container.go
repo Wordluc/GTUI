@@ -102,9 +102,6 @@ func (c *Container) GetPos() (int, int) {
 }
 
 func (b *Container) SetLayer(layer Core.Layer) {
-	if layer>Core.LMax{
-		layer=Core.LMax
-	}
 	diff := layer - b.layer
 	for _,comp:=range b.children {
 		comp.SetLayer(comp.GetLayer()+diff)

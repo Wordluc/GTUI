@@ -157,21 +157,25 @@ type TreeManager[T ElementTree] struct {
 	root             []*TreeNode[T]
 	chachedCollision [5]collisionChache[T]
 	nextIndexToCache int
-	nLayer           Layer
 }
-
-func CreateTreeManager[T ElementTree](nLayer Layer) *TreeManager[T] {
+func (d *TreeManager[T]) GetLayerN() int {
+	return len(d.root)+1
+	
+}
+func CreateTreeManager[T ElementTree]() *TreeManager[T] {
 
 	return &TreeManager[T]{
 		chachedCollision: [5]collisionChache[T]{},
 		nextIndexToCache: 0,
-		root:             make([]*TreeNode[T], nLayer),
-		nLayer:           nLayer,
+		root:             make([]*TreeNode[T], 1),
 	}
 }
 
 func (d *TreeManager[T]) AddElement(element T) {
 	layer := element.GetLayer()
+	for int(layer) >= len(d.root) {
+		d.root = append(d.root, nil)
+	}
 	if d.root[layer] == nil {
 		d.root[layer] = CreateNode(element, ByX)
 		return
@@ -181,11 +185,17 @@ func (d *TreeManager[T]) AddElement(element T) {
 
 // Iterate over all nodes, if return false, it will stop iteration
 func (d *TreeManager[T]) Execute(layer Layer, cond func(node *TreeNode[T]) bool) {
+	if int(layer) >= len(d.root) {
+		return
+	}
 	d.root[layer].executeForAll(cond)
 }
 
 func (d *TreeManager[T]) Search(layer Layer, x, y int) ([]T, error) {
 	var result []T
+	if int(layer) >= len(d.root) {
+		return result,nil
+	}
 	if d.root[layer] == nil {
 		return nil, errors.New("Tree is empty")
 	}
@@ -194,9 +204,9 @@ func (d *TreeManager[T]) Search(layer Layer, x, y int) ([]T, error) {
 }
 
 func (d *TreeManager[T]) SearchAll(x, y int) ([]T, error) {
-	var results [][]T = make([][]T, d.nLayer)
+	var results [][]T = make([][]T, len(d.root))
 	var group sync.WaitGroup = sync.WaitGroup{}
-	for layer := 0; layer < int(d.nLayer); layer++ {
+	for layer := 0; layer < len(d.root); layer++ {
 		if d.root[layer] == nil {
 			continue
 		}
@@ -240,8 +250,8 @@ func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *
 }
 
 func (d *TreeManager[T]) Refresh() {
-	newTree := CreateTreeManager[T](d.nLayer)
-	for layer := 0; layer < int(d.nLayer); layer++ {
+	newTree := CreateTreeManager[T]()
+	for layer := 0; layer < len(d.root); layer++ {
 		d._refresh(Layer(layer), newTree)
 	}
 	(*d) = (*newTree) //deep copy

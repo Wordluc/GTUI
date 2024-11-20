@@ -22,7 +22,6 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
 	textD := Drawing.CreateTextField(0, 0,text)
-	rect.SetLayer(Core.L1)
 	textD.SetLayer(Core.L2)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2
 	textD.SetPos(xC, yC)
@@ -46,9 +45,6 @@ func (b *Button) GetLayer() Core.Layer {
 	return b.graphics.GetLayer()
 }
 func (b *Button) SetLayer(layer Core.Layer) {
-	if layer>Core.LMax{
-		layer=Core.LMax
-	}
 	b.graphics.SetLayer(layer)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
@@ -72,17 +68,19 @@ func (b *Button) OnClick() {
 	if b.isClicked {
 		return
 	}
-	if b.onClick != nil {
-		b.onClick()
+	if b.onClick == nil {
+		return
 	}
-	b.isClicked = true
+	b.onClick()
 	time.AfterFunc(time.Millisecond*500, func() {
 		b.OnRelease()
 		EventManager.Call(EventManager.Refresh, []any{b})
 	})
+	b.isClicked = true
 }
 func (b *Button) OnRelease() {
-	if b.onRelease != nil {
+	if b.onRelease == nil {
+		return
 	}
 	b.isClicked = false
 	b.onRelease()
