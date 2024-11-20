@@ -155,6 +155,7 @@ func (c *Gtui) InsertComponent(componentToAdd Core.IComponent) error {
 		c.InsertEntity(componentToAdd.GetGraphics())
 		return nil
 	}
+	//DO NOT CHANGE ORDER
 	c.InsertEntity(componentToAdd.GetGraphics())
 	c.entityTree.AddElement(componentToAdd)
 	componentToAdd.OnLeave()
