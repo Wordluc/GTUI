@@ -9,8 +9,7 @@ const (
 	modalL2
 	
 )
-
-func CreateModal(x, y, sizeX, sizeY int,content *Container) *Container {
+func CreateModal(x, y, sizeX, sizeY int,content *Container) Core.IComponent {
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
 	null := CreateNullComponent(0, 0, sizeX, sizeY)
 	contComp:= CreateContainer(0,0)
