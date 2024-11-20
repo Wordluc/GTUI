@@ -59,7 +59,7 @@ func main() {
 			button1.OnRelease()
 		})
 	})
-	button2=Component.CreateButton(105,0,10,10,"test")
+	button2=Component.CreateButton(62,15,10,10,"test")
 	button2.SetLayer(Core.L2)
 	button2.GetVisibleArea().SetInsideColor(Color.Blue)
 	button2.SetOnLeave(func() {

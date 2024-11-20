@@ -88,23 +88,34 @@ func (d *TreeNode[T]) search(x, y int) []T {
 	var result []T
 	d.execute(x, y, func(node *TreeNode[T]) {
 		if isColliding := node.isCollidingWithNode(x, y, 0, 0); isColliding {
-			if isColliding {
-				result = append(result, node.element)
-			}
+			result = append(result, node.element)
 		}
 	})
 	return result
 }
 
 func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
-	do(d)
 	xPosElNode, yPosElNode := d.element.GetPos()
-	if d.smaller != nil && ((d.nodeType == ByY && x < xPosElNode) || (d.nodeType == ByX && y < yPosElNode) || d.smaller.isCollidingWithNode(x, y, 0, 0)) {
+	smallerDone := false
+	biggerDone := false
+
+	if d.smaller != nil && d.smaller.isCollidingWithNode(x, y, 0, 0) {
 		d.smaller.execute(x, y, do)
-	}
-	if d.bigger != nil && ((d.nodeType == ByY && x >= xPosElNode) || (d.nodeType == ByX && y >= yPosElNode) || d.bigger.isCollidingWithNode(x, y, 0, 0)) {
+		smallerDone = true
+	}else
+	if d.bigger != nil && d.bigger.isCollidingWithNode(x, y, 0, 0) {
 		d.bigger.execute(x, y, do)
+		biggerDone = true
 	}
+
+	if d.smaller != nil && !smallerDone && ((d.nodeType == ByY && x < xPosElNode) || (d.nodeType == ByX && y < yPosElNode)) {
+		d.smaller.execute(x, y, do)
+	} else {
+		if d.bigger != nil && !biggerDone {
+			d.bigger.execute(x, y, do)
+		}
+	}
+	do(d)
 }
 
 // Iterate over all over the tree,if the function returns false the iteration will stop
@@ -186,17 +197,14 @@ func (d *TreeManager[T]) SearchAll(x, y int) ([]T, error) {
 	var results [][]T = make([][]T, d.nLayer)
 	var group sync.WaitGroup = sync.WaitGroup{}
 	for layer := 0; layer < int(d.nLayer); layer++ {
-		if d.root[layer] != nil {
-			group.Add(1)
-			go func() {
-				d.root[layer].execute(x, y, func(node *TreeNode[T]) {
-					if node.isCollidingWithNode(x, y, 0, 0) {
-						results[layer] = append(results[layer], node.element)
-					}
-				})
-				group.Done()
-			}()
+		if d.root[layer] == nil {
+			continue
 		}
+		group.Add(1)
+		go func() {
+			results[layer] = d.root[layer].search(x, y)
+			group.Done()
+		}()
 	}
 	group.Wait()
 	var result []T
@@ -208,7 +216,7 @@ func (d *TreeManager[T]) SearchAll(x, y int) ([]T, error) {
 
 func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *TreeNode[T]) []T {
 	var result []T
-	defer func (){
+	defer func() {
 		d.nextIndexToCache = (d.nextIndexToCache + 1) % len(d.chachedCollision)
 		d.chachedCollision[d.nextIndexToCache] = collisionChache[T]{node: elementWhichCollides, collisionElement: result}
 	}()
@@ -236,7 +244,7 @@ func (d *TreeManager[T]) Refresh() {
 	for layer := 0; layer < int(d.nLayer); layer++ {
 		d._refresh(Layer(layer), newTree)
 	}
-	(*d)=(*newTree) //deep copy
+	(*d) = (*newTree) //deep copy
 }
 
 func (d *TreeManager[T]) _refresh(layer Layer, tree *TreeManager[T]) {
