@@ -15,6 +15,7 @@ import (
 
 var comp Core.IComponent
 var button2 *Component.Button
+var modal Core.IComponent
 func main() {
 	kbr := Keyboard.NewKeyboard()
 	core, _ := GTUI.NewGtui(loop, kbr, &Terminal.Terminal{})
@@ -94,7 +95,7 @@ func main() {
 	cont.AddDrawing(Drawing.CreateTextField(10,0,"modal"))
 	cont.AddComponent(Component.CreateButton(0,5,10,3,"ok"))
 	cont.AddComponent(Component.CreateButton(18,5,10,3,"esplodi"))
-	modal:=Component.CreateModal(10,20,30,10,cont)
+	modal=Component.CreateModal(10,20,30,10,cont)
 	if e:=core.AddComponent(modal);e!=nil{
 		panic(e)
 	}
@@ -118,6 +119,10 @@ func loop(keyb Kd.IKeyBoard,core *GTUI.Gtui) bool {
 
 	if keyb.IsKeySPressed(Keyboard.CtrlS) {
 		button2.SetPos(x, y)
+	}
+
+	if keyb.IsKeySPressed(Keyboard.CtrlP) {
+		modal.SetPos(x, y)
 	}
 
 	core.SetCur(x, y)
