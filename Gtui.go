@@ -105,7 +105,6 @@ func (c *Gtui) SetCur(x, y int) error {
 			break
 		}
 	}
-
 	c.yCursor = y
 	c.xCursor = x
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
@@ -148,23 +147,17 @@ func (c *Gtui) InsertEntity(entityToAdd Core.IDrawing) {
 	c.entityTree.AddElement(entityToAdd)
 }
 
-
 func (c *Gtui) InsertComponent(componentToAdd Core.IComponent) error {
 	if container, ok := componentToAdd.(*Component.Container); ok {
 		for _, component := range container.GetComponents() {
-			c._insertComponent(component)
+			c.InsertComponent(component)
 		}
 		c.InsertEntity(componentToAdd.GetGraphics())
 		return nil
 	}
-	c._insertComponent(componentToAdd)
-	return nil
-}
-
-func (c *Gtui) _insertComponent(componentToAdd Core.IComponent) error {
 	c.InsertEntity(componentToAdd.GetGraphics())
-	componentToAdd.OnLeave()
 	c.entityTree.AddElement(componentToAdd)
+	componentToAdd.OnLeave()
 	return nil
 }
 
