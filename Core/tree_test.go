@@ -47,7 +47,7 @@ func testElement(x,y int,t *testing.T,tree *TreeManager[mockElementTree] ,namete
 	}
 }
 func TestTree1(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(5,5,10,10,"test1"))
 	tree.AddElement(createMockElementTree(7,7,10,10,"test2"))
 	testElement(6,6,t,tree,"prima verifica 0","test1")
@@ -55,7 +55,7 @@ func TestTree1(t *testing.T) {
 	testElement(16,16,t,tree,"prima verifica 2","test2")
 }
 func TestTree2(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(7,7,10,10,"test2"))
 	tree.AddElement(createMockElementTree(5,5,10,10,"test1"))
 	if tree.root[0].smaller.element.name!="test1"{
@@ -66,7 +66,7 @@ func TestTree2(t *testing.T) {
 	testElement(16,16,t,tree,"seconda verifica 2","test2")
 }
 func TestTreeSeparatedComponents1(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(5,5,10,10,"test1"))
 	tree.AddElement(createMockElementTree(17,17,10,10,"test2"))
 	testElement(6,6,t,tree,"terza verifica 0","test1")
@@ -74,7 +74,7 @@ func TestTreeSeparatedComponents1(t *testing.T) {
 	testElement(18,18,t,tree,"terza verifica 2","test2")
 }
 func TestTreeSeparatedComponents2(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(17,17,10,10,"test2"))
 	tree.AddElement(createMockElementTree(0,0,10,10,"test1"))
 	testElement(6,6,t,tree,"quarta verifica 0","test1")
@@ -82,7 +82,7 @@ func TestTreeSeparatedComponents2(t *testing.T) {
 	testElement(18,18,t,tree,"quarta verifica 2","test2")
 }
 func TestTreeMixedCase1(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(17,17,10,10,"test2"))
 	tree.AddElement(createMockElementTree(20,20,10,10,"test3"))
 	tree.AddElement(createMockElementTree(0,0,10,10,"test1"))
@@ -92,14 +92,14 @@ func TestTreeMixedCase1(t *testing.T) {
 	testElement(21,21,t,tree,"quinta verifica 3","test3","test2")
 }
 func TestTreeMixedCase2(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(70,0,20,30,"button"))
 	tree.AddElement(createMockElementTree(0,0,50,60,"textBox"))
 	tree.AddElement(createMockElementTree(85,0,10,10,"button1"))
 	testElement(1,1,t,tree,"sesta verifica 0","textBox")
 }
 func TestTreeRefresh(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(70,0,20,30,"button"))
 	tree.AddElement(createMockElementTree(0,0,50,60,"textBox"))
 	tree.AddElement(createMockElementTree(85,0,10,10,"button1"))
@@ -108,14 +108,14 @@ func TestTreeRefresh(t *testing.T) {
 	testElement(1,1,t,tree,"settima verifica 0","textBox")
 }
 func TestTreeElementAbove(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(40,40,40,40,"button1"))
 	tree.AddElement(createMockElementTree(40,0,10,10,"textBox"))
 	testElement(41,1,t,tree,"ottava verifica 0","textBox")
 	testElement(41,41,t,tree,"ottava verifica 1","button1")
 }
 func TestTreeElementNextToAnotherElement(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(10,5,10,5,"button1"))
 	tree.AddElement(createMockElementTree(25,0,50,50,"textBox"))
 	if tree.root[0].element.name!="button1"{
@@ -131,7 +131,7 @@ func TestTreeElementNextToAnotherElement(t *testing.T) {
 	}
 }
 func TestTreeElementNextToAnotherElementSameH(t *testing.T) {
-	tree := CreateTreeManager[mockElementTree](6)
+	tree := CreateTreeManager[mockElementTree]()
 	tree.AddElement(createMockElementTree(10,5,10,5,"button1"))
 	tree.AddElement(createMockElementTree(30,5,50,5,"textBox"))
 	if tree.root[0].element.name!="button1"{

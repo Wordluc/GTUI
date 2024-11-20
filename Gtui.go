@@ -37,8 +37,8 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 		loop:             loop,
 		term:             term,
 		keyb:             keyb,
-		drawingTree:      Core.CreateTreeManager[Core.IDrawing](Core.LMax),
-		componentTree:    Core.CreateTreeManager[Core.IComponent](Core.LMax),
+		drawingTree:      Core.CreateTreeManager[Core.IDrawing](),
+		componentTree:    Core.CreateTreeManager[Core.IComponent](),
 		xCursor:          0,
 		yCursor:          0,
 		xSize:            xSize,
@@ -48,14 +48,14 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 
 func (c *Gtui) initializeEventManager() {
 	EventManager.Subscribe(EventManager.Refresh, 100, func(comp []any) {
-		c.refresh(true)
+		c.refresh()
 	})
 
 	EventManager.Subscribe(EventManager.ReorganizeElements, 100, func(comp []any) {
 		c.IClear()
 		c.drawingTree.Refresh()
 		c.componentTree.Refresh()
-		c.refresh(false)
+		c.refresh()
 	})
 }
 
@@ -131,7 +131,7 @@ func (c *Gtui) Start() {
 	c.initializeEventManager()
 	c.term.Start()
 	c.term.Clear()
-	c.refresh(false)
+	c.refresh()
 	c.keyb.Start(c.innerLoop)
 	c.term.Stop()
 }
@@ -161,7 +161,7 @@ func (c *Gtui) AddComponent(componentToAdd Core.IComponent) error {
 }
 
 func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
-	for i := Core.LMax - 1; i >= 0; i-- {
+	for i := c.componentTree.GetLayerN(); i >= 0; i-- {
 		if isDone, e := c.callEventOnLayer(x, y, Core.Layer(i), event); isDone {
 			return e
 		}
@@ -184,7 +184,7 @@ func (c *Gtui) callEventOnLayer(x, y int, layer Core.Layer, event func(Core.ICom
 }
 
 func (c *Gtui) Click(x, y int) error {
-	for i := Core.LMax - 1; i >= 0; i-- {
+	for i := c.componentTree.GetLayerN() ; i >= 0; i-- {
 		if isDone, e := c.clickOnLayer(x, y, Core.Layer(i)); isDone {
 			return e
 		}
@@ -206,7 +206,7 @@ func (c *Gtui) clickOnLayer(x, y int, layer Core.Layer) (bool, error) {
 }
 
 func (c *Gtui) AllineCursor() {
-	for i := Core.LMax - 1; i >= 0; i-- {
+	for i := c.componentTree.GetLayerN(); i >= 0; i-- {
 		if isDone := c._allineCursor(Core.Layer(i)); isDone {
 			break
 		}
@@ -229,12 +229,11 @@ func (c *Gtui) _allineCursor(layer Core.Layer) bool {
 	return false
 }
 
-func (c *Gtui) refresh(onlyTouched bool) error { //TODO: optimize
+func (c *Gtui) refresh() error { //TODO: optimize
 	var str strings.Builder
-	var toDraw bool = false
 	var s strings.Builder
-	for i := 0; i < int(Core.LMax); i++ {
-		s, toDraw = c.refreshLayer(Core.Layer(i), onlyTouched && !toDraw)
+	for i := 0; i < c.componentTree.GetLayerN(); i++ {
+		s, _ = c.refreshLayer(Core.Layer(i), false)
 		str.WriteString(s.String())
 	}
 	if c.cursorVisibility {
@@ -251,7 +250,7 @@ func (c *Gtui) refresh(onlyTouched bool) error { //TODO: optimize
 func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder, bool) {
 	var str strings.Builder
 	var drawing Core.IDrawing
-	var drew bool
+	var drew bool=false
 	var elementToRefresh map[Core.IDrawing]struct{} = make(map[Core.IDrawing]struct{})
 	cond := func(node *Core.TreeNode[Core.IDrawing]) bool {
 		drawing = node.GetElement()
@@ -284,6 +283,6 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	if !c.loop(c.keyb, c) {
 		return false
 	}
-	c.refresh(true)
+	c.refresh()
 	return true
 }

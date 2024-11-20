@@ -26,7 +26,7 @@ func (c *Container) AddComponent(component Core.IComponent)error {
 	return c.drawing.AddChild(component.GetGraphics())
 }
 
-func (c *Container) AddDrawing(container *Drawing.Container)error {
+func (c *Container) AddDrawing(container Core.IDrawing)error {
 	return c.drawing.AddChild(container)
 }
 //DO NOT USE
@@ -34,9 +34,6 @@ func (c *Container) GetSize() (int,int) {
 	panic("mustn't be called")
 }
 func (b *Container) SetLayer(layer Core.Layer) {
-	if layer>Core.LMax{
-		layer=Core.LMax
-	}
 	diff:= layer - b.layer
 	for _,comp:=range b.components {
 		comp.SetLayer(comp.GetLayer()+diff)

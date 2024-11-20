@@ -90,9 +90,6 @@ func (r *RectangleFull) SetPos(x, y int) {
 }
 
 func (b *RectangleFull) SetLayer(layer Core.Layer) {
-	if layer>Core.LMax{
-		layer=Core.LMax
-	}
 	b.layer = layer
 	b.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{b})

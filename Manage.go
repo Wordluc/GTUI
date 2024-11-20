@@ -8,7 +8,7 @@ import (
 
 func (c *Gtui) ISetGlobalColor(color Color.Color) {
 	c.globalColor = color
-	c.refresh(false)
+	c.refresh()
 }
 
 func (c *Gtui) IResetGlobalColor() {
