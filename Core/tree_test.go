@@ -51,7 +51,7 @@ func TestTree1(t *testing.T) {
 	tree.AddElement(createMockElementTree(5,5,10,10,"test1"))
 	tree.AddElement(createMockElementTree(7,7,10,10,"test2"))
 	testElement(6,6,t,tree,"prima verifica 0","test1")
-	testElement(8,8,t,tree,"prima verifica 1","test1","test2")
+	testElement(8,8,t,tree,"prima verifica 1","test2","test1")
 	testElement(16,16,t,tree,"prima verifica 2","test2")
 }
 func TestTree2(t *testing.T) {
@@ -62,7 +62,7 @@ func TestTree2(t *testing.T) {
 		t.Error("Expected test1 got ",tree.root[0].smaller.element.name)
 	}
 	testElement(6,6,t,tree,"seconda verifica 0","test1")
-	testElement(8,8,t,tree,"seconda verifica 1","test2","test1")
+	testElement(8,8,t,tree,"seconda verifica 1","test1","test2")
 	testElement(16,16,t,tree,"seconda verifica 2","test2")
 }
 func TestTreeSeparatedComponents1(t *testing.T) {
@@ -89,7 +89,7 @@ func TestTreeMixedCase1(t *testing.T) {
 	testElement(2,2,t,tree,"quinta verifica 0","test1")
 	testElement(8,8,t,tree,"quinta verifica 1","test1",)
 	testElement(18,18,t,tree,"quinta verifica 2","test2")
-	testElement(21,21,t,tree,"quinta verifica 3","test2","test3")
+	testElement(21,21,t,tree,"quinta verifica 3","test3","test2")
 }
 func TestTreeMixedCase2(t *testing.T) {
 	tree := CreateTreeManager[mockElementTree](6)

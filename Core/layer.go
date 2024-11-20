@@ -7,7 +7,10 @@ const (
 	L3
 	L4
 	L5
-	L6//it is on the top
-	LMax
+	L6
+	LMax//it is on the top
+	modalL1
+	modalL2
+	modalL3
+	modalL4
 )
-
