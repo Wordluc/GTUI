@@ -2,7 +2,6 @@ package GTUI
 
 import (
 	"errors"
-	"sort"
 	"strings"
 	"sync"
 
@@ -95,20 +94,13 @@ func (c *Gtui) SetCur(x, y int) error {
 		c.yCursor = y
 		return nil
 	}
-	compPreSet, _ := c.componentTree.SearchAll(c.xCursor, c.yCursor)
-	sort.Slice(compPreSet,func(i, j int) bool {
-		return compPreSet[i].GetLayer() > compPreSet[j].GetLayer()
-	})
-	compPreSet=getHighterElements(compPreSet)
 
-	compsPostSet, _ := c.componentTree.SearchAll(x, y)
-	sort.Slice(compsPostSet,func(i, j int) bool {
-		return compsPostSet[i].GetLayer() > compsPostSet[j].GetLayer()
-	})
-	compsPostSet=getHighterElements(compsPostSet)
+	compPreSet := c.componentTree.GetHighterLayerElements(c.xCursor, c.yCursor)
+	compsPostSet := c.componentTree.GetHighterLayerElements(x, y)
 
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
 	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
+
 	for i, comp := range inPostButNotInPre {
 		if ci, ok := inPostButNotInPre[i].(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
@@ -207,7 +199,7 @@ func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
 }
 
 func (c *Gtui) callEventOnLayer(x, y int, layer Core.Layer, event func(Core.IComponent)) (bool, error) {
-	resultArray, e := c.componentTree.Search(layer, x, y)
+	resultArray, e := c.componentTree.SearchOnLayer(layer, x, y)
 	if e != nil {
 		return false, e
 	}
@@ -229,7 +221,7 @@ func (c *Gtui) Click(x, y int) error {
 	return nil
 }
 func (c *Gtui) clickOnLayer(x, y int, layer Core.Layer) (bool, error) {
-	resultArray, e := c.componentTree.Search(layer, x, y)
+	resultArray, e := c.componentTree.SearchOnLayer(layer, x, y)
 	if e != nil {
 		return false, e
 	}
@@ -251,7 +243,7 @@ func (c *Gtui) AllineCursor() {
 }
 func (c *Gtui) _allineCursor(layer Core.Layer) bool {
 	x, y := c.GetCur()
-	comps, _ := c.componentTree.Search(layer, x, y)
+	comps, _ := c.componentTree.SearchOnLayer(layer, x, y)
 	for _, comp := range comps {
 		if ci, ok := comp.(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
@@ -309,7 +301,7 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 		}
 		return true
 	}
-	c.drawingTree.Execute(layer, cond)
+	c.drawingTree.ExecuteOnLayerForAll(layer, cond)
 	for drawing := range elementToRefresh {
 		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
