@@ -102,8 +102,7 @@ func (d *TreeNode[T]) execute(x, y int, do func(*TreeNode[T])) {
 	if d.smaller != nil && d.smaller.isCollidingWithNode(x, y, 0, 0) {
 		d.smaller.execute(x, y, do)
 		smallerDone = true
-	}else
-	if d.bigger != nil && d.bigger.isCollidingWithNode(x, y, 0, 0) {
+	} else if d.bigger != nil && d.bigger.isCollidingWithNode(x, y, 0, 0) {
 		d.bigger.execute(x, y, do)
 		biggerDone = true
 	}
@@ -158,9 +157,10 @@ type TreeManager[T ElementTree] struct {
 	chachedCollision [5]collisionChache[T]
 	nextIndexToCache int
 }
+
 func (d *TreeManager[T]) GetLayerN() int {
-	return len(d.root)+1
-	
+	return len(d.root) + 1
+
 }
 func CreateTreeManager[T ElementTree]() *TreeManager[T] {
 
@@ -184,17 +184,17 @@ func (d *TreeManager[T]) AddElement(element T) {
 }
 
 // Iterate over all nodes, if return false, it will stop iteration
-func (d *TreeManager[T]) Execute(layer Layer, cond func(node *TreeNode[T]) bool) {
+func (d *TreeManager[T]) ExecuteOnLayerForAll(layer Layer, cond func(node *TreeNode[T]) bool) {
 	if int(layer) >= len(d.root) {
 		return
 	}
 	d.root[layer].executeForAll(cond)
 }
 
-func (d *TreeManager[T]) Search(layer Layer, x, y int) ([]T, error) {
+func (d *TreeManager[T]) SearchOnLayer(layer Layer, x, y int) ([]T, error) {
 	var result []T
 	if int(layer) >= len(d.root) {
-		return result,nil
+		return result, nil
 	}
 	if d.root[layer] == nil {
 		return nil, errors.New("Tree is empty")
@@ -203,7 +203,7 @@ func (d *TreeManager[T]) Search(layer Layer, x, y int) ([]T, error) {
 	return result, nil
 }
 
-func (d *TreeManager[T]) SearchAll(x, y int) ([]T, error) {
+func (d *TreeManager[T]) SearchInDifferentLayers(x, y int) [][]T {
 	var results [][]T = make([][]T, len(d.root))
 	var group sync.WaitGroup = sync.WaitGroup{}
 	for layer := 0; layer < len(d.root); layer++ {
@@ -217,11 +217,26 @@ func (d *TreeManager[T]) SearchAll(x, y int) ([]T, error) {
 		}()
 	}
 	group.Wait()
+	return results
+}
+
+func (d *TreeManager[T]) Search(x, y int) ([]T, error) {
+	resultsMatrix := d.SearchInDifferentLayers(x, y)
 	var result []T
-	for _, res := range results {
+	for _, res := range resultsMatrix {
 		result = append(result, res...)
 	}
 	return result, nil
+}
+
+func (d *TreeManager[T]) GetHighterLayerElements(x,y int) []T {
+	resultMatrix:=d.SearchInDifferentLayers(x,y)
+	for i := len(resultMatrix) - 1; i >= 0; i-- {
+		if resultMatrix[i] != nil {
+			return resultMatrix[i]
+		}
+	}
+	return nil
 }
 
 func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *TreeNode[T]) []T {
