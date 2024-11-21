@@ -190,75 +190,45 @@ func (c *Gtui) AddComponent(componentToAdd Core.IComponent) error {
 }
 
 func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
-	for i := c.componentTree.GetLayerN(); i >= 0; i-- {
-		if isDone, e := c.callEventOnLayer(x, y, Core.Layer(i), event); isDone {
-			return e
-		}
-	}
-	return nil
-}
-
-func (c *Gtui) callEventOnLayer(x, y int, layer Core.Layer, event func(Core.IComponent)) (bool, error) {
-	resultArray, e := c.componentTree.SearchOnLayer(layer, x, y)
-	if e != nil {
-		return false, e
-	}
+	resultArray:= c.componentTree.GetHighterLayerElements(x, y)
 	if len(resultArray) == 0 {
-		return false, nil
+		return nil
 	}
 	for i := range resultArray {
 		event(resultArray[i])
 	}
-	return true, nil
-}
-
-func (c *Gtui) Click(x, y int) error {
-	for i := c.componentTree.GetLayerN() ; i >= 0; i-- {
-		if isDone, e := c.clickOnLayer(x, y, Core.Layer(i)); isDone {
-			return e
-		}
-	}
 	return nil
 }
-func (c *Gtui) clickOnLayer(x, y int, layer Core.Layer) (bool, error) {
-	resultArray, e := c.componentTree.SearchOnLayer(layer, x, y)
-	if e != nil {
-		return false, e
-	}
+
+
+func (c *Gtui) Click(x, y int) error {
+	resultArray := c.componentTree.GetHighterLayerElements(x, y)
 	if len(resultArray) == 0 {
-		return false, nil
+		return nil
 	}
 	for i := range resultArray {
 		resultArray[i].OnClick()
 	}
-	return true, nil
+	return nil
 }
 
 func (c *Gtui) AllineCursor() {
-	for i := c.componentTree.GetLayerN(); i >= 0; i-- {
-		if isDone := c._allineCursor(Core.Layer(i)); isDone {
-			break
-		}
-	}
-}
-func (c *Gtui) _allineCursor(layer Core.Layer) bool {
 	x, y := c.GetCur()
-	comps, _ := c.componentTree.SearchOnLayer(layer, x, y)
+	comps := c.componentTree.GetHighterLayerElements(x, y)
 	for _, comp := range comps {
 		if ci, ok := comp.(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
 				deltax, deltay := ci.DiffCurrentToXY(x, y)
 				c.yCursor = y + deltay
 				c.xCursor = x + deltax
-				return true
+				return 
 			}
 		}
 	}
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
-	return false
 }
 
-func (c *Gtui) refresh(onlyTouched bool) error { //TODO: optimize
+func (c *Gtui) refresh(onlyTouched bool) error {
 	var str strings.Builder
 	var s strings.Builder
 	var drew bool
