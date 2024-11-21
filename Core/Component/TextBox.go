@@ -191,14 +191,3 @@ func (b *TextBox) DiffCurrentToXY(x, y int) (int, int) {
 func (b *TextBox) SetCurrentPosCursor(x, y int) (int, int) {
 	return b.textBlock.SetCursor_Relative(x, y)
 }
-func (b *TextBox) GetShape() (Core.IInteractiveShape, error) {
-	x, y := b.textBlock.GetPos()
-	xDim, yDim := b.textBlock.GetSize()
-	shape := Core.BaseInteractiveShape{
-		XPos:   x,
-		YPos:   y,
-		Width:  xDim,
-		Height: yDim,
-	}
-	return &shape, nil
-}
