@@ -70,21 +70,6 @@ func (c *Gtui) initializeEventManager() {
 	})
 }
 
-//must be sorted
-func getHighterElements(comps []Core.IComponent) []Core.IComponent {
-	if len(comps) == 0 {
-		return []Core.IComponent{}
-	}
-	var result []Core.IComponent=[]Core.IComponent{comps[0]}
-	for _, comp := range comps[1:] {
-		if comp.GetLayer() < comps[0].GetLayer() {
-			break
-		}
-		result = append(result, comp)
-	}
-	return result
-}
-
 func (c *Gtui) SetCur(x, y int) error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
 		return errors.New("cursor out of range")

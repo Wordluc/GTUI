@@ -31,7 +31,7 @@ func (e mockElementTree) SetLayer(layer Layer){
 }
 
 func testElement(x,y int,t *testing.T,tree *TreeManager[mockElementTree] ,nametest string,expected ...string) {
-	result,err := tree.Search(L1,x,y)
+	result,err := tree.SearchOnLayer(L1,x,y)
 	if err != nil {
 		t.Error(err)
 		return
