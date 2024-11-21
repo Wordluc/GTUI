@@ -2,6 +2,7 @@ package GTUI
 
 import (
 	"errors"
+	"sort"
 	"strings"
 	"sync"
 
@@ -70,6 +71,21 @@ func (c *Gtui) initializeEventManager() {
 	})
 }
 
+//must be sorted
+func getHighterElements(comps []Core.IComponent) []Core.IComponent {
+	if len(comps) == 0 {
+		return []Core.IComponent{}
+	}
+	var result []Core.IComponent=[]Core.IComponent{comps[0]}
+	for _, comp := range comps[1:] {
+		if comp.GetLayer() < comps[0].GetLayer() {
+			break
+		}
+		result = append(result, comp)
+	}
+	return result
+}
+
 func (c *Gtui) SetCur(x, y int) error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
 		return errors.New("cursor out of range")
@@ -80,7 +96,17 @@ func (c *Gtui) SetCur(x, y int) error {
 		return nil
 	}
 	compPreSet, _ := c.componentTree.SearchAll(c.xCursor, c.yCursor)
+	sort.Slice(compPreSet,func(i, j int) bool {
+		return compPreSet[i].GetLayer() > compPreSet[j].GetLayer()
+	})
+	compPreSet=getHighterElements(compPreSet)
+
 	compsPostSet, _ := c.componentTree.SearchAll(x, y)
+	sort.Slice(compsPostSet,func(i, j int) bool {
+		return compsPostSet[i].GetLayer() > compsPostSet[j].GetLayer()
+	})
+	compsPostSet=getHighterElements(compsPostSet)
+
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
 	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
 	for i, comp := range inPostButNotInPre {
