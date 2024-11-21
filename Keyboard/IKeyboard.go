@@ -16,4 +16,5 @@ type IKeyBoard interface {
 	DeleteChannel(int)
 	InsertClickboard(string)
 	GetClickboard() string
+	CleanKeyboardState()
 }
