@@ -100,14 +100,3 @@ func (b *Button) GetGraphics() Core.IDrawing {
 func (b *Button) GetVisibleArea() *Drawing.RectangleFull {
 	return b.visibleArea
 }
-func (b *Button) GetShape() (Core.IInteractiveShape, error) {
-	x, y := b.visibleArea.GetPos()
-	xDim, yDim := b.visibleArea.GetSize()
-	shape := Core.BaseInteractiveShape{
-		XPos:   x + 1,
-		YPos:   y + 1,
-		Width:  xDim - 1,
-		Height: yDim - 1,
-	}
-	return &shape, nil
-}

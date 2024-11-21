@@ -87,15 +87,3 @@ func (c *Container) OnLeave() {
 func (c *Container) GetGraphics() Core.IDrawing {
 	return c.drawing
 }
-
-func (c *Container) GetShape() (Core.IInteractiveShape, error) {
-	complexShape := &Core.ComplexInteractiveShape{}
-	for _, component := range c.components {
-		shape, err := component.GetShape()
-		if err != nil {
-			return &Core.BaseInteractiveShape{}, err
-		}
-		complexShape.AddShape(shape)
-	}
-	return complexShape, nil
-}

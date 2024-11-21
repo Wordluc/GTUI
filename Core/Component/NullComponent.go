@@ -61,15 +61,3 @@ func (b *NullComponent) GetGraphics() Core.IDrawing {
 func (b *NullComponent) GetVisibleArea() *Drawing.Rectangle {
 	return b.visibleArea
 }
-
-func (b *NullComponent) GetShape() (Core.IInteractiveShape, error) {
-	x, y := b.GetPos()
-	xDim, yDim := b.GetSize()
-	shape := Core.BaseInteractiveShape{
-		XPos:   x,
-		YPos:   y,
-		Width:  xDim,
-		Height: yDim,
-	}
-	return &shape, nil
-}
