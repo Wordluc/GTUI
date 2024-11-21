@@ -217,7 +217,7 @@ func (c *Gtui) refresh(onlyTouched bool) error {
 	var str strings.Builder
 	var s strings.Builder
 	var drew bool
-	for i := 0; i < c.componentTree.GetLayerN(); i++ {
+	for i := 0; i < c.drawingTree.GetLayerN(); i++ {
 		s, drew = c.refreshLayer(Core.Layer(i), onlyTouched)
 		if drew {
 			onlyTouched = false
