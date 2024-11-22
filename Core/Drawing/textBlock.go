@@ -144,7 +144,7 @@ func (t *TextBlock) IsTouched() bool {
 }
 func (t *TextBlock) GetAnsiCode(defaultColor Color.Color) string {
 	if t.isChanged {
-		t.ansiCode = t.GetText(true)
+		t.ansiCode = t.makeAnsiCode(defaultColor)
 		t.isChanged = false
 	}
 	return t.ansiCode
@@ -367,10 +367,9 @@ func insertTextToOrigin(origin, text string, pos int) string {
 	}
 	return origin[:pos] + text + origin[pos:]
 }
-// Get the text, if parm == true the ansi code will be added
-func (t *TextBlock) GetText(withAnsiCode bool) string {
+func (t *TextBlock) makeAnsiCode(defaultColor Color.Color) string {
 	full := strings.Builder{}
-	full.WriteString(t.color.GetAnsiColor())
+	full.WriteString(t.color.GetMixedColor(defaultColor).GetAnsiColor())
 	y := 0
 	if !t.wrap {
 		t.xStartingWrapping = t.absoluteCurrentCharacter
@@ -386,9 +385,7 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 		if line == nil {
 			break
 		}
-		if withAnsiCode {
-			full.WriteString(U.GetAnsiMoveTo(t.xPos, t.yPos+y))
-		}
+		full.WriteString(U.GetAnsiMoveTo(t.xPos, t.yPos+y))
 		text := line.getText()
 		text = t.parseText(text)
 		edge := t.getWrapperEdges()
@@ -402,13 +399,28 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 		}
 
 		full.WriteString(text)
-		if !withAnsiCode {
-			full.WriteRune('\n')
-		}
 		y++
 	}
-	full.WriteString(Color.GetDefaultColor().GetAnsiColor())
+	full.WriteString(defaultColor.GetAnsiColor())
 	return strings.TrimSuffix(full.String(),"\n")
+}
+func (t *TextBlock) GetText() string {
+	var res strings.Builder
+	for i, line := range t.lines {
+		if i < t.yRelativeMinSize {
+			continue
+		}
+		if i >= t.yRelativeMaxSize {
+			break
+		}
+		if line == nil {
+			break
+		}
+		text := line.getText()
+		text = t.parseText(text)
+		res.WriteString(text+"\n")
+	}
+	return strings.TrimSuffix(res.String(), "\n")
 }
 func (t *TextBlock) parseText(text string) string {
 	start := 0

@@ -105,7 +105,7 @@ func (v *TextBox) GetSelectedText() string {
 }
 
 func (t *TextBox) GetText()string {
-	return t.textBlock.GetText(false)
+	return t.textBlock.GetText()
 }
 
 func (t *TextBox) SetWrap(isOn bool) {
