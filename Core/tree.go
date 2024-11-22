@@ -45,16 +45,17 @@ func CreateNode[T ElementTree](element T, typeNode typeTreeNode) *TreeNode[T] {
 }
 
 func (t *TreeNode[T]) isCollidingWithNode(x, y int, width, height int) bool {
-	if x > t.xPos && x < t.xPos+t.width && y > t.yPos && y < t.yPos+t.height {
+	//-1 to avoid trigger on border
+	if x > t.xPos && x < t.xPos+t.width-1 && y > t.yPos && y < t.yPos+t.height-1 {
 		return true
 	}
-	if x+width > t.xPos && x+width < t.xPos+t.width && y > t.yPos && y < t.yPos+t.height {
+	if x+width > t.xPos && x+width < t.xPos+t.width-1 && y > t.yPos && y < t.yPos+t.height-1 {
 		return true
 	}
-	if x > t.xPos && x < t.xPos+t.width && y+height > t.yPos && y+height < t.yPos+t.height {
+	if x > t.xPos && x < t.xPos+t.width-1 && y+height > t.yPos && y+height < t.yPos+t.height-1 {
 		return true
 	}
-	if x+width > t.xPos && x+width < t.xPos+t.width && y+height > t.yPos && y+height < t.yPos+t.height {
+	if x+width > t.xPos && x+width < t.xPos+t.width-1 && y+height > t.yPos && y+height < t.yPos+t.height-1 {
 		return true
 	}
 	return false
@@ -229,8 +230,8 @@ func (d *TreeManager[T]) Search(x, y int) ([]T, error) {
 	return result, nil
 }
 
-func (d *TreeManager[T]) GetHighterLayerElements(x,y int) []T {
-	resultMatrix:=d.SearchInDifferentLayers(x,y)
+func (d *TreeManager[T]) GetHighterLayerElements(x, y int) []T {
+	resultMatrix := d.SearchInDifferentLayers(x, y)
 	for i := len(resultMatrix) - 1; i >= 0; i-- {
 		if resultMatrix[i] != nil {
 			return resultMatrix[i]
