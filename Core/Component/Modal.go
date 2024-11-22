@@ -12,7 +12,7 @@ const (
 	
 )
 type Modal struct {
-	component *Container
+	container *Container
 	nullComponent *NullComponent
 }
 
@@ -23,7 +23,7 @@ func CreateModal(sizeX, sizeY int) *Modal {
 	contComp.SetLayer(modalL1)
 	return &Modal{
 		nullComponent: null,
-		component: contComp,
+		container: contComp,
 	}
 }
 
@@ -33,27 +33,27 @@ func (b *Modal) SetBackgroundColor(color Color.ColorValue) {
 }
 
 func (b *Modal) AddComponent(componentToAdd Core.IComponent) error {
-	if e:=componentToAdd.SetLayer(b.component.GetLayer()+1);e!=nil{
+	if e:=componentToAdd.SetLayer(b.container.GetLayer()+1);e!=nil{
 		return e
 	}
-	b.component.AddComponent(componentToAdd)
+	b.container.AddComponent(componentToAdd)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
 }
 
 func (b *Modal) AddDrawing(drawingToAdd Core.IDrawing) error {
 	drawingToAdd.SetLayer(drawingToAdd.GetLayer()+modalL1+1)
-	b.component.AddDrawing(drawingToAdd)
+	b.container.AddDrawing(drawingToAdd)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
 }
 
 func	(b *Modal)GetComponets() []Core.IComponent{
-	return b.component.GetComponents()
+	return b.container.GetComponents()
 }
 
 func (b *Modal) SetPos(x, y int) {
-	b.component.SetPos(x, y)
+	b.container.SetPos(x, y)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
 
@@ -62,20 +62,20 @@ func (b *Modal) GetPos() (int, int) {
 }
 
 func (b *Modal) GetLayer() Core.Layer {
-	return b.component.GetLayer()
+	return b.container.GetLayer()
 }
 
 func (b *Modal) SetLayer(layer Core.Layer) error{
 	if layer<0 {
 		return errors.New("layer can't be negative")
 	}
-	b.component.SetLayer(layer)
+	b.container.SetLayer(layer)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
 }
 
 func (b *Modal) GetGraphics() Core.IDrawing {
-	return b.component.GetGraphics()
+	return b.container.GetGraphics()
 }
 
 func (b *Modal) GetSize() (int, int) {
