@@ -65,6 +65,7 @@ func (c *Gtui) initializeEventManager() {
 			c.componentTree.Refresh()
 			group.Done()
 		}()
+		c.SetCur(c.xCursor, c.yCursor)
 		group.Wait()
 		c.refresh(false)
 	})
