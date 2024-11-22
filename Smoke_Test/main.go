@@ -114,6 +114,7 @@ func main() {
 	setDefaultEventButton(esplodi,Color.Gray,Color.White,Color.Red)
 
 	modal=Component.CreateModal(30,10)
+	modal.SetBackgroundColor(Color.Gray)
 	modal.AddDrawing(text)
 	modal.AddComponent(esplodi)
 	modal.AddComponent(ok)

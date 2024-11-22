@@ -14,23 +14,31 @@ type Container struct {
 	components []Core.IComponent
 	drawing    *Drawing.Container
 	layer      Core.Layer
+	x,y int
 }
 
 func CreateContainer(x, y int) *Container {
 	return &Container{
 		active:     true,
+		x: x,
+		y: y,
 		drawing:    Drawing.CreateContainer(x, y),
 		components: make([]Core.IComponent, 0),
 	}
 }
 func (c *Container) AddComponent(component Core.IComponent)error {
 	c.components = append(c.components, component)
-	return c.drawing.AddChild(component.GetGraphics())
+	return nil
 }
 
 func (c *Container) AddDrawing(container Core.IDrawing)error {
 	return c.drawing.AddChild(container)
 }
+
+func (c *Container) GetComnponents() []Core.IComponent {
+	return c.components
+}
+
 //DO NOT USE
 func (c *Container) GetSize() (int,int) {
 	panic("mustn't be called")
@@ -61,12 +69,23 @@ func (c *Container) SetonClick(onClick func()) {
 func (c *Container) SetActivity(active bool) {
 	c.active = active
 }
+
 func (c *Container) GetActivity() bool {
 	return c.active
 }
 
 func (c *Container) SetPos(x, y int) {
-	c.drawing.SetPos(x, y)
+	diffX:=x-c.x
+	diffY:=y-c.y
+	for _, comp := range c.components {
+		xE, yE := comp.GetPos()
+		comp.SetPos(xE+diffX, yE+diffY)
+	}
+	cD, cE := c.drawing.GetPos()
+	c.drawing.SetPos(cD+diffX, cE+diffY)
+	c.x=x
+	c.y=y
+	c.drawing.Touch()
 	EventManager.Call(EventManager.ReorganizeElements, []any{c})
 }
 

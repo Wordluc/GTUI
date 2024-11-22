@@ -2,7 +2,6 @@ package Component
 
 import (
 	"errors"
-
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/EventManager"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
@@ -16,33 +15,34 @@ type Modal struct {
 	component *Container
 	nullComponent *NullComponent
 }
+
 func CreateModal(sizeX, sizeY int) *Modal {
 	null := CreateNullComponent(0, 0, sizeX, sizeY)
-	null.SetLayer(modalL1)
-	null.SetOnHover(func() {
-		null.GetRect().SetColor(Color.Get(Color.White,Color.None))
-		null.graphics.Touch()
-	})
-	null.SetOnLeave(func() {
-		null.GetRect().SetColor(Color.Get(Color.Gray,Color.None))
-		null.graphics.Touch()
-	})
 	contComp:= CreateContainer(0,0)
 	contComp.AddComponent(null)
+	contComp.SetLayer(modalL1)
 	return &Modal{
 		nullComponent: null,
 		component: contComp,
 	}
 }
+
+func (b *Modal) SetBackgroundColor(color Color.ColorValue) {
+	b.nullComponent.GetRect().SetInsideColor(color)
+	b.nullComponent.graphics.Touch()
+}
+
 func (b *Modal) AddComponent(componentToAdd Core.IComponent) error {
-	componentToAdd.SetLayer(componentToAdd.GetLayer()+modalL1)
+	if e:=componentToAdd.SetLayer(b.component.GetLayer()+1);e!=nil{
+		return e
+	}
 	b.component.AddComponent(componentToAdd)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
 }
 
 func (b *Modal) AddDrawing(drawingToAdd Core.IDrawing) error {
-	drawingToAdd.SetLayer(drawingToAdd.GetLayer()+modalL1)
+	drawingToAdd.SetLayer(drawingToAdd.GetLayer()+modalL1+1)
 	b.component.AddDrawing(drawingToAdd)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil

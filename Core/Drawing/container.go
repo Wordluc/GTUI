@@ -23,7 +23,6 @@ func CreateContainer( x, y int) *Container {
 		yPos:  y,
 		color: Color.GetNoneColor(),
 		visible: true,
-		layer: Core.L1,
 	}
 }
 
