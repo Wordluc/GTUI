@@ -1,7 +1,9 @@
 package Component
 
 import (
+	"errors"
 	"time"
+
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
@@ -43,9 +45,13 @@ func (b *Button) GetPos() (int, int) {
 func (b *Button) GetLayer() Core.Layer {
 	return b.graphics.GetLayer()
 }
-func (b *Button) SetLayer(layer Core.Layer) {
+func (b *Button) SetLayer(layer Core.Layer)error {
+	if layer<0 {
+		return errors.New("layer can't be negative")
+	}
 	b.graphics.SetLayer(layer)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	return nil
 }
 func (b *Button) GetSize() (int, int) {
 	return b.visibleArea.GetSize()

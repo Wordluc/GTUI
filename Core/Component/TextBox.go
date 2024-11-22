@@ -1,6 +1,7 @@
 package Component
 
 import (
+	"errors"
 	"time"
 
 	"github.com/Wordluc/GTUI/Core"
@@ -52,9 +53,13 @@ func (b *TextBox) SetPos(x, y int) {
 func (b *TextBox) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
 }
-func (b *TextBox) SetLayer(layer Core.Layer) {
+func (b *TextBox) SetLayer(layer Core.Layer)error {
+	if layer<0 {
+		return errors.New("layer can't be negative")
+	}
 	b.graphics.SetLayer(layer)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	return nil
 }
 func (b *TextBox) GetLayer() Core.Layer {
 	return b.graphics.GetLayer()

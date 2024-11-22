@@ -1,9 +1,11 @@
 package Drawing
 
 import (
+	"errors"
 	"strings"
-	"github.com/Wordluc/GTUI/Core/EventManager"
+
 	"github.com/Wordluc/GTUI/Core"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -89,10 +91,14 @@ func (r *RectangleFull) SetPos(x, y int) {
 	EventManager.Call(EventManager.ReorganizeElements,[]any{r})
 }
 
-func (b *RectangleFull) SetLayer(layer Core.Layer) {
+func (b *RectangleFull) SetLayer(layer Core.Layer) error{
+	if layer<0 {
+		return errors.New("layer can't be negative")
+	}
 	b.layer = layer
 	b.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	return nil
 }
 func (c *RectangleFull) GetLayer() Core.Layer {
 	return c.layer

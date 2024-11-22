@@ -29,7 +29,7 @@ func setDefaultEventButton(b *Component.Button,idle Color.ColorValue,active Colo
 }
 var comp Core.IComponent
 var button2 *Component.Button
-var modal Core.IComponent
+var modal *Component.Modal
 func main() {
 	kbr := Keyboard.NewKeyboard()
 	core, _ := GTUI.NewGtui(loop, kbr, &Terminal.Terminal{})
@@ -106,19 +106,17 @@ func main() {
 		panic(e)
 	}
 
-	cont:=Component.CreateContainer(0,0)
-
-	text:=Drawing.CreateTextField(10,0,"modal")
-	ok:=Component.CreateButton(0,5,10,3,"ok")
+	text:=Drawing.CreateTextField(10,1,"modal")
+	ok:=Component.CreateButton(2,5,10,3,"ok")
 	esplodi:=Component.CreateButton(18,5,10,3,"esplodi")
 
 	setDefaultEventButton(ok,Color.Gray,Color.White,Color.Red)
 	setDefaultEventButton(esplodi,Color.Gray,Color.White,Color.Red)
 
-	cont.AddDrawing(text)
-	cont.AddComponent(esplodi)
-	cont.AddComponent(ok)
-	modal=Component.CreateModal(10,20,30,10,cont)
+	modal=Component.CreateModal(30,10)
+	modal.AddDrawing(text)
+	modal.AddComponent(esplodi)
+	modal.AddComponent(ok)
 	if e:=core.AddComponent(modal);e!=nil{
 		panic(e)
 	}

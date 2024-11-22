@@ -1,10 +1,12 @@
 package Drawing
 
 import (
+	"errors"
 	"slices"
 	"strings"
-	"github.com/Wordluc/GTUI/Core/EventManager"
+
 	"github.com/Wordluc/GTUI/Core"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -153,10 +155,14 @@ func (t *TextBlock) SetPos(x, y int) {
 	EventManager.Call(EventManager.ReorganizeElements,[]any{t})
 }
 
-func (b *TextBlock) SetLayer(layer Core.Layer) {
+func (b *TextBlock) SetLayer(layer Core.Layer) error{
+	if layer<0 {
+		return errors.New("layer can't be negative")
+	}
 	b.layer = layer
 	b.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	return nil
 }
 
 func (c *TextBlock) GetLayer() Core.Layer {
