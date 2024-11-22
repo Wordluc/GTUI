@@ -35,14 +35,6 @@ func (c *Container) AddDrawing(container Core.IDrawing)error {
 	return c.drawing.AddChild(container)
 }
 
-func (c *Container) GetComnponents() []Core.IComponent {
-	return c.components
-}
-
-//DO NOT USE
-func (c *Container) GetSize() (int,int) {
-	panic("mustn't be called")
-}
 func (b *Container) SetLayer(layer Core.Layer) error{
 	if layer<0 {
 		return errors.New("layer can't be negative")
@@ -93,22 +85,31 @@ func (c *Container) GetPos() (int, int) {
 	return c.drawing.GetPos()
 }
 
+func (c *Container) GetGraphics() Core.IDrawing {
+	return c.drawing
+}
+
+//DO NOT USE
 func (c *Container) OnClick() {
 	panic("mustn't be called")
 }
 
+//DO NOT USE
 func (c *Container) OnRelease() {
 	panic("mustn't be called")
 }
 
+//DO NOT USE
 func (c *Container) OnHover() {
 	panic("mustn't be called")
 }
 
+//DO NOT USE
 func (c *Container) OnLeave() {
 	panic("mustn't be called")
 }
 
-func (c *Container) GetGraphics() Core.IDrawing {
-	return c.drawing
+//DO NOT USE
+func (c *Container) GetSize() (int,int) {
+	panic("mustn't be called")
 }
