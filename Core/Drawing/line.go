@@ -23,13 +23,12 @@ type Line struct {
 	layer     Core.Layer
 }
 
-func CreateLine(x, y, len int, angle int16) *Line {
+func CreateLine(x, y, len int) *Line {
 	return &Line{
 		ansiCode:  "",
 		xPos:      x,
 		yPos:      y,
 		Len:       len,
-		angle:     angle,
 		isChanged: true,
 		color:     Color.GetNoneColor(),
 		visible:   true,
@@ -63,14 +62,15 @@ func (r *Line) GetAnsiCode(defaultColor Color.Color) string {
 	return r.ansiCode
 }
 
-func (r *Line) SetAngle(angle int16) {
+func (r *Line) SetAngle(angle int16)error {
 	switch angle {
 	case 0, 45, 90:
 		r.angle = angle
 	default:
-		return
+		return errors.New("invalid angle")
 	}
 	r.Touch()
+	return nil
 }
 
 func (l *Line) SetPos(x, y int) {
@@ -80,10 +80,14 @@ func (l *Line) SetPos(x, y int) {
 	EventManager.Call(EventManager.ReorganizeElements, []any{l})
 }
 
-func (b *Line) SetLayer(layer Core.Layer) {
+func (b *Line) SetLayer(layer Core.Layer)error {
+	if layer<0 {
+		return errors.New("layer can't be negative")
+	}
 	b.layer = layer
 	b.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	return nil
 }
 func (c *Line) GetLayer() Core.Layer {
 	return c.layer

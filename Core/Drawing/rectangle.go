@@ -73,10 +73,14 @@ func (l *Rectangle) SetSize(x, y int) error {
 	return nil
 }
 
-func (b *Rectangle) SetLayer(layer Core.Layer) {
+func (b *Rectangle) SetLayer(layer Core.Layer) error{
+	if layer<0 {
+		return errors.New("layer can't be negative")
+	}
 	b.layer = layer
 	b.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	return nil
 }
 
 func (c *Rectangle) GetLayer() Core.Layer {

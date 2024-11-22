@@ -101,7 +101,10 @@ func (c *Container) GetPos() (int, int) {
 	return c.xPos, c.yPos
 }
 
-func (b *Container) SetLayer(layer Core.Layer) {
+func (b *Container) SetLayer(layer Core.Layer) error{
+	if layer<0 {
+		panic("layer can't be negative")
+	}
 	diff := layer - b.layer
 	for _,comp:=range b.children {
 		comp.SetLayer(comp.GetLayer()+diff)
@@ -109,6 +112,7 @@ func (b *Container) SetLayer(layer Core.Layer) {
 	b.layer = layer
 	b.Touch()
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	return nil
 }
 
 func (c *Container) GetLayer() Core.Layer {

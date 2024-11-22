@@ -1,6 +1,8 @@
 package Component
 
 import (
+	"errors"
+
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
@@ -33,7 +35,10 @@ func (c *Container) AddDrawing(container Core.IDrawing)error {
 func (c *Container) GetSize() (int,int) {
 	panic("mustn't be called")
 }
-func (b *Container) SetLayer(layer Core.Layer) {
+func (b *Container) SetLayer(layer Core.Layer) error{
+	if layer<0 {
+		return errors.New("layer can't be negative")
+	}
 	diff:= layer - b.layer
 	for _,comp:=range b.components {
 		comp.SetLayer(comp.GetLayer()+diff)
@@ -41,6 +46,7 @@ func (b *Container) SetLayer(layer Core.Layer) {
 	b.drawing.SetLayer(b.drawing.GetLayer()+diff)
 	b.layer = layer
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	return nil
 }
 func (c *Container) GetLayer() Core.Layer {
 	return c.layer
