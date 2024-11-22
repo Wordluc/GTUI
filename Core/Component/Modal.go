@@ -78,14 +78,6 @@ func (b *Modal) GetGraphics() Core.IDrawing {
 	return b.container.GetGraphics()
 }
 
-func (b *Modal) GetSize() (int, int) {
-	panic("mustn't be called")
-}
-
-func (b *Modal) GetVisibleArea() Core.IDrawing {
-	panic("mustn't be called")
-}
-
 func (b *Modal) OnClick() {
 }
 func (b *Modal) OnRelease() {
@@ -93,4 +85,14 @@ func (b *Modal) OnRelease() {
 func (b *Modal) OnHover() {
 }
 func (b *Modal) OnLeave() {
+}
+
+//DO NOT USE
+func (b *Modal) GetSize() (int, int) {
+	panic("mustn't be called")
+}
+
+//DO NOT USE
+func (b *Modal) GetVisibleArea() Core.IDrawing {
+	panic("mustn't be called")
 }
