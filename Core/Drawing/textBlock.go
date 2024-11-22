@@ -107,6 +107,7 @@ type TextBlock struct {
 	tabSize                  int
 	wrap                     bool
 	layer                    Core.Layer
+	color                    Color.Color
 }
 
 func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock {
@@ -131,6 +132,7 @@ func CreateTextBlock(x, y int, xSize, ySize int, initialCapacity int) *TextBlock
 		absoluteCurrentCharacter: 0,
 		tabSize:                  4,
 		wrap:                     false,
+		color:                    Color.GetDefaultColor(),
 	}
 }
 
@@ -147,7 +149,10 @@ func (t *TextBlock) GetAnsiCode(defaultColor Color.Color) string {
 	}
 	return t.ansiCode
 }
-
+func (t *TextBlock) SetColor(color Color.Color) {
+	t.color = color
+	t.Touch()
+}
 func (t *TextBlock) SetPos(x, y int) {
 	t.xPos = x
 	t.yPos = y
@@ -365,6 +370,7 @@ func insertTextToOrigin(origin, text string, pos int) string {
 // Get the text, if parm == true the ansi code will be added
 func (t *TextBlock) GetText(withAnsiCode bool) string {
 	full := strings.Builder{}
+	full.WriteString(t.color.GetAnsiColor())
 	y := 0
 	if !t.wrap {
 		t.xStartingWrapping = t.absoluteCurrentCharacter
@@ -401,6 +407,7 @@ func (t *TextBlock) GetText(withAnsiCode bool) string {
 		}
 		y++
 	}
+	full.WriteString(Color.GetDefaultColor().GetAnsiColor())
 	return strings.TrimSuffix(full.String(),"\n")
 }
 func (t *TextBlock) parseText(text string) string {

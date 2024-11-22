@@ -107,6 +107,7 @@ func main() {
 	}
 
 	text:=Drawing.CreateTextField(10,1,"modal")
+	text.SetColor(Color.Get(Color.White,Color.Red))
 	ok:=Component.CreateButton(2,5,10,3,"ok")
 	esplodi:=Component.CreateButton(18,5,10,3,"esplodi")
 
