@@ -55,13 +55,13 @@ func (c *Gtui) initializeEventManager() {
 
 	EventManager.Subscribe(EventManager.ReorganizeElements, 100, func(comp []any) {
 		c.IClear()
-		group:=sync.WaitGroup{}
+		group := sync.WaitGroup{}
 		group.Add(2)
-		go func(){
+		go func() {
 			c.drawingTree.Refresh()
 			group.Done()
 		}()
-		go func(){
+		go func() {
 			c.componentTree.Refresh()
 			group.Done()
 		}()
@@ -75,8 +75,6 @@ func (c *Gtui) SetCur(x, y int) error {
 		return errors.New("cursor out of range")
 	}
 	if !c.cursorVisibility {
-		c.xCursor = x
-		c.yCursor = y
 		return nil
 	}
 
@@ -95,7 +93,7 @@ func (c *Gtui) SetCur(x, y int) error {
 		comp.OnHover()
 	}
 
-	for i,comp := range inPreButNotInPost{
+	for i, comp := range inPreButNotInPost {
 		if ci, ok := inPreButNotInPost[i].(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
 				ci.SetCurrentPosCursor(x, y)
@@ -168,6 +166,13 @@ func (c *Gtui) AddComponent(componentToAdd Core.IComponent) error {
 		c.AddDrawing(componentToAdd.GetGraphics())
 		return nil
 	}
+	if container, ok := componentToAdd.(Core.IComposableComponent); ok {
+		for _, component := range container.GetComponets() {
+			c.AddComponent(component)
+		}
+		c.AddDrawing(componentToAdd.GetGraphics())
+		return nil
+	}
 	c.AddDrawing(componentToAdd.GetGraphics())
 	c.componentTree.AddElement(componentToAdd)
 	componentToAdd.OnLeave()
@@ -175,7 +180,7 @@ func (c *Gtui) AddComponent(componentToAdd Core.IComponent) error {
 }
 
 func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
-	resultArray:= c.componentTree.GetHighterLayerElements(x, y)
+	resultArray := c.componentTree.GetHighterLayerElements(x, y)
 	if len(resultArray) == 0 {
 		return nil
 	}
@@ -184,7 +189,6 @@ func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
 	}
 	return nil
 }
-
 
 func (c *Gtui) Click(x, y int) error {
 	resultArray := c.componentTree.GetHighterLayerElements(x, y)
@@ -206,7 +210,7 @@ func (c *Gtui) AllineCursor() {
 				deltax, deltay := ci.DiffCurrentToXY(x, y)
 				c.yCursor = y + deltay
 				c.xCursor = x + deltax
-				return 
+				return
 			}
 		}
 	}
@@ -238,7 +242,7 @@ func (c *Gtui) refresh(onlyTouched bool) error {
 func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder, bool) {
 	var str strings.Builder
 	var drawing Core.IDrawing
-	var drew bool=false
+	var drew bool = false
 	var elementToRefresh map[Core.IDrawing]struct{} = make(map[Core.IDrawing]struct{})
 	cond := func(node *Core.TreeNode[Core.IDrawing]) bool {
 		drawing = node.GetElement()
