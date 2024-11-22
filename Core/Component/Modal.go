@@ -1,8 +1,11 @@
 package Component
 
 import (
+	"errors"
+
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/EventManager"
+	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 const (
 	modalL1 Core.Layer= Core.LMax+iota
@@ -11,25 +14,38 @@ const (
 )
 type Modal struct {
 	component *Container
-	visibleArea Core.IDrawing
+	nullComponent *NullComponent
 }
-func CreateModal(x, y, sizeX, sizeY int,content *Container) *Modal {
+func CreateModal(sizeX, sizeY int) *Modal {
 	null := CreateNullComponent(0, 0, sizeX, sizeY)
+	null.SetLayer(modalL1)
+	null.SetOnHover(func() {
+		null.GetRect().SetColor(Color.Get(Color.White,Color.None))
+		null.graphics.Touch()
+	})
+	null.SetOnLeave(func() {
+		null.GetRect().SetColor(Color.Get(Color.Gray,Color.None))
+		null.graphics.Touch()
+	})
 	contComp:= CreateContainer(0,0)
-
 	contComp.AddComponent(null)
-	contComp.AddComponent(content)
-
-	content.SetLayer(modalL2)
-	contComp.SetLayer(modalL1)
-
-	content.SetPos(1,1)
-	contComp.SetPos(x, y)
-	
 	return &Modal{
-		visibleArea: null.GetGraphics(),
+		nullComponent: null,
 		component: contComp,
 	}
+}
+func (b *Modal) AddComponent(componentToAdd Core.IComponent) error {
+	componentToAdd.SetLayer(componentToAdd.GetLayer()+modalL1)
+	b.component.AddComponent(componentToAdd)
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	return nil
+}
+
+func (b *Modal) AddDrawing(drawingToAdd Core.IDrawing) error {
+	drawingToAdd.SetLayer(drawingToAdd.GetLayer()+modalL1)
+	b.component.AddDrawing(drawingToAdd)
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	return nil
 }
 
 func	(b *Modal)GetComponets() []Core.IComponent{
@@ -42,16 +58,20 @@ func (b *Modal) SetPos(x, y int) {
 }
 
 func (b *Modal) GetPos() (int, int) {
-	return b.visibleArea.GetPos()
+	return b.nullComponent.GetPos()
 }
 
 func (b *Modal) GetLayer() Core.Layer {
 	return b.component.GetLayer()
 }
 
-func (b *Modal) SetLayer(layer Core.Layer) {
+func (b *Modal) SetLayer(layer Core.Layer) error{
+	if layer<0 {
+		return errors.New("layer can't be negative")
+	}
 	b.component.SetLayer(layer)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	return nil
 }
 
 func (b *Modal) GetGraphics() Core.IDrawing {

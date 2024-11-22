@@ -11,7 +11,7 @@ type IComponent interface {
 	GetPos() (int, int)
 	GetSize() (int, int)
 	GetLayer() Layer
-	SetLayer(layer Layer)
+	SetLayer(layer Layer)error
 }
 
 type IComposableComponent interface {

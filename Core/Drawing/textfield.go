@@ -1,9 +1,11 @@
 package Drawing
 
 import (
+	"errors"
 	"strings"
-	"github.com/Wordluc/GTUI/Core/EventManager"
+
 	"github.com/Wordluc/GTUI/Core"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -51,10 +53,14 @@ func (s *TextField) SetPos(x, y int) {
 	s.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{s})
 }
-func (s *TextField) SetLayer(layer Core.Layer) {
+func (s *TextField) SetLayer(layer Core.Layer) error{
+	if s.layer == layer{
+		return errors.New("layer already set")
+	}
 	s.layer = layer
 	s.Touch()
 	EventManager.Call(EventManager.ReorganizeElements,[]any{s})
+	return nil
 }
 func (s *TextField) GetLayer() Core.Layer {
 	return s.layer
