@@ -45,17 +45,16 @@ func CreateNode[T ElementTree](element T, typeNode typeTreeNode) *TreeNode[T] {
 }
 
 func (t *TreeNode[T]) isCollidingWithNode(x, y int, width, height int) bool {
-	//-1 to avoid trigger on border
-	if x > t.xPos && x < t.xPos+t.width-1 && y > t.yPos && y < t.yPos+t.height-1 {
+	if x >= t.xPos && x < t.xPos+t.width && y >= t.yPos && y < t.yPos+t.height {
 		return true
 	}
-	if x+width > t.xPos && x+width < t.xPos+t.width-1 && y > t.yPos && y < t.yPos+t.height-1 {
+	if x+width >= t.xPos && x+width < t.xPos+t.width && y >= t.yPos && y < t.yPos+t.height {
 		return true
 	}
-	if x > t.xPos && x < t.xPos+t.width-1 && y+height > t.yPos && y+height < t.yPos+t.height-1 {
+	if x >= t.xPos && x < t.xPos+t.width && y+height >= t.yPos && y+height < t.yPos+t.height {
 		return true
 	}
-	if x+width > t.xPos && x+width < t.xPos+t.width-1 && y+height > t.yPos && y+height < t.yPos+t.height-1 {
+	if x+width >= t.xPos && x+width < t.xPos+t.width && y+height >= t.yPos && y+height < t.yPos+t.height {
 		return true
 	}
 	return false
