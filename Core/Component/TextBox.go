@@ -47,7 +47,7 @@ func (b *TextBox) GetSize() (int, int) {
 }
 
 func (b *TextBox) SetPos(x, y int) {
-	b.visibleArea.SetPos(x, y)
+	b.graphics.SetPos(x, y)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 }
 func (b *TextBox) GetPos() (int, int) {

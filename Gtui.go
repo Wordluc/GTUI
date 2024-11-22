@@ -160,15 +160,15 @@ func (c *Gtui) AddDrawing(entityToAdd Core.IDrawing) {
 }
 
 func (c *Gtui) AddComponent(componentToAdd Core.IComponent) error {
-	if container, ok := componentToAdd.(*Component.Container); ok {
-		for _, component := range container.GetComponents() {
+	if container, ok := componentToAdd.(Core.IComposableComponent); ok {
+		for _, component := range container.GetComponets() {
 			c.AddComponent(component)
 		}
 		c.AddDrawing(componentToAdd.GetGraphics())
 		return nil
 	}
-	if container, ok := componentToAdd.(Core.IComposableComponent); ok {
-		for _, component := range container.GetComponets() {
+	if container, ok := componentToAdd.(*Component.Container); ok {
+		for _, component := range container.GetComponents() {
 			c.AddComponent(component)
 		}
 		c.AddDrawing(componentToAdd.GetGraphics())
