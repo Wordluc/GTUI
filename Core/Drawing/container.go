@@ -52,6 +52,9 @@ func (c *Container) IsTouched() (bool) {
 	return false
 }
 func (c *Container) SetVisibility(visible bool) {
+	for _, child := range c.children {
+		child.SetVisibility(visible)
+	}
 	c.visible = visible
 }
 
@@ -60,16 +63,7 @@ func (c *Container) GetVisibility() bool {
 }
 
 func (c *Container) GetAnsiCode(defaultColor Color.Color) string {
-	if !c.visible {
-		return ""
-	}
-	var str strings.Builder
-	str.WriteString(c.color.GetMixedColor(defaultColor).GetAnsiColor())
-	for _, child := range c.children {
-		str.WriteString(child.GetAnsiCode(defaultColor))
-		str.WriteString(c.color.GetMixedColor(defaultColor).GetAnsiColor())
-	}
-	return str.String()
+	panic("mustn't be called")
 }
 
 func (c *Container) getAnsiCode(defaultColor Color.Color) string {
