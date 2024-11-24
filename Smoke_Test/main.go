@@ -50,6 +50,7 @@ func main() {
 	contDraw:=Drawing.CreateContainer(0,0)
 	contDraw.AddChild(rect)
 	contDraw.AddChild(rect1)
+	contDraw.SetVisibility(true)
 	compComponent:=Component.CreateContainer(0,0)
 	compComponent.AddDrawing(contDraw)
 	if e := compComponent.AddComponent(c); e != nil {
