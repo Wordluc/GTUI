@@ -26,7 +26,12 @@ func CreateModal(sizeX, sizeY int) *Modal {
 		container: contComp,
 	}
 }
-
+func (b *Modal) SetVisibility(visible bool)  {
+	for _, child := range b.container.GetComponents() {
+		child.GetGraphics().SetVisibility(visible)
+	}
+	b.nullComponent.GetGraphics().SetVisibility(visible)
+}
 func (b *Modal) SetBackgroundColor(color Color.ColorValue) {
 	b.nullComponent.GetRect().SetInsideColor(color)
 	b.nullComponent.graphics.Touch()
