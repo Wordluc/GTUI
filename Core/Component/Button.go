@@ -17,6 +17,7 @@ type Button struct {
 	onHover     Core.OnEvent
 	onLeave     Core.OnEvent
 	isClicked   bool
+	isActive    bool
 }
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont := Drawing.CreateContainer(0, 0)
@@ -33,8 +34,14 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 		graphics:    cont,
 		visibleArea: rect,
 		isClicked:   false,
+		isActive:    true,
 	}
 }
+
+func (b *Button) SetActive(isActive bool)  {
+	b.isActive = isActive
+}
+
 func (b *Button) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
@@ -69,7 +76,9 @@ func (b *Button) SetOnHover(onHover Core.OnEvent) {
 	b.onHover = onHover
 }
 func (b *Button) OnClick() {
-
+	if !b.isActive {
+		return
+	}
 	if b.isClicked {
 		return
 	}
@@ -84,6 +93,9 @@ func (b *Button) OnClick() {
 	b.isClicked = true
 }
 func (b *Button) OnRelease() {
+	if !b.isActive {
+		return
+	}
 	if b.onRelease == nil {
 		return
 	}
@@ -91,11 +103,17 @@ func (b *Button) OnRelease() {
 	b.onRelease()
 }
 func (b *Button) OnHover() {
+	if !b.isActive {
+		return
+	}
 	if b.onHover != nil {
 		b.onHover()
 	}
 }
 func (b *Button) OnLeave() {
+	if !b.isActive {
+		return
+	}
 	if b.onLeave != nil {
 		b.onLeave()
 	}

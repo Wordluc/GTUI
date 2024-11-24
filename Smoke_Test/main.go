@@ -58,6 +58,7 @@ func main() {
 	}
 	comp=compComponent
 	button1:=Component.CreateButton(100,0,10,10,"test")
+	button1.SetActive(false)
 	button1.SetLayer(Core.L4)
 	button1.GetVisibleArea().SetInsideColor(Color.White)
 	button1.SetOnLeave(func() {
