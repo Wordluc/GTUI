@@ -133,11 +133,11 @@ func (d *TreeNode[T]) executeForAll(do func(node *TreeNode[T]) bool) *TreeNode[T
 	}
 	return nil
 }
-
+//Get the element of the node
 func (d *TreeNode[T]) GetElement() T {
 	return d.element
 }
-
+//Get all elements from the node to the bottom
 func (d *TreeNode[T]) GetElements() []T {
 	result := make([]T, 0)
 	d.executeForAll(func(node *TreeNode[T]) bool {
@@ -190,7 +190,7 @@ func (d *TreeManager[T]) ExecuteOnLayerForAll(layer Layer, cond func(node *TreeN
 	}
 	d.root[layer].executeForAll(cond)
 }
-
+//Get all elements that collide with the point in a specific layer
 func (d *TreeManager[T]) SearchOnLayer(layer Layer, x, y int) ([]T, error) {
 	var result []T
 	if int(layer) >= len(d.root) {
@@ -202,7 +202,7 @@ func (d *TreeManager[T]) SearchOnLayer(layer Layer, x, y int) ([]T, error) {
 	result = d.root[layer].search(x, y)
 	return result, nil
 }
-
+//Get all elements that collide with the point, divided in different array(layer)
 func (d *TreeManager[T]) SearchInDifferentLayers(x, y int) [][]T {
 	var results [][]T = make([][]T, len(d.root))
 	var group sync.WaitGroup = sync.WaitGroup{}
@@ -219,7 +219,7 @@ func (d *TreeManager[T]) SearchInDifferentLayers(x, y int) [][]T {
 	group.Wait()
 	return results
 }
-
+//Get all elements that collide with the point,indipendently of the layer
 func (d *TreeManager[T]) Search(x, y int) ([]T, error) {
 	resultsMatrix := d.SearchInDifferentLayers(x, y)
 	var result []T
@@ -228,7 +228,7 @@ func (d *TreeManager[T]) Search(x, y int) ([]T, error) {
 	}
 	return result, nil
 }
-
+//Get all elements that collide with the point and are higher
 func (d *TreeManager[T]) GetHighterLayerElements(x, y int) []T {
 	resultMatrix := d.SearchInDifferentLayers(x, y)
 	for i := len(resultMatrix) - 1; i >= 0; i-- {
@@ -238,7 +238,7 @@ func (d *TreeManager[T]) GetHighterLayerElements(x, y int) []T {
 	}
 	return nil
 }
-
+//Get all elements that collide with the element
 func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *TreeNode[T]) []T {
 	var result []T
 	defer func() {
@@ -263,7 +263,7 @@ func (d *TreeManager[T]) GetCollidingElement(layer Layer, elementWhichCollides *
 	})
 	return result
 }
-
+//Use when you want to refresh the tree
 func (d *TreeManager[T]) Refresh() {
 	newTree := CreateTreeManager[T]()
 	for layer := 0; layer < len(d.root); layer++ {

@@ -3,6 +3,7 @@ package Core
 import "github.com/Wordluc/GTUI/Core/Utils/Color"
 
 type IDrawing interface {
+	//Notify that the element has been touched,so it needs to be redrawn
 	Touch()
 	IsTouched() bool
 	GetAnsiCode(defaultColor Color.Color) string

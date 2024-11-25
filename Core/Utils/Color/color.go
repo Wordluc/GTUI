@@ -36,7 +36,7 @@ func GetNoneColor() Color {
 func GetDefaultColor() Color {
 	return Color{foreground: Reset, Background: gBg(Reset)}
 }
-
+//Get the color that is the combination of the default color and the current color,if the a part of default color is not set, the default color will be used
 func (c Color) GetMixedColor(defaultColor Color) Color {
 	if GetNoneColor().IsEqual(c) {
 		return GetNoneColor()

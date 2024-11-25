@@ -9,6 +9,7 @@ const (
 	L5
 	L6
 	LMax//it is on the top
+	//for modal
 	modalL1
 	modalL2
 	modalL3
