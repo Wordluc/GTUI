@@ -18,6 +18,7 @@ This framework allows you to build terminal applications in Go without worrying 
 ### Showcase
 
 To demonstrate the capabilities of this framework, a **TODO app** has been created. It features interactive UI elements, such as buttons and textboxes, to manage tasks in the terminal.
+https://github.com/Wordluc/Fedi
 ![image](https://github.com/user-attachments/assets/e67d8219-b3a2-4a73-8a30-173d706837a3)
 
 To see a "demo",you can launch `go run Smoke_Test/main.go`
