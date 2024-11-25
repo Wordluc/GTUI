@@ -104,7 +104,7 @@ func (t *Keyboard) IsKeySPressed(key Key) bool {
 func (t *Keyboard) IsKeyPressed(key rune) bool {
 	return t.key.rune == key
 }
-
+//Clean the keybaord state
 func (t *Keyboard) CleanKeyboardState() {
 	t.key = stateKey{}
 }

@@ -24,5 +24,6 @@ type IWritableComponent interface {
 	StopTyping()
 	//return offset between actual character and line to x,y,(AnCharacter-x,AnLine-y)
 	DiffCurrentToXY(x, y int) (int, int)
+	//Set the cursor inside the component to the position (x,y)
 	SetCurrentPosCursor(x, y int) (int, int)
 }
