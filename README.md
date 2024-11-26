@@ -1,7 +1,7 @@
 # Terminal Interface Framework in Go
 
 This framework allows you to build terminal applications in Go without worrying about the complexities of rendering and event calling. It automatically handles screen refreshing when necessary, optimizing performance.
-
+To see a "demo",you can launch `go run Smoke_Test/main.go`
 ### Features:
 
 - **Element Support:**  
@@ -19,6 +19,3 @@ This framework allows you to build terminal applications in Go without worrying 
 
 To demonstrate the capabilities of this framework, a **TODO app** has been created: https://github.com/Wordluc/Fedi
 ![image](https://github.com/user-attachments/assets/e67d8219-b3a2-4a73-8a30-173d706837a3)
-
-To see a "demo",you can launch `go run Smoke_Test/main.go`
-
