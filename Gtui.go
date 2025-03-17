@@ -172,10 +172,11 @@ func (c *Gtui) AddContainer(container Core.IContainer) error{
 }
 
 func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error{
-	drawings:=complEle.GetDrawings()
 	componets:=complEle.GetComponents()
+	drawings:=complEle.GetDrawings()
 	for _,comp:=range componets{
 		c.componentTree.AddElement(comp)
+		comp.OnLeave()
 	}
 	for _,draw:=range drawings{
 		c.drawingTree.AddElement(draw)
