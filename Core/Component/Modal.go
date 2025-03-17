@@ -57,7 +57,7 @@ func (b *Modal) AddDrawing(drawingToAdd Core.IDrawing) error {
 	return nil
 }
 
-func	(b *Modal)GetComponets() []Core.IComponent{
+func	(b *Modal)GetComponents() []Core.IComponent{
 	return b.container.GetComponents()
 }
 
@@ -86,8 +86,3 @@ func (b *Modal) SetLayer(layer Core.Layer) error{
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
 }
-
-func (c *Modal) GetComponents() ([]Core.IComponent) {
-	return []Core.IComponent{}
-}
-

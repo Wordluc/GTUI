@@ -30,6 +30,7 @@ func (c *Container) AddComponent(components ...Core.IComponent)error {
 	for _,comp:=range components{
 		c.drawings=append(c.drawings,comp.GetGraphics()...)
 	}
+
 	return nil
 }
 
@@ -46,6 +47,14 @@ func (c *Container) AddContainer(containers ...Core.IContainer)error {
 		c.components = append(c.components,conp.GetComponents()... )
 	}
 	return nil
+}
+
+func (c *Container) GetComponents() ([]Core.IComponent) {
+	return c.components
+}
+
+func (c *Container) GetDrawings() ([]Core.IDrawing) {
+	return c.drawings
 }
 
 func (b *Container) SetLayer(layer Core.Layer) error{
@@ -67,13 +76,6 @@ func (c *Container) GetLayer() Core.Layer {
 	return c.layer
 }
 
-func (c *Container) GetComponents() ([]Core.IComponent) {
-	return c.components
-}
-
-func (c *Container) GetDrawings() ([]Core.IDrawing) {
-	return c.drawings
-}
 
 func (c *Container) SetonClick(onClick func()) {
 	c.onClick = onClick
