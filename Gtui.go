@@ -7,7 +7,6 @@ import (
 
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
-	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
 	"github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
@@ -149,37 +148,40 @@ func (c *Gtui) Start() {
 	c.term.Stop()
 }
 
-func (c *Gtui) AddDrawing(entityToAdd Core.IDrawing) {
-	if container, ok := entityToAdd.(*Drawing.Container); ok {
-		for _, entity := range container.GetChildren() {
-			c.AddDrawing(entity)
-		}
-		return
+func (c *Gtui) AddDrawing(entitiesToAdd ...Core.IDrawing) {
+	for _,draw:=range entitiesToAdd{
+		c.drawingTree.AddElement(draw)
 	}
-	c.drawingTree.AddElement(entityToAdd)
 }
 
-func (c *Gtui) AddComponent(componentToAdd Core.IComponent) error {
-	if container, ok := componentToAdd.(Core.IComposableComponent); ok {
-		for _, component := range container.GetComponets() {
-			c.AddComponent(component)
-		}
-		c.AddDrawing(componentToAdd.GetGraphics())
-		return nil
+func (c *Gtui) AddComponent(componentsToAdd ...Core.IComponent) error {
+	for _,componentToAdd:=range componentsToAdd{
+		c.AddDrawing(componentToAdd.GetGraphics()...)
+		c.componentTree.AddElement(componentToAdd)
+		componentToAdd.OnLeave()
 	}
-	if container, ok := componentToAdd.(*Component.Container); ok {
-		for _, component := range container.GetComponents() {
-			c.AddComponent(component)
-		}
-		c.AddDrawing(componentToAdd.GetGraphics())
-		return nil
-	}
-	c.AddDrawing(componentToAdd.GetGraphics())
-	c.componentTree.AddElement(componentToAdd)
-	componentToAdd.OnLeave()
 	return nil
 }
 
+func (c *Gtui) AddContainer(container Core.IContainer) error{
+	drawings:=container.GetDrawings()
+	componets:=container.GetComponents()
+	c.AddDrawing(drawings...)
+	c.AddComponent(componets...)
+	return nil
+}
+
+func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error{
+	drawings:=complEle.GetDrawings()
+	componets:=complEle.GetComponents()
+	for _,comp:=range componets{
+		c.componentTree.AddElement(comp)
+	}
+	for _,draw:=range drawings{
+		c.drawingTree.AddElement(draw)
+	}
+	return nil
+}
 func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
 	resultArray := c.componentTree.GetHighterLayerElements(x, y)
 	if len(resultArray) == 0 {
