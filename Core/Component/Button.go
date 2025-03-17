@@ -19,16 +19,17 @@ type Button struct {
 	isClicked   bool
 	isActive    bool
 }
+
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
-	textD := Drawing.CreateTextField(0, 0,text)
+	textD := Drawing.CreateTextField(0, 0, text)
 	rect.SetLayer(Core.L1)
 	textD.SetLayer(Core.L2)
 	xC, yC := sizeX/2-len(text)/2, sizeY/2
 	textD.SetPos(xC, yC)
-	cont.AddChild(rect)
-	cont.AddChild(textD)
+	cont.AddDrawings(rect)
+	cont.AddDrawings(textD)
 	cont.SetPos(x, y)
 	return &Button{
 		graphics:    cont,
@@ -38,8 +39,16 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	}
 }
 
-func (b *Button) SetActive(isActive bool)  {
+func (b *Button) SetActive(isActive bool) {
 	b.isActive = isActive
+	if !b.isActive {
+		time.AfterFunc(0, func() {
+			EventManager.Call(EventManager.Refresh, []any{b})
+			b.isActive = true
+			b.OnLeave()
+			b.isActive = false
+		})
+	}
 }
 
 func (b *Button) SetPos(x, y int) {
@@ -52,8 +61,8 @@ func (b *Button) GetPos() (int, int) {
 func (b *Button) GetLayer() Core.Layer {
 	return b.graphics.GetLayer()
 }
-func (b *Button) SetLayer(layer Core.Layer)error {
-	if layer<0 {
+func (b *Button) SetLayer(layer Core.Layer) error {
+	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
 	b.graphics.SetLayer(layer)
@@ -92,6 +101,7 @@ func (b *Button) OnClick() {
 	})
 	b.isClicked = true
 }
+
 func (b *Button) OnRelease() {
 	if !b.isActive {
 		return
@@ -102,6 +112,7 @@ func (b *Button) OnRelease() {
 	b.isClicked = false
 	b.onRelease()
 }
+
 func (b *Button) OnHover() {
 	if !b.isActive {
 		return
@@ -110,6 +121,7 @@ func (b *Button) OnHover() {
 		b.onHover()
 	}
 }
+
 func (b *Button) OnLeave() {
 	if !b.isActive {
 		return
@@ -118,9 +130,11 @@ func (b *Button) OnLeave() {
 		b.onLeave()
 	}
 }
-func (b *Button) GetGraphics() Core.IDrawing {
-	return b.graphics
+
+func (b *Button) GetGraphics() []Core.IDrawing {
+	return b.graphics.GetDrawings()
 }
+
 func (b *Button) GetVisibleArea() *Drawing.RectangleFull {
 	return b.visibleArea
 }

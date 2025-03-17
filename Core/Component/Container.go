@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/Wordluc/GTUI/Core"
-	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
 )
 
@@ -12,7 +11,7 @@ type Container struct {
 	onClick    func()
 	active     bool
 	components []Core.IComponent
-	drawing    *Drawing.Container
+	drawings    []Core.IDrawing
 	layer      Core.Layer
 	x,y int
 }
@@ -22,17 +21,31 @@ func CreateContainer(x, y int) *Container {
 		active:     true,
 		x: x,
 		y: y,
-		drawing:    Drawing.CreateContainer(x, y),
+		drawings:    make([]Core.IDrawing, 0),
 		components: make([]Core.IComponent, 0),
 	}
 }
-func (c *Container) AddComponent(component Core.IComponent)error {
-	c.components = append(c.components, component)
+func (c *Container) AddComponent(components ...Core.IComponent)error {
+	c.components = append(c.components, components...)
+	for _,comp:=range components{
+		c.drawings=append(c.drawings,comp.GetGraphics()...)
+	}
 	return nil
 }
 
-func (c *Container) AddDrawing(container Core.IDrawing)error {
-	return c.drawing.AddChild(container)
+func (c *Container) AddDrawing(drawings ...Core.IDrawing)error {
+	for _,draw:=range drawings{
+		c.drawings = append(c.drawings,draw )
+	}
+	return nil
+}
+
+func (c *Container) AddContainer(containers ...Core.IContainer)error {
+	for _,conp:=range containers{
+		c.drawings = append(c.drawings,conp.GetDrawings()... )
+		c.components = append(c.components,conp.GetComponents()... )
+	}
+	return nil
 }
 
 func (b *Container) SetLayer(layer Core.Layer) error{
@@ -43,7 +56,9 @@ func (b *Container) SetLayer(layer Core.Layer) error{
 	for _,comp:=range b.components {
 		comp.SetLayer(comp.GetLayer()+diff)
 	}
-	b.drawing.SetLayer(b.drawing.GetLayer()+diff)
+	for _,draw:=range(b.drawings){
+		draw.SetLayer(draw.GetLayer()+diff)
+	}
 	b.layer = layer
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
@@ -51,9 +66,15 @@ func (b *Container) SetLayer(layer Core.Layer) error{
 func (c *Container) GetLayer() Core.Layer {
 	return c.layer
 }
-func (c *Container) GetComponents() []Core.IComponent {
+
+func (c *Container) GetComponents() ([]Core.IComponent) {
 	return c.components
 }
+
+func (c *Container) GetDrawings() ([]Core.IDrawing) {
+	return c.drawings
+}
+
 func (c *Container) SetonClick(onClick func()) {
 	c.onClick = onClick
 }
@@ -73,43 +94,16 @@ func (c *Container) SetPos(x, y int) {
 		xE, yE := comp.GetPos()
 		comp.SetPos(xE+diffX, yE+diffY)
 	}
-	cD, cE := c.drawing.GetPos()
-	c.drawing.SetPos(cD+diffX, cE+diffY)
+	for _,draw:=range(c.drawings){
+		cD, cE := draw.GetPos()
+		draw.SetPos(cD+diffX, cE+diffY)
+		draw.Touch()
+	}
 	c.x=x
 	c.y=y
-	c.drawing.Touch()
 	EventManager.Call(EventManager.ReorganizeElements, []any{c})
 }
 
 func (c *Container) GetPos() (int, int) {
-	return c.drawing.GetPos()
-}
-
-func (c *Container) GetGraphics() Core.IDrawing {
-	return c.drawing
-}
-
-//DO NOT USE
-func (c *Container) OnClick() {
-	panic("mustn't be called")
-}
-
-//DO NOT USE
-func (c *Container) OnRelease() {
-	panic("mustn't be called")
-}
-
-//DO NOT USE
-func (c *Container) OnHover() {
-	panic("mustn't be called")
-}
-
-//DO NOT USE
-func (c *Container) OnLeave() {
-	panic("mustn't be called")
-}
-
-//DO NOT USE
-func (c *Container) GetSize() (int,int) {
-	panic("mustn't be called")
+	return c.x,c.y
 }

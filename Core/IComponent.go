@@ -6,7 +6,7 @@ type IComponent interface {
 	OnRelease()
 	OnHover()
 	OnLeave()
-	GetGraphics() IDrawing
+	GetGraphics() []IDrawing
 	SetPos(x, y int)
 	GetPos() (int, int)
 	GetSize() (int, int)
@@ -14,10 +14,15 @@ type IComponent interface {
 	SetLayer(layer Layer)error
 }
 
-type IComposableComponent interface {
-	GetComponets() []IComponent
+type IContainer interface {
+	GetDrawings() []IDrawing
+	GetComponents() []IComponent
+	AddContainer(...IContainer) error
 }
-
+type IComplexElement interface{
+	GetDrawings() []IDrawing
+	GetComponents() []IComponent
+}
 type IWritableComponent interface {
 	IsTyping() bool
 	StartTyping()

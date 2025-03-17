@@ -11,7 +11,7 @@ import (
 type Container struct {
 	xPos     int
 	yPos     int
-	children []Core.IDrawing
+	drawings []Core.IDrawing
 	color    Color.Color
 	visible  bool
 	layer    Core.Layer
@@ -26,25 +26,35 @@ func CreateContainer( x, y int) *Container {
 	}
 }
 
-func (c *Container) GetChildren() []Core.IDrawing {
-	return c.children
-}
-//DO NOT USE
-func (c *Container) GetSize()(int,int) {
-	panic("mustn't be called")
+func (c *Container) GetComponents() ([]Core.IComponent) {
+	return []Core.IComponent{}
 }
 
-func (c *Container) AddChild(child Core.IDrawing) error {//TODO: controllare se l'errare è gestito dai caller
-	c.children = append(c.children, child)
+func (c *Container) GetDrawings() ([]Core.IDrawing) {
+	return c.drawings
+}
+
+func (c *Container) AddDrawings(eles ...Core.IDrawing) error {
+	for _,ele := range eles{
+		c.drawings = append(c.drawings, ele)
+	}
 	return nil
 }
+
+func (c *Container) AddContainer(containers ...Core.IContainer)error {
+	for _,conp:=range containers{
+		c.drawings = append(c.drawings,conp.GetDrawings()... )
+	}
+	return nil
+}
+
 func (c *Container) Touch() {
-	for _, child := range c.children {
+	for _, child := range c.drawings {
 		child.Touch()
 	}
 }
 func (c *Container) IsTouched() (bool) {
-	for _, child := range c.children {
+	for _, child := range c.drawings {
 		if child.IsTouched(){
 			return true
 		}
@@ -52,7 +62,7 @@ func (c *Container) IsTouched() (bool) {
 	return false
 }
 func (c *Container) SetVisibility(visible bool) {
-	for _, child := range c.children {
+	for _, child := range c.drawings {
 		child.SetVisibility(visible)
 	}
 	c.visible = visible
@@ -62,14 +72,10 @@ func (c *Container) GetVisibility() bool {
 	return c.visible
 }
 
-func (c *Container) GetAnsiCode(defaultColor Color.Color) string {
-	panic("mustn't be called")
-}
-
 func (c *Container) getAnsiCode(defaultColor Color.Color) string {
 	var str strings.Builder
 	str.WriteString(c.color.GetAnsiColor())
-	for _, child := range c.children {
+	for _, child := range c.drawings {
 		str.WriteString(child.GetAnsiCode(defaultColor))
 		str.WriteString(c.color.GetAnsiColor())
 	}
@@ -82,7 +88,7 @@ func (c *Container) SetPos(x, y int) {
 	deltaY := y - c.yPos
 	c.xPos = x
 	c.yPos = y
-	for _, child := range c.children {
+	for _, child := range c.drawings {
 		xChild, yChild := child.GetPos()
 		child.SetPos(xChild+deltaX, yChild+deltaY)
 	}
@@ -99,7 +105,7 @@ func (b *Container) SetLayer(layer Core.Layer) error{
 		panic("layer can't be negative")
 	}
 	diff := layer - b.layer
-	for _,comp:=range b.children {
+	for _,comp:=range b.drawings {
 		comp.SetLayer(comp.GetLayer()+diff)
 	}
 	b.layer = layer

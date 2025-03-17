@@ -20,7 +20,7 @@ type NullComponent struct {
 func CreateNullComponent(x, y, sizeX, sizeY int) (*NullComponent) {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
-	cont.AddChild(rect)
+	cont.AddDrawings(rect)
 	cont.SetPos(x, y)
 	return &NullComponent{
 		graphics:    cont,
@@ -57,8 +57,8 @@ func (b *NullComponent) GetLayer() Core.Layer {
 	return b.graphics.GetLayer()
 }
 
-func (b *NullComponent) GetGraphics() Core.IDrawing {
-	return b.graphics
+func (b *NullComponent) GetGraphics() []Core.IDrawing {
+	return b.graphics.GetDrawings()
 }
 
 func (b *NullComponent) SetOnLeave(onLeave func()) {
