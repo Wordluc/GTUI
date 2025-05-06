@@ -7,17 +7,22 @@ import (
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
+	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 
 type Button struct {
-	graphics    *Drawing.Container
-	visibleArea *Drawing.RectangleFull
-	onClick     Core.OnEvent
-	onRelease   Core.OnEvent
-	onHover     Core.OnEvent
-	onLeave     Core.OnEvent
-	isClicked   bool
-	isActive    bool
+	graphics       *Drawing.Container
+	visibleArea    *Drawing.RectangleFull
+	onClick        Core.OnEvent
+	onRelease      Core.OnEvent
+	onHover        Core.OnEvent
+	onLeave        Core.OnEvent
+	isClicked      bool
+	isActive       bool
+	OnClickColor   Color.Color
+	OnReleaseColor Color.Color
+	OnLeaveColor   Color.Color
+	OnHoverColor   Color.Color
 }
 
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
@@ -32,10 +37,14 @@ func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
 	cont.AddDrawings(textD)
 	cont.SetPos(x, y)
 	return &Button{
-		graphics:    cont,
-		visibleArea: rect,
-		isClicked:   false,
-		isActive:    true,
+		graphics:       cont,
+		visibleArea:    rect,
+		isClicked:      false,
+		isActive:       true,
+		OnClickColor:   Color.Get(Color.Red, Color.None),
+		OnReleaseColor: Color.Get(Color.Gray, Color.None),
+		OnLeaveColor:   Color.Get(Color.Gray, Color.None),
+		OnHoverColor:   Color.GetDefaultColor(),
 	}
 }
 
@@ -50,7 +59,6 @@ func (b *Button) SetActive(isActive bool) {
 		})
 	}
 }
-
 func (b *Button) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
@@ -91,6 +99,7 @@ func (b *Button) OnClick() {
 	if b.isClicked {
 		return
 	}
+	b.GetVisibleArea().SetBorderColor(b.OnClickColor)
 	if b.onClick != nil {
 		b.onClick()
 	}
@@ -108,6 +117,7 @@ func (b *Button) OnRelease() {
 	if b.onRelease != nil {
 		b.onRelease()
 	}
+	b.GetVisibleArea().SetBorderColor(b.OnReleaseColor)
 	b.isClicked = false
 }
 
@@ -118,6 +128,8 @@ func (b *Button) OnHover() {
 	if b.onHover != nil {
 		b.onHover()
 	}
+
+	b.GetVisibleArea().SetBorderColor(b.OnHoverColor)
 }
 
 func (b *Button) OnLeave() {
@@ -127,6 +139,7 @@ func (b *Button) OnLeave() {
 	if b.onLeave != nil {
 		b.onLeave()
 	}
+	b.GetVisibleArea().SetBorderColor(b.OnLeaveColor)
 }
 
 func (b *Button) GetGraphics() []Core.IDrawing {
