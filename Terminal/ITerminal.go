@@ -10,4 +10,5 @@ type ITerminal interface {
 	SetCursor(x, y int)
 	HideCursor() string
 	ShowCursor() string
+	Resized() bool
 }
