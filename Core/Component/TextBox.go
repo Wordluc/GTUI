@@ -7,19 +7,24 @@ import (
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
+	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
 
 type TextBox struct {
-	graphics    *Drawing.Container
-	visibleArea *Drawing.Rectangle
-	textBlock   *Drawing.TextBlock
-	isTyping    bool
-	isClicked   bool
-	streamText  StreamCharacter
-	wrap        bool
-	onClick     func()
-	onLeave     func()
-	onHover     func()
+	graphics          *Drawing.Container
+	visibleArea       *Drawing.Rectangle
+	textBlock         *Drawing.TextBlock
+	isTyping          bool
+	isClicked         bool
+	streamText        StreamCharacter
+	wrap              bool
+	onClick           func()
+	onLeave           func()
+	onHover           func()
+	OnTypingColor     Color.Color
+	OnStopTypingColor Color.Color
+	OnHoverColor      Color.Color
+	IsOneLine         bool
 }
 
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox, error) {
@@ -34,12 +39,15 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox
 	}
 	cont.SetPos(x, y)
 	return &TextBox{
-		graphics:    cont,
-		visibleArea: rect,
-		isTyping:    false,
-		isClicked:   false,
-		streamText:  streamText,
-		textBlock:   textBox,
+		graphics:          cont,
+		visibleArea:       rect,
+		isTyping:          false,
+		isClicked:         false,
+		streamText:        streamText,
+		textBlock:         textBox,
+		OnTypingColor:     Color.GetDefaultColor(),
+		OnStopTypingColor: Color.Get(Color.Gray, Color.None),
+		OnHoverColor:      Color.GetDefaultColor(),
 	}, nil
 }
 func (b *TextBox) GetSize() (int, int) {
@@ -53,8 +61,8 @@ func (b *TextBox) SetPos(x, y int) {
 func (b *TextBox) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
 }
-func (b *TextBox) SetLayer(layer Core.Layer)error {
-	if layer<0 {
+func (b *TextBox) SetLayer(layer Core.Layer) error {
+	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
 	b.graphics.SetLayer(layer)
@@ -70,6 +78,11 @@ func (b *TextBox) loopTyping() {
 	for str := range channel {
 		if !b.isTyping {
 			return
+		}
+		if b.IsOneLine && str == "\n" {
+			channel <- ""
+			b.StopTyping()
+			break
 		}
 		for _, key = range []rune(str) {
 			if key == '\b' {
@@ -104,7 +117,7 @@ func (v *TextBox) GetSelectedText() string {
 	return v.textBlock.GetSelectedText()
 }
 
-func (t *TextBox) GetText()string {
+func (t *TextBox) GetText() string {
 	return t.textBlock.GetText()
 }
 
@@ -119,6 +132,7 @@ func (b *TextBox) StartTyping() {
 	if b.isTyping {
 		return
 	}
+	b.GetVisibleArea().SetColor(b.OnTypingColor)
 	b.isTyping = true
 	go b.loopTyping()
 	b.streamText.Delete()
@@ -126,6 +140,7 @@ func (b *TextBox) StartTyping() {
 func (b *TextBox) StopTyping() {
 	b.streamText.Delete()
 	b.isTyping = false
+	b.GetVisibleArea().SetColor(b.OnStopTypingColor)
 }
 
 func (b *TextBox) OnClick() {
@@ -145,7 +160,7 @@ func (b *TextBox) OnClick() {
 
 func (b *TextBox) OnLeave() {
 	if b.onLeave != nil {
-		b.onLeave()	
+		b.onLeave()
 	}
 	b.StopTyping()
 }
@@ -168,8 +183,10 @@ func (b *TextBox) OnRelease() {
 
 func (b *TextBox) OnHover() {
 	if b.onHover != nil {
-		b.onHover()	
+		b.onHover()
 	}
+
+	b.GetVisibleArea().SetColor(b.OnHoverColor)
 }
 
 func (b *TextBox) GetGraphics() []Core.IDrawing {

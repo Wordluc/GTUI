@@ -9,12 +9,12 @@ type Color struct {
 	Background ColorValue
 }
 
-func (c *Color) SetForeground(color ColorValue)  {
-	c.foreground=color
+func (c *Color) SetForeground(color ColorValue) {
+	c.foreground = color
 }
 
-func (c *Color) SetBackground(color ColorValue)  {
-	c.Background=gBg(color)
+func (c *Color) SetBackground(color ColorValue) {
+	c.Background = gBg(color)
 }
 
 func (c Color) IsEqual(other Color) bool {
@@ -30,18 +30,19 @@ func gBg(i ColorValue) ColorValue {
 }
 
 func GetNoneColor() Color {
-	return Color{foreground: None, Background:gBg(None)}
+	return Color{foreground: None, Background: gBg(None)}
 }
 
 func GetDefaultColor() Color {
 	return Color{foreground: Reset, Background: gBg(Reset)}
 }
-//Get the color that is the combination of the default color and the current color,if the a part of default color is not set, the default color will be used
+
+// Get the color that is the combination of the default color and the current color,if the a part of default color is not set, the default color will be used
 func (c Color) GetMixedColor(defaultColor Color) Color {
 	if GetNoneColor().IsEqual(c) {
 		return GetNoneColor()
 	}
-	color:=c
+	color := c
 	if c.Background == gBg(None) {
 		color.Background = defaultColor.Background
 	}
