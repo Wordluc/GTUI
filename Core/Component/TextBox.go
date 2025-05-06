@@ -26,10 +26,10 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
 	textBox := Drawing.CreateTextBlock(1, 1, sizeX-2, sizeY-2, 10)
-	if e := cont.AddChild(rect); e != nil {
+	if e := cont.AddDrawings(rect); e != nil {
 		return nil, e
 	}
-	if e := cont.AddChild(textBox); e != nil {
+	if e := cont.AddDrawings(textBox); e != nil {
 		return nil, e
 	}
 	cont.SetPos(x, y)
@@ -172,8 +172,8 @@ func (b *TextBox) OnHover() {
 	}
 }
 
-func (b *TextBox) GetGraphics() Core.IDrawing {
-	return b.graphics
+func (b *TextBox) GetGraphics() []Core.IDrawing {
+	return b.graphics.GetDrawings()
 }
 
 func (b *TextBox) GetVisibleArea() *Drawing.Rectangle {

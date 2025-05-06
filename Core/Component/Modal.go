@@ -19,7 +19,7 @@ type Modal struct {
 func CreateModal(sizeX, sizeY int) *Modal {
 	null := CreateNullComponent(0, 0, sizeX, sizeY)
 	contComp:= CreateContainer(0,0)
-	contComp.AddComponent(null)
+	contComp.AddDrawing(null.GetGraphics()...)
 	contComp.SetLayer(modalL1)
 	return &Modal{
 		nullComponent: null,
@@ -27,10 +27,14 @@ func CreateModal(sizeX, sizeY int) *Modal {
 	}
 }
 func (b *Modal) SetVisibility(visible bool)  {
-	for _, child := range b.container.GetComponents() {
-		child.GetGraphics().SetVisibility(visible)
+	for _, comp := range b.container.GetComponents() {
+		for _, child := range comp.GetGraphics() {
+			child.SetVisibility(visible)
+		}
 	}
-	b.nullComponent.GetGraphics().SetVisibility(visible)
+	for _, child := range b.nullComponent.GetGraphics() {
+		child.SetVisibility(visible)
+	}
 }
 func (b *Modal) SetBackgroundColor(color Color.ColorValue) {
 	b.nullComponent.GetRect().SetInsideColor(color)
@@ -53,8 +57,12 @@ func (b *Modal) AddDrawing(drawingToAdd Core.IDrawing) error {
 	return nil
 }
 
-func	(b *Modal)GetComponets() []Core.IComponent{
+func	(b *Modal)GetComponents() []Core.IComponent{
 	return b.container.GetComponents()
+}
+
+func (c *Modal) GetDrawings() ([]Core.IDrawing) {
+	return c.container.GetDrawings()
 }
 
 func (b *Modal) SetPos(x, y int) {
@@ -77,27 +85,4 @@ func (b *Modal) SetLayer(layer Core.Layer) error{
 	b.container.SetLayer(layer)
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
-}
-
-func (b *Modal) GetGraphics() Core.IDrawing {
-	return b.container.GetGraphics()
-}
-
-func (b *Modal) OnClick() {
-}
-func (b *Modal) OnRelease() {
-}
-func (b *Modal) OnHover() {
-}
-func (b *Modal) OnLeave() {
-}
-
-//DO NOT USE
-func (b *Modal) GetSize() (int, int) {
-	panic("mustn't be called")
-}
-
-//DO NOT USE
-func (b *Modal) GetVisibleArea() Core.IDrawing {
-	panic("mustn't be called")
 }

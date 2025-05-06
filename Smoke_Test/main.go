@@ -27,7 +27,7 @@ func setDefaultEventButton(b *Component.Button,idle Color.ColorValue,active Colo
 		b.GetVisibleArea().SetBorderColor(Color.Get(idle, Color.None))
 	})
 }
-var comp Core.IComponent
+var comp *Component.Container
 var button2 *Component.Button
 var modal *Component.Modal
 func main() {
@@ -48,16 +48,16 @@ func main() {
 	rect:=Drawing.CreateRectangle(2,2,xS-1,yS-1)
 	rect1:=Drawing.CreateRectangle(16,26,10,10)
 	contDraw:=Drawing.CreateContainer(0,0)
-	contDraw.AddChild(rect)
-	contDraw.AddChild(rect1)
+	contDraw.AddDrawings(rect)
+	contDraw.AddDrawings(rect1)
 	contDraw.SetVisibility(true)
 	compComponent:=Component.CreateContainer(0,0)
-	compComponent.AddDrawing(contDraw)
+	compComponent.AddDrawing(contDraw.GetDrawings()...)
 	if e := compComponent.AddComponent(c); e != nil {
 		panic(e)
 	}
 	comp=compComponent
-	button1:=Component.CreateButton(100,0,10,10,"test")
+	button1:=Component.CreateButton(100,0,10,10,"test1")
 	button1.SetActive(false)
 	button1.SetLayer(Core.L4)
 	button1.GetVisibleArea().SetInsideColor(Color.White)
@@ -72,9 +72,6 @@ func main() {
 	})
 	button1.SetOnClick(func() {
 		button1.GetVisibleArea().SetBorderColor(Color.Get(Color.Red, Color.None))
-		time.AfterFunc(time.Millisecond*1000, func() {
-			button1.OnRelease()
-		})
 	})
 	button2=Component.CreateButton(62,15,10,10,"test")
 	button2.SetLayer(Core.L1)
@@ -95,7 +92,7 @@ func main() {
 		})
 	})
 	comp.SetPos(10,10)
-	if e := core.AddComponent(compComponent); e != nil {
+	if e := core.AddContainer(compComponent); e != nil {
 		panic(e)
 	}
 	if e:=core.AddComponent(button1);e!=nil{
@@ -112,16 +109,15 @@ func main() {
 	text.SetColor(Color.Get(Color.White,Color.Red))
 	ok:=Component.CreateButton(2,5,10,3,"ok")
 	esplodi:=Component.CreateButton(18,5,10,3,"esplodi")
-
 	setDefaultEventButton(ok,Color.Gray,Color.White,Color.Red)
 	setDefaultEventButton(esplodi,Color.Gray,Color.White,Color.Red)
 
-	modal=Component.CreateModal(30,10)
+	modal=Component.CreateModal(30,10)//the buttons dont work inside the modal
 	modal.SetBackgroundColor(Color.Gray)
 	modal.AddDrawing(text)
 	modal.AddComponent(esplodi)
 	modal.AddComponent(ok)
-	if e:=core.AddComponent(modal);e!=nil{
+	if e:=core.AddComplexElement(modal);e!=nil{
 		panic(e)
 	}
 	core.Start()
