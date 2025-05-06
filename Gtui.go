@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
@@ -50,6 +51,10 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 func (c *Gtui) initializeEventManager() {
 	EventManager.Subscribe(EventManager.Refresh, 100, func(comp []any) {
 		c.refresh(true)
+	})
+	EventManager.Subscribe(EventManager.ForceRefresh, 100, func(comp []any) {
+		c.IClear()
+		c.refresh(false)
 	})
 
 	EventManager.Subscribe(EventManager.ReorganizeElements, 100, func(comp []any) {
@@ -143,19 +148,27 @@ func (c *Gtui) Start() {
 	c.initializeEventManager()
 	c.term.Start()
 	c.term.Clear()
+	c.lazyCheck()
 	c.refresh(true)
 	c.keyb.Start(c.innerLoop)
 	c.term.Stop()
 }
-
+func (c *Gtui) lazyCheck() {
+	time.AfterFunc(time.Second*2, func() {
+		if c.term.Resized() {
+			EventManager.Call(EventManager.ForceRefresh, nil)
+		}
+		c.lazyCheck()
+	})
+}
 func (c *Gtui) AddDrawing(entitiesToAdd ...Core.IDrawing) {
-	for _,draw:=range entitiesToAdd{
+	for _, draw := range entitiesToAdd {
 		c.drawingTree.AddElement(draw)
 	}
 }
 
 func (c *Gtui) AddComponent(componentsToAdd ...Core.IComponent) error {
-	for _,componentToAdd:=range componentsToAdd{
+	for _, componentToAdd := range componentsToAdd {
 		c.AddDrawing(componentToAdd.GetGraphics()...)
 		c.componentTree.AddElement(componentToAdd)
 		componentToAdd.OnLeave()
@@ -163,22 +176,22 @@ func (c *Gtui) AddComponent(componentsToAdd ...Core.IComponent) error {
 	return nil
 }
 
-func (c *Gtui) AddContainer(container Core.IContainer) error{
-	drawings:=container.GetDrawings()
-	componets:=container.GetComponents()
+func (c *Gtui) AddContainer(container Core.IContainer) error {
+	drawings := container.GetDrawings()
+	componets := container.GetComponents()
 	c.AddDrawing(drawings...)
 	c.AddComponent(componets...)
 	return nil
 }
 
-func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error{
-	componets:=complEle.GetComponents()
-	drawings:=complEle.GetDrawings()
-	for _,comp:=range componets{
+func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error {
+	componets := complEle.GetComponents()
+	drawings := complEle.GetDrawings()
+	for _, comp := range componets {
 		c.componentTree.AddElement(comp)
 		comp.OnLeave()
 	}
-	for _,draw:=range drawings{
+	for _, draw := range drawings {
 		c.drawingTree.AddElement(draw)
 	}
 	return nil
@@ -273,8 +286,6 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 }
 
 func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
-	//Keyboard
-	//	c.IRefreshAll()
 	c.AllineCursor()
 	if !c.loop(c.keyb, c) {
 		return false

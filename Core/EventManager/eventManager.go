@@ -9,8 +9,10 @@ import (
 type EventType int8
 
 const (
-	//Event to call when a component need an instant screee refresh
+	//Event to call when a component need an instant screee refresh, only touched elements
 	Refresh EventType = iota
+	//Event to call when a component need an instant screee refresh, full refresh
+	ForceRefresh
 	//Event to call when a element change its position
 	ReorganizeElements
 )
@@ -21,7 +23,7 @@ type eventPartioning struct {
 	offsetTime int
 }
 type subscriber struct {
-	event func([]any)
+	event      func([]any)
 	offsetTime int
 }
 type EventManager struct {
@@ -51,7 +53,7 @@ func Call(typeEvent EventType, caller []any) error {
 	}
 	if partition == nil {
 		eventManager.eventpartitions[typeEvent] = &eventPartioning{caller: caller, subscriber: eventManager.subscribers[typeEvent]}
-		offset:= eventManager.subscribers[typeEvent].offsetTime
+		offset := eventManager.subscribers[typeEvent].offsetTime
 		time.AfterFunc(time.Millisecond*time.Duration(offset), func() {
 			eventManager.mu.Lock()
 			defer eventManager.mu.Unlock()
@@ -68,7 +70,7 @@ func Call(typeEvent EventType, caller []any) error {
 	return nil
 }
 
-func Subscribe(typeEvent EventType,offsetTime int, f func([]any)) error {
+func Subscribe(typeEvent EventType, offsetTime int, f func([]any)) error {
 	if eventManager == nil {
 		return errors.New("EventManager not setup")
 	}
