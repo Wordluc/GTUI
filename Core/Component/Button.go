@@ -91,10 +91,9 @@ func (b *Button) OnClick() {
 	if b.isClicked {
 		return
 	}
-	if b.onClick == nil {
-		return
+	if b.onClick != nil {
+		b.onClick()
 	}
-	b.onClick()
 	time.AfterFunc(time.Millisecond*500, func() {
 		b.OnRelease()
 		EventManager.Call(EventManager.Refresh, []any{b})
@@ -106,11 +105,10 @@ func (b *Button) OnRelease() {
 	if !b.isActive {
 		return
 	}
-	if b.onRelease == nil {
-		return
+	if b.onRelease != nil {
+		b.onRelease()
 	}
 	b.isClicked = false
-	b.onRelease()
 }
 
 func (b *Button) OnHover() {
