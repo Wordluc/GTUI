@@ -156,6 +156,7 @@ func (c *Gtui) Start() {
 func (c *Gtui) lazyCheck() {
 	time.AfterFunc(time.Second*2, func() {
 		if c.term.Resized() {
+			c.xSize, c.ySize = c.term.Size()
 			EventManager.Call(EventManager.ForceRefresh, nil)
 		}
 		c.lazyCheck()
