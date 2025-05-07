@@ -45,7 +45,7 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox
 		isClicked:         false,
 		streamText:        streamText,
 		textBlock:         textBox,
-		OnTypingColor:     Color.GetDefaultColor(),
+		OnTypingColor:     Color.Get(Color.Blue, Color.None),
 		OnStopTypingColor: Color.Get(Color.Gray, Color.None),
 		OnHoverColor:      Color.GetDefaultColor(),
 	}, nil
