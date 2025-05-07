@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/Wordluc/GTUI/Core/EventManager"
 	"github.com/Wordluc/GTUI/Core"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -56,7 +56,7 @@ func (l *Rectangle) SetPos(x, y int) {
 	l.xPos = x
 	l.yPos = y
 	l.Touch()
-	EventManager.Call(EventManager.ReorganizeElements,[]any{l})
+	EventManager.Call(EventManager.ReorganizeElements, []any{l})
 }
 
 func (l *Rectangle) GetSize() (int, int) {
@@ -73,13 +73,13 @@ func (l *Rectangle) SetSize(x, y int) error {
 	return nil
 }
 
-func (b *Rectangle) SetLayer(layer Core.Layer) error{
-	if layer<0 {
+func (b *Rectangle) SetLayer(layer Core.Layer) error {
+	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
 	b.layer = layer
 	b.Touch()
-	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
 }
 
@@ -98,12 +98,14 @@ func (l *Rectangle) GetPos() (int, int) {
 
 func (s *Rectangle) SetVisibility(visible bool) {
 	s.visible = visible
+	s.Touch()
+	EventManager.Call(EventManager.ForceRefresh, nil)
 }
 
 func (l *Rectangle) GetVisibility() bool {
 	return l.visible
 }
- 
+
 func (s *Rectangle) getAnsiRectangle(defaultColor Color.Color) string {
 	var horizontal = strings.Repeat(U.HorizontalLine, s.width-2)
 	var color = s.color.GetMixedColor(defaultColor).GetAnsiColor()

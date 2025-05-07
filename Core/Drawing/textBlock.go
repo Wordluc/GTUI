@@ -157,16 +157,16 @@ func (t *TextBlock) SetPos(x, y int) {
 	t.xPos = x
 	t.yPos = y
 	t.Touch()
-	EventManager.Call(EventManager.ReorganizeElements,[]any{t})
+	EventManager.Call(EventManager.ReorganizeElements, []any{t})
 }
 
-func (b *TextBlock) SetLayer(layer Core.Layer) error{
-	if layer<0 {
+func (b *TextBlock) SetLayer(layer Core.Layer) error {
+	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
 	b.layer = layer
 	b.Touch()
-	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
 }
 
@@ -175,7 +175,7 @@ func (c *TextBlock) GetLayer() Core.Layer {
 }
 
 func (t *TextBlock) GetSize() (int, int) {
-	return t.xSize-1, t.ySize
+	return t.xSize - 1, t.ySize
 }
 
 func (t *TextBlock) GetPos() (int, int) {
@@ -183,6 +183,8 @@ func (t *TextBlock) GetPos() (int, int) {
 }
 func (t *TextBlock) SetVisibility(visible bool) {
 	t.visible = visible
+	t.Touch()
+	EventManager.Call(EventManager.ForceRefresh, nil)
 }
 
 func (t *TextBlock) GetVisibility() bool {
@@ -275,31 +277,31 @@ func (t *TextBlock) getWrapperEdges() WrapperEdges {
 		result.endX = t.xStartingWrapping
 		result.endY = t.yStartingWrapping
 	}
-	result.endX=result.endX-t.xRelativeMinSize
-	result.endY=result.endY-t.yRelativeMinSize
-	result.startY=result.startY-t.yRelativeMinSize
-	result.startX=result.startX-t.xRelativeMinSize
-	if result.startX<0{
-		result.startX=0
+	result.endX = result.endX - t.xRelativeMinSize
+	result.endY = result.endY - t.yRelativeMinSize
+	result.startY = result.startY - t.yRelativeMinSize
+	result.startX = result.startX - t.xRelativeMinSize
+	if result.startX < 0 {
+		result.startX = 0
 	}
-	if result.endX<0{
-		result.endX=0
+	if result.endX < 0 {
+		result.endX = 0
 	}
-	if result.startY<0{
-		result.startY=0
+	if result.startY < 0 {
+		result.startY = 0
 	}
-	if result.endY<0{
-		result.endY=0
+	if result.endY < 0 {
+		result.endY = 0
 	}
 	return result
 }
 
 func (t *TextBlock) ClearAll() {
-	t.lines=make([]*lineText, 1)
+	t.lines = make([]*lineText, 1)
 	t.lines[0] = createLineText(t.initialCapacity)
 	t.xRelativeMinSize = 0
 	t.yRelativeMinSize = 0
-	t.xRelativeMaxSize = t.xSize+1
+	t.xRelativeMaxSize = t.xSize + 1
 	t.yRelativeMaxSize = t.ySize
 	t.currentLine = 0
 	t.totalLine = 1
@@ -307,6 +309,7 @@ func (t *TextBlock) ClearAll() {
 	t.wrap = false
 	t.Touch()
 }
+
 // delete the selected text
 func (t *TextBlock) deleteWrapping() {
 	defer t.Touch()
@@ -389,20 +392,20 @@ func (t *TextBlock) makeAnsiCode(defaultColor Color.Color) string {
 		text := line.getText()
 		text = t.parseText(text)
 		edge := t.getWrapperEdges()
-		if t.wrap{
-			if edge.endY==i{
+		if t.wrap {
+			if edge.endY == i {
 				text = insertTextToOrigin(text, "\033[m", edge.endX)
 			}
-			if edge.startY==i{
+			if edge.startY == i {
 				text = insertTextToOrigin(text, "\033[100m", edge.startX)
-			}	
+			}
 		}
 
 		full.WriteString(text)
 		y++
 	}
 	full.WriteString(defaultColor.GetAnsiColor())
-	return strings.TrimSuffix(full.String(),"\n")
+	return strings.TrimSuffix(full.String(), "\n")
 }
 func (t *TextBlock) GetText() string {
 	var res strings.Builder
@@ -418,7 +421,7 @@ func (t *TextBlock) GetText() string {
 		}
 		text := line.getText()
 		text = t.parseText(text)
-		res.WriteString(text+"\n")
+		res.WriteString(text + "\n")
 	}
 	return strings.TrimSuffix(res.String(), "\n")
 }

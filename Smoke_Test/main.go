@@ -98,6 +98,9 @@ func loop(keyb Kd.IKeyBoard, core *GTUI.Gtui) bool {
 		modal.SetPos(x, y)
 	}
 
+	if keyb.IsKeyPressed('v') {
+		modal.SetVisibility(!modal.GetVisibility())
+	}
 	core.SetCur(x, y)
 	if keyb.IsKeySPressed(Keyboard.Esc) {
 		core.CallEventOn(x, y, func(c Core.IComponent) {

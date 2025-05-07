@@ -11,62 +11,62 @@ type Container struct {
 	onClick    func()
 	active     bool
 	components []Core.IComponent
-	drawings    []Core.IDrawing
+	drawings   []Core.IDrawing
 	layer      Core.Layer
-	x,y int
+	x, y       int
 }
 
 func CreateContainer(x, y int) *Container {
 	return &Container{
 		active:     true,
-		x: x,
-		y: y,
-		drawings:    make([]Core.IDrawing, 0),
+		x:          x,
+		y:          y,
+		drawings:   make([]Core.IDrawing, 0),
 		components: make([]Core.IComponent, 0),
 	}
 }
-func (c *Container) AddComponent(components ...Core.IComponent)error {
+func (c *Container) AddComponent(components ...Core.IComponent) error {
 	c.components = append(c.components, components...)
-	for _,comp:=range components{
-		c.drawings=append(c.drawings,comp.GetGraphics()...)
-	}
 
 	return nil
 }
 
-func (c *Container) AddDrawing(drawings ...Core.IDrawing)error {
-	for _,draw:=range drawings{
-		c.drawings = append(c.drawings,draw )
+func (c *Container) AddDrawing(drawings ...Core.IDrawing) error {
+	c.drawings = append(c.drawings, drawings...)
+	return nil
+}
+
+func (c *Container) AddContainer(containers ...Core.IContainer) error {
+	for _, conp := range containers {
+		c.drawings = append(c.drawings, conp.GetDrawings()...)
+		c.components = append(c.components, conp.GetComponents()...)
 	}
 	return nil
 }
 
-func (c *Container) AddContainer(containers ...Core.IContainer)error {
-	for _,conp:=range containers{
-		c.drawings = append(c.drawings,conp.GetDrawings()... )
-		c.components = append(c.components,conp.GetComponents()... )
-	}
-	return nil
-}
-
-func (c *Container) GetComponents() ([]Core.IComponent) {
+func (c *Container) GetComponents() []Core.IComponent {
 	return c.components
 }
 
-func (c *Container) GetDrawings() ([]Core.IDrawing) {
-	return c.drawings
+func (c *Container) GetDrawings() (result []Core.IDrawing) {
+	result = append(result, c.drawings...)
+
+	for _, drawing := range c.components {
+		result = append(result, drawing.GetGraphics()...)
+	}
+	return result
 }
 
-func (b *Container) SetLayer(layer Core.Layer) error{
-	if layer<0 {
+func (b *Container) SetLayer(layer Core.Layer) error {
+	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
-	diff:= layer - b.layer
-	for _,comp:=range b.components {
-		comp.SetLayer(comp.GetLayer()+diff)
+	diff := layer - b.layer
+	for _, comp := range b.components {
+		comp.SetLayer(comp.GetLayer() + diff)
 	}
-	for _,draw:=range(b.drawings){
-		draw.SetLayer(draw.GetLayer()+diff)
+	for _, draw := range b.drawings {
+		draw.SetLayer(draw.GetLayer() + diff)
 	}
 	b.layer = layer
 	EventManager.Call(EventManager.ReorganizeElements, []any{b})
@@ -75,7 +75,6 @@ func (b *Container) SetLayer(layer Core.Layer) error{
 func (c *Container) GetLayer() Core.Layer {
 	return c.layer
 }
-
 
 func (c *Container) SetonClick(onClick func()) {
 	c.onClick = onClick
@@ -90,22 +89,22 @@ func (c *Container) GetActivity() bool {
 }
 
 func (c *Container) SetPos(x, y int) {
-	diffX:=x-c.x
-	diffY:=y-c.y
+	diffX := x - c.x
+	diffY := y - c.y
 	for _, comp := range c.components {
 		xE, yE := comp.GetPos()
 		comp.SetPos(xE+diffX, yE+diffY)
 	}
-	for _,draw:=range(c.drawings){
+	for _, draw := range c.drawings {
 		cD, cE := draw.GetPos()
 		draw.SetPos(cD+diffX, cE+diffY)
 		draw.Touch()
 	}
-	c.x=x
-	c.y=y
+	c.x = x
+	c.y = y
 	EventManager.Call(EventManager.ReorganizeElements, []any{c})
 }
 
 func (c *Container) GetPos() (int, int) {
-	return c.x,c.y
+	return c.x, c.y
 }

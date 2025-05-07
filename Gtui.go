@@ -264,6 +264,9 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 	var elementToRefresh map[Core.IDrawing]struct{} = make(map[Core.IDrawing]struct{})
 	cond := func(node *Core.TreeNode[Core.IDrawing]) bool {
 		drawing = node.GetElement()
+		if !drawing.GetVisibility() {
+			return true
+		}
 		if onlyTouched && !drawing.IsTouched() {
 			return true
 		}
