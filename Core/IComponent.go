@@ -11,7 +11,7 @@ type IComponent interface {
 	GetPos() (int, int)
 	GetSize() (int, int)
 	GetLayer() Layer
-	SetLayer(layer Layer)error
+	SetLayer(layer Layer) error
 }
 
 type IContainer interface {
@@ -19,7 +19,7 @@ type IContainer interface {
 	GetComponents() []IComponent
 	AddContainer(...IContainer) error
 }
-type IComplexElement interface{
+type IComplexElement interface {
 	GetDrawings() []IDrawing
 	GetComponents() []IComponent
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/Wordluc/GTUI/Core/EventManager"
 )
 
-//To use when you wanna avoid the interaction under the component
+// To use when you wanna avoid the interaction under the component
 type NullComponent struct {
 	graphics    *Drawing.Container
 	visibleArea *Drawing.RectangleFull
@@ -17,7 +17,7 @@ type NullComponent struct {
 	onRelease   func()
 }
 
-func CreateNullComponent(x, y, sizeX, sizeY int) (*NullComponent) {
+func CreateNullComponent(x, y, sizeX, sizeY int) *NullComponent {
 	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
 	cont.AddDrawings(rect)
@@ -33,23 +33,23 @@ func (b *NullComponent) GetSize() (int, int) {
 
 func (b *NullComponent) SetPos(x, y int) {
 	b.visibleArea.SetPos(x, y)
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 }
 
 func (b *NullComponent) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
 }
 
-func (b *NullComponent) GetRect() *Drawing.RectangleFull  {
+func (b *NullComponent) GetRect() *Drawing.RectangleFull {
 	return b.visibleArea
 }
 
-func (b *NullComponent) SetLayer(layer Core.Layer)error {
-	if layer<0 {
+func (b *NullComponent) SetLayer(layer Core.Layer) error {
+	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
 	b.graphics.SetLayer(layer)
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 

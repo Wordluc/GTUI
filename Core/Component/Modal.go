@@ -33,7 +33,10 @@ func (b *Modal) SetVisibility(visible bool) {
 		drawing.SetVisibility(visible)
 	}
 	b.visibility = visible
-	EventManager.Call(EventManager.ForceRefresh, nil)
+	EventManager.Call(EventManager.ForceRefresh)
+}
+func (b *Modal) SetActivity(activity bool) {
+	b.container.SetActivity(activity)
 }
 func (b *Modal) GetVisibility() bool {
 	return b.visibility
@@ -48,14 +51,14 @@ func (b *Modal) AddComponent(componentToAdd Core.IComponent) error {
 		return e
 	}
 	b.container.AddComponent(componentToAdd)
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 
 func (b *Modal) AddDrawing(drawingToAdd Core.IDrawing) error {
 	drawingToAdd.SetLayer(drawingToAdd.GetLayer() + modalL1 + 1)
 	b.container.AddDrawing(drawingToAdd)
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 
@@ -69,7 +72,7 @@ func (c *Modal) GetDrawings() []Core.IDrawing {
 
 func (b *Modal) SetPos(x, y int) {
 	b.container.SetPos(x, y)
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 }
 
 func (b *Modal) GetPos() (int, int) {
@@ -85,6 +88,6 @@ func (b *Modal) SetLayer(layer Core.Layer) error {
 		return errors.New("layer can't be negative")
 	}
 	b.container.SetLayer(layer)
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }

@@ -80,7 +80,7 @@ func (l *Line) SetPos(x, y int) {
 	l.xPos = x
 	l.yPos = y
 	l.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{l})
+	EventManager.Call(EventManager.ReorganizeElements, l)
 }
 
 func (b *Line) SetLayer(layer Core.Layer) error {
@@ -89,7 +89,7 @@ func (b *Line) SetLayer(layer Core.Layer) error {
 	}
 	b.layer = layer
 	b.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 func (c *Line) GetLayer() Core.Layer {
@@ -112,7 +112,7 @@ func (l *Line) SetLen(len int) error {
 func (s *Line) SetVisibility(visible bool) {
 	s.visible = visible
 	s.Touch()
-	EventManager.Call(EventManager.ForceRefresh, nil)
+	EventManager.Call(EventManager.ForceRefresh)
 }
 
 func (s *Line) GetVisibility() bool {

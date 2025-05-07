@@ -88,7 +88,7 @@ func (r *RectangleFull) SetPos(x, y int) {
 	r.YPos = y
 	r.border.SetPos(x, y)
 	r.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{r})
+	EventManager.Call(EventManager.ReorganizeElements, r)
 }
 
 func (b *RectangleFull) SetLayer(layer Core.Layer) error {
@@ -97,7 +97,7 @@ func (b *RectangleFull) SetLayer(layer Core.Layer) error {
 	}
 	b.layer = layer
 	b.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 func (c *RectangleFull) GetLayer() Core.Layer {
@@ -117,7 +117,7 @@ func (r *RectangleFull) GetSize() (int, int) {
 func (s *RectangleFull) SetVisibility(visible bool) {
 	s.visible = visible
 	s.Touch()
-	EventManager.Call(EventManager.ForceRefresh, nil)
+	EventManager.Call(EventManager.ForceRefresh)
 }
 
 func (s *RectangleFull) GetVisibility() bool {

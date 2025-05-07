@@ -51,7 +51,7 @@ func (s *TextField) SetPos(x, y int) {
 	s.XPos = x
 	s.YPos = y
 	s.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{s})
+	EventManager.Call(EventManager.ReorganizeElements, s)
 }
 func (s *TextField) SetLayer(layer Core.Layer) error {
 	if s.layer == layer {
@@ -59,7 +59,7 @@ func (s *TextField) SetLayer(layer Core.Layer) error {
 	}
 	s.layer = layer
 	s.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{s})
+	EventManager.Call(EventManager.ReorganizeElements, s)
 	return nil
 }
 func (s *TextField) GetLayer() Core.Layer {
@@ -76,7 +76,7 @@ func (s *TextField) SetColor(color Color.Color) {
 func (s *TextField) SetVisibility(visible bool) {
 	s.visible = visible
 	s.Touch()
-	EventManager.Call(EventManager.ForceRefresh, nil)
+	EventManager.Call(EventManager.ForceRefresh)
 }
 func (s *TextField) GetVisibility() bool {
 	return s.visible

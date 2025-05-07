@@ -69,7 +69,7 @@ func (b *Container) SetLayer(layer Core.Layer) error {
 		draw.SetLayer(draw.GetLayer() + diff)
 	}
 	b.layer = layer
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 func (c *Container) GetLayer() Core.Layer {
@@ -82,6 +82,7 @@ func (c *Container) SetonClick(onClick func()) {
 
 func (c *Container) SetActivity(active bool) {
 	c.active = active
+	//TODO propagate activity to childrens
 }
 
 func (c *Container) GetActivity() bool {
@@ -102,7 +103,7 @@ func (c *Container) SetPos(x, y int) {
 	}
 	c.x = x
 	c.y = y
-	EventManager.Call(EventManager.ReorganizeElements, []any{c})
+	EventManager.Call(EventManager.ReorganizeElements, c)
 }
 
 func (c *Container) GetPos() (int, int) {

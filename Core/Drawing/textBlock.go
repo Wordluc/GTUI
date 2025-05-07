@@ -157,7 +157,7 @@ func (t *TextBlock) SetPos(x, y int) {
 	t.xPos = x
 	t.yPos = y
 	t.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{t})
+	EventManager.Call(EventManager.ReorganizeElements, t)
 }
 
 func (b *TextBlock) SetLayer(layer Core.Layer) error {
@@ -166,7 +166,7 @@ func (b *TextBlock) SetLayer(layer Core.Layer) error {
 	}
 	b.layer = layer
 	b.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 
@@ -184,7 +184,7 @@ func (t *TextBlock) GetPos() (int, int) {
 func (t *TextBlock) SetVisibility(visible bool) {
 	t.visible = visible
 	t.Touch()
-	EventManager.Call(EventManager.ForceRefresh, nil)
+	EventManager.Call(EventManager.ForceRefresh)
 }
 
 func (t *TextBlock) GetVisibility() bool {
