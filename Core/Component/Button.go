@@ -52,7 +52,7 @@ func (b *Button) SetActive(isActive bool) {
 	b.isActive = isActive
 	if !b.isActive {
 		time.AfterFunc(0, func() {
-			EventManager.Call(EventManager.Refresh, []any{b})
+			EventManager.Call(EventManager.Refresh, b)
 			b.isActive = true
 			b.OnLeave()
 			b.isActive = false
@@ -61,7 +61,7 @@ func (b *Button) SetActive(isActive bool) {
 }
 func (b *Button) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 }
 func (b *Button) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
@@ -74,7 +74,7 @@ func (b *Button) SetLayer(layer Core.Layer) error {
 		return errors.New("layer can't be negative")
 	}
 	b.graphics.SetLayer(layer)
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 func (b *Button) GetSize() (int, int) {
@@ -105,7 +105,7 @@ func (b *Button) OnClick() {
 	}
 	time.AfterFunc(time.Millisecond*500, func() {
 		b.OnRelease()
-		EventManager.Call(EventManager.Refresh, []any{b})
+		EventManager.Call(EventManager.Refresh, b)
 	})
 	b.isClicked = true
 }

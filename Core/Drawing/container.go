@@ -67,7 +67,7 @@ func (c *Container) SetVisibility(visible bool) {
 	}
 	c.visible = visible
 	c.Touch()
-	EventManager.Call(EventManager.ForceRefresh, nil)
+	EventManager.Call(EventManager.ForceRefresh)
 }
 
 func (c *Container) GetVisibility() bool {
@@ -95,7 +95,7 @@ func (c *Container) SetPos(x, y int) {
 		child.SetPos(xChild+deltaX, yChild+deltaY)
 	}
 	c.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{c})
+	EventManager.Call(EventManager.ReorganizeElements, c)
 }
 
 func (c *Container) GetPos() (int, int) {
@@ -112,7 +112,7 @@ func (b *Container) SetLayer(layer Core.Layer) error {
 	}
 	b.layer = layer
 	b.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 

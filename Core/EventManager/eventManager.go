@@ -41,7 +41,7 @@ func Setup() error {
 	eventManager = &EventManager{subscribers: make(map[EventType]*subscriber), eventpartitions: make(map[EventType]*eventPartioning), mu: sync.Mutex{}}
 	return nil
 }
-func Call(typeEvent EventType, caller []any) error {
+func Call(typeEvent EventType, caller ...any) error {
 	if eventManager == nil {
 		return errors.New("EventManager not setup")
 	}

@@ -56,7 +56,7 @@ func (l *Rectangle) SetPos(x, y int) {
 	l.xPos = x
 	l.yPos = y
 	l.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{l})
+	EventManager.Call(EventManager.ReorganizeElements, l)
 }
 
 func (l *Rectangle) GetSize() (int, int) {
@@ -79,7 +79,7 @@ func (b *Rectangle) SetLayer(layer Core.Layer) error {
 	}
 	b.layer = layer
 	b.Touch()
-	EventManager.Call(EventManager.ReorganizeElements, []any{b})
+	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 
@@ -99,7 +99,7 @@ func (l *Rectangle) GetPos() (int, int) {
 func (s *Rectangle) SetVisibility(visible bool) {
 	s.visible = visible
 	s.Touch()
-	EventManager.Call(EventManager.ForceRefresh, nil)
+	EventManager.Call(EventManager.ForceRefresh)
 }
 
 func (l *Rectangle) GetVisibility() bool {
