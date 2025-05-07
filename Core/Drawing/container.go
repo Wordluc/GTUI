@@ -17,33 +17,33 @@ type Container struct {
 	layer    Core.Layer
 }
 
-func CreateContainer( x, y int) *Container {
+func CreateContainer(x, y int) *Container {
 	return &Container{
-		xPos:  x,
-		yPos:  y,
-		color: Color.GetNoneColor(),
+		xPos:    x,
+		yPos:    y,
+		color:   Color.GetNoneColor(),
 		visible: true,
 	}
 }
 
-func (c *Container) GetComponents() ([]Core.IComponent) {
+func (c *Container) GetComponents() []Core.IComponent {
 	return []Core.IComponent{}
 }
 
-func (c *Container) GetDrawings() ([]Core.IDrawing) {
+func (c *Container) GetDrawings() []Core.IDrawing {
 	return c.drawings
 }
 
 func (c *Container) AddDrawings(eles ...Core.IDrawing) error {
-	for _,ele := range eles{
+	for _, ele := range eles {
 		c.drawings = append(c.drawings, ele)
 	}
 	return nil
 }
 
-func (c *Container) AddContainer(containers ...Core.IContainer)error {
-	for _,conp:=range containers{
-		c.drawings = append(c.drawings,conp.GetDrawings()... )
+func (c *Container) AddContainer(containers ...Core.IContainer) error {
+	for _, conp := range containers {
+		c.drawings = append(c.drawings, conp.GetDrawings()...)
 	}
 	return nil
 }
@@ -53,9 +53,9 @@ func (c *Container) Touch() {
 		child.Touch()
 	}
 }
-func (c *Container) IsTouched() (bool) {
+func (c *Container) IsTouched() bool {
 	for _, child := range c.drawings {
-		if child.IsTouched(){
+		if child.IsTouched() {
 			return true
 		}
 	}
@@ -66,6 +66,8 @@ func (c *Container) SetVisibility(visible bool) {
 		child.SetVisibility(visible)
 	}
 	c.visible = visible
+	c.Touch()
+	EventManager.Call(EventManager.ForceRefresh, nil)
 }
 
 func (c *Container) GetVisibility() bool {
@@ -79,7 +81,7 @@ func (c *Container) getAnsiCode(defaultColor Color.Color) string {
 		str.WriteString(child.GetAnsiCode(defaultColor))
 		str.WriteString(c.color.GetAnsiColor())
 	}
-		str.WriteString(Color.GetResetColor())
+	str.WriteString(Color.GetResetColor())
 	return str.String()
 }
 
@@ -100,13 +102,13 @@ func (c *Container) GetPos() (int, int) {
 	return c.xPos, c.yPos
 }
 
-func (b *Container) SetLayer(layer Core.Layer) error{
-	if layer<0 {
+func (b *Container) SetLayer(layer Core.Layer) error {
+	if layer < 0 {
 		panic("layer can't be negative")
 	}
 	diff := layer - b.layer
-	for _,comp:=range b.drawings {
-		comp.SetLayer(comp.GetLayer()+diff)
+	for _, comp := range b.drawings {
+		comp.SetLayer(comp.GetLayer() + diff)
 	}
 	b.layer = layer
 	b.Touch()

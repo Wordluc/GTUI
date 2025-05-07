@@ -21,7 +21,7 @@ type TextField struct {
 	layer     Core.Layer
 }
 
-func CreateTextField(x, y int,text string) *TextField {
+func CreateTextField(x, y int, text string) *TextField {
 	return &TextField{
 		XPos:      x,
 		YPos:      y,
@@ -33,8 +33,8 @@ func CreateTextField(x, y int,text string) *TextField {
 	}
 }
 
-func (s *TextField) GetSize() (int,int) {
-	return len(s.text),1
+func (s *TextField) GetSize() (int, int) {
+	return len(s.text), 1
 }
 
 func (s *TextField) GetAnsiCode(defaultColor Color.Color) string {
@@ -51,15 +51,15 @@ func (s *TextField) SetPos(x, y int) {
 	s.XPos = x
 	s.YPos = y
 	s.Touch()
-	EventManager.Call(EventManager.ReorganizeElements,[]any{s})
+	EventManager.Call(EventManager.ReorganizeElements, []any{s})
 }
-func (s *TextField) SetLayer(layer Core.Layer) error{
-	if s.layer == layer{
+func (s *TextField) SetLayer(layer Core.Layer) error {
+	if s.layer == layer {
 		return errors.New("layer already set")
 	}
 	s.layer = layer
 	s.Touch()
-	EventManager.Call(EventManager.ReorganizeElements,[]any{s})
+	EventManager.Call(EventManager.ReorganizeElements, []any{s})
 	return nil
 }
 func (s *TextField) GetLayer() Core.Layer {
@@ -75,6 +75,8 @@ func (s *TextField) SetColor(color Color.Color) {
 }
 func (s *TextField) SetVisibility(visible bool) {
 	s.visible = visible
+	s.Touch()
+	EventManager.Call(EventManager.ForceRefresh, nil)
 }
 func (s *TextField) GetVisibility() bool {
 	return s.visible

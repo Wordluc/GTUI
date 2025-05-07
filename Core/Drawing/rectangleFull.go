@@ -44,7 +44,7 @@ func (r *RectangleFull) Touch() {
 }
 
 func (r *RectangleFull) IsTouched() bool {
-	return r.isChanged||r.border.IsTouched()
+	return r.isChanged || r.border.IsTouched()
 }
 func (r *RectangleFull) GetAnsiCode(defaultColor Color.Color) string {
 	if !r.visible {
@@ -88,16 +88,16 @@ func (r *RectangleFull) SetPos(x, y int) {
 	r.YPos = y
 	r.border.SetPos(x, y)
 	r.Touch()
-	EventManager.Call(EventManager.ReorganizeElements,[]any{r})
+	EventManager.Call(EventManager.ReorganizeElements, []any{r})
 }
 
-func (b *RectangleFull) SetLayer(layer Core.Layer) error{
-	if layer<0 {
+func (b *RectangleFull) SetLayer(layer Core.Layer) error {
+	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
 	b.layer = layer
 	b.Touch()
-	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
 }
 func (c *RectangleFull) GetLayer() Core.Layer {
@@ -116,6 +116,8 @@ func (r *RectangleFull) GetSize() (int, int) {
 
 func (s *RectangleFull) SetVisibility(visible bool) {
 	s.visible = visible
+	s.Touch()
+	EventManager.Call(EventManager.ForceRefresh, nil)
 }
 
 func (s *RectangleFull) GetVisibility() bool {

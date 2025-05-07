@@ -5,8 +5,8 @@ import (
 	"math"
 	"strings"
 
-	"github.com/Wordluc/GTUI/Core/EventManager"
 	"github.com/Wordluc/GTUI/Core"
+	"github.com/Wordluc/GTUI/Core/EventManager"
 	U "github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 )
@@ -42,14 +42,17 @@ func (r *Line) IsTouched() bool {
 	return r.isChanged
 }
 func (r *Line) GetSize() (int, int) {
-   switch(r.angle){
-		case 0:return r.Len,1
-		case 45:
-			var x = int(math.Sqrt(float64(r.Len^2)+float64(r.Len^2)))
-			return x,x
-		case 90:return 1,r.Len
-		default:return 0,0
-   }
+	switch r.angle {
+	case 0:
+		return r.Len, 1
+	case 45:
+		var x = int(math.Sqrt(float64(r.Len^2) + float64(r.Len^2)))
+		return x, x
+	case 90:
+		return 1, r.Len
+	default:
+		return 0, 0
+	}
 }
 func (r *Line) GetAnsiCode(defaultColor Color.Color) string {
 	if !r.visible {
@@ -62,7 +65,7 @@ func (r *Line) GetAnsiCode(defaultColor Color.Color) string {
 	return r.ansiCode
 }
 
-func (r *Line) SetAngle(angle int16)error {
+func (r *Line) SetAngle(angle int16) error {
 	switch angle {
 	case 0, 45, 90:
 		r.angle = angle
@@ -80,13 +83,13 @@ func (l *Line) SetPos(x, y int) {
 	EventManager.Call(EventManager.ReorganizeElements, []any{l})
 }
 
-func (b *Line) SetLayer(layer Core.Layer)error {
-	if layer<0 {
+func (b *Line) SetLayer(layer Core.Layer) error {
+	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
 	b.layer = layer
 	b.Touch()
-	EventManager.Call(EventManager.ReorganizeElements,[]any{b})
+	EventManager.Call(EventManager.ReorganizeElements, []any{b})
 	return nil
 }
 func (c *Line) GetLayer() Core.Layer {
@@ -108,6 +111,8 @@ func (l *Line) SetLen(len int) error {
 
 func (s *Line) SetVisibility(visible bool) {
 	s.visible = visible
+	s.Touch()
+	EventManager.Call(EventManager.ForceRefresh, nil)
 }
 
 func (s *Line) GetVisibility() bool {
