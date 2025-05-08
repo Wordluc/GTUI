@@ -56,9 +56,6 @@ func (c *Gtui) initializeEventManager() {
 	EventManager.Subscribe(EventManager.Refresh, 100, func(comp []any) {
 		c.refresh(true)
 	})
-	EventManager.Subscribe(EventManager.Refresh, 100, func(comp []any) {
-		c.refresh(true)
-	})
 	EventManager.Subscribe(EventManager.ForceRefresh, 100, func(comp []any) {
 		c.IClear()
 		c.SetCur(c.xCursor, c.yCursor)
@@ -223,7 +220,7 @@ func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error {
 	return nil
 }
 func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
-	resultArray := c.componentTree.GetHighterLayerElements(x, y)
+	resultArray := c.getHigherLayerElementsNoDisabled(x, y)
 	if len(resultArray) == 0 {
 		return nil
 	}
