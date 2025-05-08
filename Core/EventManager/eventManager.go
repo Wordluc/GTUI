@@ -9,6 +9,8 @@ import (
 type EventType int8
 
 const (
+	//Event to call when you need to realign the cursor
+	CursorAlign EventType = iota
 	//Event to call when a component need an instant screee refresh, only touched elements
 	Refresh EventType = iota
 	//Event to call when a component need an instant screee refresh, full refresh
