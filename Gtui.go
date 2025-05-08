@@ -17,17 +17,18 @@ import (
 
 type Loop func(Keyboard.IKeyBoard, *Gtui) bool
 type Gtui struct {
-	globalColor      Color.Color
-	term             Terminal.ITerminal
-	keyb             Keyboard.IKeyBoard
-	drawingTree      *Core.TreeManager[Core.IDrawing]
-	componentTree    *Core.TreeManager[Core.IComponent]
-	xCursor          int
-	yCursor          int
-	xSize            int
-	ySize            int
-	cursorVisibility bool
-	loop             Loop
+	globalColor          Color.Color
+	term                 Terminal.ITerminal
+	keyb                 Keyboard.IKeyBoard
+	drawingTree          *Core.TreeManager[Core.IDrawing]
+	componentTree        *Core.TreeManager[Core.IComponent]
+	xCursor              int
+	yCursor              int
+	xSize                int
+	ySize                int
+	cursorVisibility     bool
+	loop                 Loop
+	preComponentsHovered []Core.IComponent
 }
 
 func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
@@ -54,6 +55,7 @@ func (c *Gtui) initializeEventManager() {
 	})
 	EventManager.Subscribe(EventManager.ForceRefresh, 100, func(comp []any) {
 		c.IClear()
+		c.SetCur(c.xCursor, c.yCursor)
 		c.refresh(false)
 	})
 
@@ -74,7 +76,24 @@ func (c *Gtui) initializeEventManager() {
 		c.refresh(false)
 	})
 }
-
+func (c *Gtui) getHigherLayerElementsNoDisabled(x, y int) (res []Core.IComponent) {
+	compInLayers := c.componentTree.SearchInDifferentLayers(x, y)
+	for i := len(compInLayers) - 1; i >= 0; i-- {
+		if compInLayers[i] == nil {
+			continue
+		}
+		res := []Core.IComponent{}
+		for _, comp := range compInLayers[i] {
+			if comp.GetActive() {
+				res = append(res, comp)
+			}
+		}
+		if len(res) != 0 {
+			return res
+		}
+	}
+	return []Core.IComponent{}
+}
 func (c *Gtui) SetCur(x, y int) error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
 		return errors.New("cursor out of range")
@@ -82,12 +101,10 @@ func (c *Gtui) SetCur(x, y int) error {
 	if !c.cursorVisibility {
 		return nil
 	}
+	compsPostSet := c.getHigherLayerElementsNoDisabled(x, y)
 
-	compPreSet := c.componentTree.GetHighterLayerElements(c.xCursor, c.yCursor)
-	compsPostSet := c.componentTree.GetHighterLayerElements(x, y)
-
-	inPreButNotInPost := Utils.GetDiff(compsPostSet, compPreSet)
-	inPostButNotInPre := Utils.GetDiff(compPreSet, compsPostSet)
+	inPreButNotInPost := Utils.GetDiff(compsPostSet, c.preComponentsHovered)
+	inPostButNotInPre := Utils.GetDiff(c.preComponentsHovered, compsPostSet)
 
 	for i, comp := range inPostButNotInPre {
 		if ci, ok := inPostButNotInPre[i].(Core.IWritableComponent); ok {
@@ -101,7 +118,6 @@ func (c *Gtui) SetCur(x, y int) error {
 	for i, comp := range inPreButNotInPost {
 		if ci, ok := inPreButNotInPost[i].(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
-				ci.SetCurrentPosCursor(x, y)
 				return nil
 			} else {
 				comp.OnLeave()
@@ -116,6 +132,8 @@ func (c *Gtui) SetCur(x, y int) error {
 			if ci.IsTyping() {
 				c.xCursor, c.yCursor = ci.SetCurrentPosCursor(x, y)
 				return nil
+			} else {
+				comp.OnHover()
 			}
 			break
 		}
@@ -124,6 +142,7 @@ func (c *Gtui) SetCur(x, y int) error {
 	c.yCursor = y
 	c.xCursor = x
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
+	c.preComponentsHovered = compsPostSet
 	return nil
 }
 
@@ -209,7 +228,8 @@ func (c *Gtui) CallEventOn(x, y int, event func(Core.IComponent)) error {
 }
 
 func (c *Gtui) Click(x, y int) error {
-	resultArray := c.componentTree.GetHighterLayerElements(x, y)
+	resultArray := c.getHigherLayerElementsNoDisabled(x, y)
+
 	if len(resultArray) == 0 {
 		return nil
 	}
@@ -221,17 +241,40 @@ func (c *Gtui) Click(x, y int) error {
 
 func (c *Gtui) AllineCursor() {
 	x, y := c.GetCur()
-	comps := c.componentTree.GetHighterLayerElements(x, y)
+	oldX, oldY := x, y
+	comps := c.getHigherLayerElementsNoDisabled(x, y)
 	for _, comp := range comps {
 		if ci, ok := comp.(Core.IWritableComponent); ok {
 			if ci.IsTyping() {
 				deltax, deltay := ci.DiffCurrentToXY(x, y)
 				c.yCursor = y + deltay
 				c.xCursor = x + deltax
-				return
 			}
 		}
 	}
+
+	x, y = c.GetCur()
+	c.preComponentsHovered = comps
+	comps = c.getHigherLayerElementsNoDisabled(x, y)
+
+	inPreButNotInPost := Utils.GetDiff(comps, c.preComponentsHovered)
+	for i, comp := range inPreButNotInPost {
+		if ci, ok := inPreButNotInPost[i].(Core.IWritableComponent); ok {
+			if ci.IsTyping() {
+				ci.(*Component.TextBox).DeleteLastCharacter()
+				c.yCursor = oldY
+				c.xCursor = oldX
+				c.term.SetCursor(c.xCursor+1, c.yCursor+1)
+				return
+			} else {
+				comp.OnLeave()
+			}
+		} else {
+			comp.OnLeave()
+		}
+	}
+
+	c.preComponentsHovered = comps
 	c.term.SetCursor(c.xCursor+1, c.yCursor+1)
 }
 

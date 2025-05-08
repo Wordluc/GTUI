@@ -12,6 +12,8 @@ type IComponent interface {
 	GetSize() (int, int)
 	GetLayer() Layer
 	SetLayer(layer Layer) error
+	SetActive(bool)
+	GetActive() bool
 }
 
 type IContainer interface {

@@ -59,6 +59,11 @@ func (b *Button) SetActive(isActive bool) {
 		})
 	}
 }
+
+func (b *Button) GetActive() bool {
+	return b.isActive
+}
+
 func (b *Button) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
 	EventManager.Call(EventManager.ReorganizeElements, b)
@@ -93,9 +98,6 @@ func (b *Button) SetOnHover(onHover Core.OnEvent) {
 	b.onHover = onHover
 }
 func (b *Button) OnClick() {
-	if !b.isActive {
-		return
-	}
 	if b.isClicked {
 		return
 	}
@@ -111,9 +113,6 @@ func (b *Button) OnClick() {
 }
 
 func (b *Button) OnRelease() {
-	if !b.isActive {
-		return
-	}
 	if b.onRelease != nil {
 		b.onRelease()
 	}
@@ -122,9 +121,6 @@ func (b *Button) OnRelease() {
 }
 
 func (b *Button) OnHover() {
-	if !b.isActive {
-		return
-	}
 	if b.onHover != nil {
 		b.onHover()
 	}
@@ -133,9 +129,6 @@ func (b *Button) OnHover() {
 }
 
 func (b *Button) OnLeave() {
-	if !b.isActive {
-		return
-	}
 	if b.onLeave != nil {
 		b.onLeave()
 	}

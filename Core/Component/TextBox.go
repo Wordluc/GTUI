@@ -11,20 +11,21 @@ import (
 )
 
 type TextBox struct {
-	graphics          *Drawing.Container
-	visibleArea       *Drawing.Rectangle
-	textBlock         *Drawing.TextBlock
-	isTyping          bool
-	isClicked         bool
-	streamText        StreamCharacter
-	wrap              bool
-	onClick           func()
-	onLeave           func()
-	onHover           func()
-	OnTypingColor     Color.Color
-	OnStopTypingColor Color.Color
-	OnHoverColor      Color.Color
-	IsOneLine         bool
+	graphics           *Drawing.Container
+	visibleArea        *Drawing.Rectangle
+	textBlock          *Drawing.TextBlock
+	isTyping           bool
+	isClicked          bool
+	streamText         StreamCharacter
+	wrap               bool
+	onClick            func()
+	onLeave            func()
+	onHover            func()
+	OnTypingColor      Color.Color
+	OnLeaveTypingColor Color.Color
+	OnHoverColor       Color.Color
+	IsOneLine          bool
+	active             bool
 }
 
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox, error) {
@@ -39,15 +40,16 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox
 	}
 	cont.SetPos(x, y)
 	return &TextBox{
-		graphics:          cont,
-		visibleArea:       rect,
-		isTyping:          false,
-		isClicked:         false,
-		streamText:        streamText,
-		textBlock:         textBox,
-		OnTypingColor:     Color.Get(Color.Blue, Color.None),
-		OnStopTypingColor: Color.Get(Color.Gray, Color.None),
-		OnHoverColor:      Color.GetDefaultColor(),
+		graphics:           cont,
+		visibleArea:        rect,
+		isTyping:           false,
+		isClicked:          false,
+		streamText:         streamText,
+		textBlock:          textBox,
+		OnTypingColor:      Color.Get(Color.Blue, Color.None),
+		OnLeaveTypingColor: Color.Get(Color.Gray, Color.None),
+		OnHoverColor:       Color.GetDefaultColor(),
+		active:             true,
 	}, nil
 }
 func (b *TextBox) GetSize() (int, int) {
@@ -57,6 +59,12 @@ func (b *TextBox) GetSize() (int, int) {
 func (b *TextBox) SetPos(x, y int) {
 	b.graphics.SetPos(x, y)
 	EventManager.Call(EventManager.ReorganizeElements, b)
+}
+func (b *TextBox) SetActive(active bool) {
+	b.active = active
+}
+func (b *TextBox) GetActive() bool {
+	return b.active
 }
 func (b *TextBox) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
@@ -140,7 +148,7 @@ func (b *TextBox) StartTyping() {
 func (b *TextBox) StopTyping() {
 	b.streamText.Delete()
 	b.isTyping = false
-	b.GetVisibleArea().SetColor(b.OnStopTypingColor)
+	EventManager.Call(EventManager.ForceRefresh)
 }
 
 func (b *TextBox) OnClick() {
@@ -162,7 +170,10 @@ func (b *TextBox) OnLeave() {
 	if b.onLeave != nil {
 		b.onLeave()
 	}
-	b.StopTyping()
+	b.streamText.Delete()
+	b.isTyping = false
+	b.GetVisibleArea().SetColor(b.OnLeaveTypingColor)
+
 }
 
 func (b *TextBox) SetOnClick(onClick func()) {
