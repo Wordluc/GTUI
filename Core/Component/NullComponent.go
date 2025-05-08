@@ -10,21 +10,19 @@ import (
 
 // To use when you wanna avoid the interaction under the component
 type NullComponent struct {
-	graphics    *Drawing.Container
 	visibleArea *Drawing.RectangleFull
 	onLeave     func()
 	onHover     func()
 	onRelease   func()
+	active      bool
 }
 
 func CreateNullComponent(x, y, sizeX, sizeY int) *NullComponent {
-	cont := Drawing.CreateContainer(0, 0)
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
-	cont.AddDrawings(rect)
-	cont.SetPos(x, y)
+	rect.SetPos(x, y)
 	return &NullComponent{
-		graphics:    cont,
 		visibleArea: rect,
+		active:      true,
 	}
 }
 func (b *NullComponent) GetSize() (int, int) {
@@ -40,6 +38,14 @@ func (b *NullComponent) GetPos() (int, int) {
 	return b.visibleArea.GetPos()
 }
 
+func (b *NullComponent) SetActive(active bool) {
+	b.active = active
+}
+
+func (b *NullComponent) GetActive() bool {
+	return b.active
+}
+
 func (b *NullComponent) GetRect() *Drawing.RectangleFull {
 	return b.visibleArea
 }
@@ -48,17 +54,17 @@ func (b *NullComponent) SetLayer(layer Core.Layer) error {
 	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
-	b.graphics.SetLayer(layer)
+	b.visibleArea.SetLayer(layer)
 	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 
 func (b *NullComponent) GetLayer() Core.Layer {
-	return b.graphics.GetLayer()
+	return b.visibleArea.GetLayer()
 }
 
 func (b *NullComponent) GetGraphics() []Core.IDrawing {
-	return b.graphics.GetDrawings()
+	return []Core.IDrawing{b.visibleArea}
 }
 
 func (b *NullComponent) SetOnLeave(onLeave func()) {

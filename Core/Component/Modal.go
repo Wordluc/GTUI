@@ -15,35 +15,35 @@ const (
 type Modal struct {
 	container     *Container
 	nullComponent *NullComponent
-	visibility    bool
 }
 
 func CreateModal(sizeX, sizeY int) *Modal {
 	null := CreateNullComponent(0, 0, sizeX, sizeY)
+	null.SetLayer(modalL1)
 	contComp := CreateContainer(0, 0)
-	contComp.AddDrawing(null.GetGraphics()...)
-	contComp.SetLayer(modalL1)
+	contComp.SetLayer(modalL2)
+	contComp.AddComponent(null)
 	return &Modal{
 		nullComponent: null,
 		container:     contComp,
 	}
 }
 func (b *Modal) SetVisibility(visible bool) {
-	for _, drawing := range b.container.GetDrawings() {
-		drawing.SetVisibility(visible)
-	}
-	b.visibility = visible
+	b.container.SetVisibility(visible)
 	EventManager.Call(EventManager.ForceRefresh)
 }
-func (b *Modal) SetActivity(activity bool) {
-	b.container.SetActivity(activity)
+
+func (b *Modal) SetActive(activity bool) {
+	b.container.SetActive(activity)
 }
+
 func (b *Modal) GetVisibility() bool {
-	return b.visibility
+	return b.container.GetVisibility()
 }
+
 func (b *Modal) SetBackgroundColor(color Color.ColorValue) {
 	b.nullComponent.GetRect().SetInsideColor(color)
-	b.nullComponent.graphics.Touch()
+	b.nullComponent.visibleArea.Touch()
 }
 
 func (b *Modal) AddComponent(componentToAdd Core.IComponent) error {

@@ -10,6 +10,7 @@ import (
 type Container struct {
 	onClick    func()
 	active     bool
+	visible    bool
 	components []Core.IComponent
 	drawings   []Core.IDrawing
 	layer      Core.Layer
@@ -27,7 +28,6 @@ func CreateContainer(x, y int) *Container {
 }
 func (c *Container) AddComponent(components ...Core.IComponent) error {
 	c.components = append(c.components, components...)
-
 	return nil
 }
 
@@ -61,11 +61,12 @@ func (b *Container) SetLayer(layer Core.Layer) error {
 	if layer < 0 {
 		return errors.New("layer can't be negative")
 	}
-	diff := layer - b.layer
 	for _, comp := range b.components {
+		diff := layer - comp.GetLayer()
 		comp.SetLayer(comp.GetLayer() + diff)
 	}
 	for _, draw := range b.drawings {
+		diff := layer - draw.GetLayer()
 		draw.SetLayer(draw.GetLayer() + diff)
 	}
 	b.layer = layer
@@ -76,13 +77,31 @@ func (c *Container) GetLayer() Core.Layer {
 	return c.layer
 }
 
+func (c *Container) GetVisibility() bool {
+	return c.visible
+}
+
+func (c *Container) SetVisibility(visible bool) {
+	for _, comp := range c.drawings {
+		comp.SetVisibility(visible)
+	}
+	for _, comp := range c.components {
+		for _, drawing := range comp.GetGraphics() {
+			drawing.SetVisibility(visible)
+		}
+	}
+	c.visible = visible
+}
+
 func (c *Container) SetonClick(onClick func()) {
 	c.onClick = onClick
 }
 
-func (c *Container) SetActivity(active bool) {
+func (c *Container) SetActive(active bool) {
 	c.active = active
-	//TODO propagate activity to childrens
+	for _, comp := range c.components {
+		comp.SetActive(active)
+	}
 }
 
 func (c *Container) GetActivity() bool {
