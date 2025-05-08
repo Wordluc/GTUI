@@ -154,7 +154,6 @@ func (b *TextBox) StopTyping() {
 	b.streamText.Delete()
 	b.isTyping = false
 	b.graphics.Touch()
-	EventManager.Call(EventManager.CursorAlign)
 	EventManager.Call(EventManager.Refresh)
 }
 
