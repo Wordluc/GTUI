@@ -81,6 +81,7 @@ func (b *TextBox) GetLayer() Core.Layer {
 	return b.graphics.GetLayer()
 }
 func (b *TextBox) loopTyping() {
+	EventManager.Call(EventManager.CursorAlign)
 	channel := b.streamText.Get()
 	var key rune
 	for str := range channel {
@@ -142,6 +143,10 @@ func (b *TextBox) StartTyping() {
 	}
 	b.GetVisibleArea().SetColor(b.OnTypingColor)
 	b.isTyping = true
+	//Align cursor
+	b.textBlock.Type(' ')
+	b.textBlock.Delete()
+	//
 	go b.loopTyping()
 	b.streamText.Delete()
 }

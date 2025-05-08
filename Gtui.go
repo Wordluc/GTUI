@@ -50,6 +50,12 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 }
 
 func (c *Gtui) initializeEventManager() {
+	EventManager.Subscribe(EventManager.CursorAlign, 100, func(comp []any) {
+		c.alignCursor()
+	})
+	EventManager.Subscribe(EventManager.Refresh, 100, func(comp []any) {
+		c.refresh(true)
+	})
 	EventManager.Subscribe(EventManager.Refresh, 100, func(comp []any) {
 		c.refresh(true)
 	})
@@ -239,7 +245,7 @@ func (c *Gtui) Click(x, y int) error {
 	return nil
 }
 
-func (c *Gtui) AllineCursor() {
+func (c *Gtui) alignCursor() {
 	x, y := c.GetCur()
 	oldX, oldY := x, y
 	comps := c.getHigherLayerElementsNoDisabled(x, y)
@@ -333,7 +339,7 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 }
 
 func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
-	c.AllineCursor()
+	c.alignCursor()
 	if !c.loop(c.keyb, c) {
 		return false
 	}

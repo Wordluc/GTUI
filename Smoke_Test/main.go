@@ -5,6 +5,7 @@ import (
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
 	"github.com/Wordluc/GTUI/Core/Drawing"
+	AlignCursor "github.com/Wordluc/GTUI/Core/EventManager"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"github.com/Wordluc/GTUI/Keyboard"
 	Kd "github.com/Wordluc/GTUI/Keyboard"
@@ -120,7 +121,7 @@ func loop(keyb Kd.IKeyBoard, core *GTUI.Gtui) bool {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
 					c.Paste(keyb.GetClickboard())
-					core.AllineCursor()
+					AlignCursor.Call(AlignCursor.CursorAlign)
 				}
 			}
 		})
