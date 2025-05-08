@@ -153,7 +153,9 @@ func (b *TextBox) StartTyping() {
 func (b *TextBox) StopTyping() {
 	b.streamText.Delete()
 	b.isTyping = false
-	EventManager.Call(EventManager.ForceRefresh)
+	b.graphics.Touch()
+	EventManager.Call(EventManager.CursorAlign)
+	EventManager.Call(EventManager.Refresh)
 }
 
 func (b *TextBox) OnClick() {
