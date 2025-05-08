@@ -49,11 +49,12 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 	}, nil
 }
 
-func (c *Gtui) initializeEventManager() {
+func (c *Gtui) initEventManager() {
 	EventManager.Subscribe(EventManager.CursorAlign, 100, func(comp []any) {
 		c.alignCursor()
 	})
 	EventManager.Subscribe(EventManager.Refresh, 100, func(comp []any) {
+		c.SetCur(c.xCursor, c.yCursor)
 		c.refresh(true)
 	})
 	EventManager.Subscribe(EventManager.ForceRefresh, 100, func(comp []any) {
@@ -167,7 +168,7 @@ func (c *Gtui) CreateStreamingCharacter() Component.StreamCharacter {
 }
 
 func (c *Gtui) Start() {
-	c.initializeEventManager()
+	c.initEventManager()
 	c.term.Start()
 	c.term.Clear()
 	c.lazyCheck()
