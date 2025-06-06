@@ -207,7 +207,7 @@ func (b *TextBox) OnHover() {
 }
 
 func (b *TextBox) GetGraphics() []Core.IDrawing {
-	return b.graphics.GetDrawings()
+	return b.graphics.GetGraphics()
 }
 
 func (b *TextBox) GetGraphic() *Drawing.Container {

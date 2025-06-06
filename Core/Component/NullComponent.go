@@ -68,7 +68,7 @@ func (b *NullComponent) GetLayer() Core.Layer {
 }
 
 func (b *NullComponent) GetGraphics() []Core.IDrawing {
-	return b.graphics.GetDrawings()
+	return b.graphics.GetGraphics()
 }
 
 func (b *NullComponent) GetGraphic() *Drawing.Container {
