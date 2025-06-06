@@ -13,7 +13,7 @@ type IDrawing interface {
 	GetVisibility() bool
 	GetSize() (int, int)
 	GetLayer() Layer
-	SetLayer(layer Layer)error
+	SetLayer(layer Layer) error
 }
 
 type IEntity interface {

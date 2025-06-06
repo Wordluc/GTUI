@@ -210,6 +210,10 @@ func (b *TextBox) GetGraphics() []Core.IDrawing {
 	return b.graphics.GetDrawings()
 }
 
+func (b *TextBox) GetGraphic() *Drawing.Container {
+	return b.graphics
+}
+
 func (b *TextBox) GetVisibleArea() *Drawing.Rectangle {
 	return b.visibleArea
 }

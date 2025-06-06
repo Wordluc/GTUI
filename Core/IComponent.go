@@ -17,12 +17,12 @@ type IComponent interface {
 }
 
 type IContainer interface {
-	GetDrawings() []IDrawing
+	GetGraphics() []IDrawing
 	GetComponents() []IComponent
 	AddContainer(...IContainer) error
 }
 type IComplexElement interface {
-	GetDrawings() []IDrawing
+	GetGraphics() []IDrawing
 	GetComponents() []IComponent
 }
 type IWritableComponent interface {
