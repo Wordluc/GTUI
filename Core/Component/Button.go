@@ -139,6 +139,10 @@ func (b *Button) GetGraphics() []Core.IDrawing {
 	return b.graphics.GetDrawings()
 }
 
+func (b *Button) GetGraphic() *Drawing.Container {
+	return b.graphics
+}
+
 func (b *Button) GetVisibleArea() *Drawing.RectangleFull {
 	return b.visibleArea
 }

@@ -43,7 +43,7 @@ func (c *Container) AddDrawings(eles ...Core.IDrawing) error {
 
 func (c *Container) AddContainer(containers ...Core.IContainer) error {
 	for _, conp := range containers {
-		c.drawings = append(c.drawings, conp.GetDrawings()...)
+		c.drawings = append(c.drawings, conp.GetGraphics()...)
 	}
 	return nil
 }

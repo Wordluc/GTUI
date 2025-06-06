@@ -10,6 +10,7 @@ import (
 
 // To use when you wanna avoid the interaction under the component
 type NullComponent struct {
+	graphics    *Drawing.Container
 	visibleArea *Drawing.RectangleFull
 	onLeave     func()
 	onHover     func()
@@ -18,11 +19,13 @@ type NullComponent struct {
 }
 
 func CreateNullComponent(x, y, sizeX, sizeY int) *NullComponent {
+	cont := Drawing.CreateContainer(x, y)
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
 	rect.SetPos(x, y)
+	cont.AddDrawings(rect)
 	return &NullComponent{
-		visibleArea: rect,
-		active:      true,
+		graphics: cont,
+		active:   true,
 	}
 }
 func (b *NullComponent) GetSize() (int, int) {
@@ -64,7 +67,11 @@ func (b *NullComponent) GetLayer() Core.Layer {
 }
 
 func (b *NullComponent) GetGraphics() []Core.IDrawing {
-	return []Core.IDrawing{b.visibleArea}
+	return b.graphics.GetDrawings()
+}
+
+func (b *NullComponent) GetGraphic() *Drawing.Container {
+	return b.graphics
 }
 
 func (b *NullComponent) SetOnLeave(onLeave func()) {

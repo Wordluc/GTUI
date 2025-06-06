@@ -66,8 +66,8 @@ func (b *Modal) GetComponents() []Core.IComponent {
 	return b.container.GetComponents()
 }
 
-func (c *Modal) GetDrawings() []Core.IDrawing {
-	return c.container.GetDrawings()
+func (c *Modal) GetGraphics() []Core.IDrawing {
+	return c.container.GetGraphics()
 }
 
 func (b *Modal) SetPos(x, y int) {

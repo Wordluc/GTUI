@@ -38,7 +38,7 @@ func (c *Container) AddDrawing(drawings ...Core.IDrawing) error {
 
 func (c *Container) AddContainer(containers ...Core.IContainer) error {
 	for _, conp := range containers {
-		c.drawings = append(c.drawings, conp.GetDrawings()...)
+		c.drawings = append(c.drawings, conp.GetGraphics()...)
 		c.components = append(c.components, conp.GetComponents()...)
 	}
 	return nil
@@ -48,7 +48,7 @@ func (c *Container) GetComponents() []Core.IComponent {
 	return c.components
 }
 
-func (c *Container) GetDrawings() (result []Core.IDrawing) {
+func (c *Container) GetGraphics() (result []Core.IDrawing) {
 	result = append(result, c.drawings...)
 
 	for _, drawing := range c.components {
