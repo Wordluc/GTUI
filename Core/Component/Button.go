@@ -136,7 +136,7 @@ func (b *Button) OnLeave() {
 }
 
 func (b *Button) GetGraphics() []Core.IDrawing {
-	return b.graphics.GetDrawings()
+	return b.graphics.GetGraphics()
 }
 
 func (b *Button) GetGraphic() *Drawing.Container {

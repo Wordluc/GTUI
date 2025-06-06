@@ -35,7 +35,7 @@ func main() {
 	contDraw.AddDrawings(rect1)
 	contDraw.SetVisibility(true)
 	compComponent := Component.CreateContainer(0, 0)
-	compComponent.AddDrawing(contDraw.GetDrawings()...)
+	compComponent.AddDrawing(contDraw.GetGraphics()...)
 	if e := compComponent.AddComponent(c); e != nil {
 		panic(e)
 	}
