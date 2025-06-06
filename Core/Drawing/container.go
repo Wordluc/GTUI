@@ -30,7 +30,7 @@ func (c *Container) GetComponents() []Core.IComponent {
 	return []Core.IComponent{}
 }
 
-func (c *Container) GetDrawings() []Core.IDrawing {
+func (c *Container) GetGraphics() []Core.IDrawing {
 	return c.drawings
 }
 
