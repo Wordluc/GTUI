@@ -24,8 +24,9 @@ func CreateNullComponent(x, y, sizeX, sizeY int) *NullComponent {
 	rect.SetPos(x, y)
 	cont.AddDrawings(rect)
 	return &NullComponent{
-		graphics: cont,
-		active:   true,
+		graphics:    cont,
+		active:      true,
+		visibleArea: rect,
 	}
 }
 func (b *NullComponent) GetSize() (int, int) {
