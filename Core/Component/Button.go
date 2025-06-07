@@ -113,6 +113,9 @@ func (b *Button) OnClick() {
 }
 
 func (b *Button) OnRelease() {
+	if !b.isActive {
+		return
+	}
 	if b.onRelease != nil {
 		b.onRelease()
 	}

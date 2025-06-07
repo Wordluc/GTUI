@@ -202,16 +202,16 @@ func (c *Gtui) AddComponent(componentsToAdd ...Core.IComponent) error {
 
 func (c *Gtui) AddContainer(container Core.IContainer) error {
 	drawings := container.GetGraphics()
-	componets := container.GetComponents()
+	components := container.GetComponents()
 	c.AddDrawing(drawings...)
-	c.AddComponent(componets...)
+	c.AddComponent(components...)
 	return nil
 }
 
 func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error {
-	componets := complEle.GetComponents()
+	components := complEle.GetComponents()
 	drawings := complEle.GetGraphics()
-	for _, comp := range componets {
+	for _, comp := range components {
 		c.componentTree.AddElement(comp)
 		comp.OnLeave()
 	}
@@ -286,7 +286,7 @@ func (c *Gtui) refresh(onlyTouched bool) error {
 	var str strings.Builder
 	var s strings.Builder
 	var drew bool
-	for i := 0; i < c.drawingTree.GetLayerN(); i++ {
+	for i := range c.drawingTree.GetLayerN() {
 		s, drew = c.refreshLayer(Core.Layer(i), onlyTouched)
 		if drew {
 			onlyTouched = false
