@@ -20,8 +20,8 @@ type Gtui struct {
 	globalColor          Color.Color
 	term                 Terminal.ITerminal
 	keyb                 Keyboard.IKeyBoard
-	drawingTree          *Core.TreeManager[Core.IDrawing]
-	componentTree        *Core.TreeManager[Core.IComponent]
+	drawingTree          *Core.MatrixHandler
+	componentTree        *Core.MatrixHandler
 	xCursor              int
 	yCursor              int
 	xSize                int
@@ -40,8 +40,8 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 		loop:             loop,
 		term:             term,
 		keyb:             keyb,
-		drawingTree:      Core.CreateTreeManager[Core.IDrawing](),
-		componentTree:    Core.CreateTreeManager[Core.IComponent](),
+		drawingTree:      Core.CreateMatrixHandler(10, 10),
+		componentTree:    Core.CreateMatrixHandler(10, 10),
 		xCursor:          0,
 		yCursor:          0,
 		xSize:            xSize,
@@ -81,13 +81,14 @@ func (c *Gtui) initEventManager() {
 	})
 }
 func (c *Gtui) getHigherLayerElementsNoDisabled(x, y int) (res []Core.IComponent) {
-	compInLayers := c.componentTree.SearchInDifferentLayers(x, y)
+	compInLayers := c.componentTree.SearchInAllLayers(x, y)
 	for i := len(compInLayers) - 1; i >= 0; i-- {
 		if compInLayers[i] == nil {
 			continue
 		}
-		res := []Core.IComponent{}
+		var res []Core.IComponent
 		for _, comp := range compInLayers[i] {
+			comp := comp.(Core.IComponent)
 			if comp.GetActive() {
 				res = append(res, comp)
 			}
@@ -308,31 +309,23 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 	var str strings.Builder
 	var drawing Core.IDrawing
 	var drew bool = false
-	var elementToRefresh map[Core.IDrawing]struct{} = make(map[Core.IDrawing]struct{})
-	cond := func(node *Core.TreeNode[Core.IDrawing]) bool {
-		drawing = node.GetElement()
+	cond := func(ele Core.ElementTree) bool {
+		drawing = ele.(Core.IDrawing)
 		if !drawing.GetVisibility() {
 			return true
 		}
-		if onlyTouched && !drawing.IsTouched() {
-			return true
-		}
+		//	if onlyTouched && !drawing.IsTouched() {
+		//		return true
+		//	}
 		x, y := drawing.GetPos()
 		width, height := drawing.GetSize()
 		str.WriteString(c.ClearZone(x, y, width, height))
 		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 		drew = true
-		for _, child := range c.drawingTree.GetCollidingElement(layer, node) {
-			elementToRefresh[child] = struct{}{}
-		}
 		return true
 	}
-	c.drawingTree.ExecuteOnLayerForAll(layer, cond)
-	for drawing := range elementToRefresh {
-		str.WriteString(drawing.GetAnsiCode(c.globalColor))
-		str.WriteString(c.globalColor.GetAnsiColor())
-	}
+	c.drawingTree.ExecuteOnLayer(int(layer), cond)
 	return str, drew
 }
 
