@@ -29,14 +29,15 @@ func CreateMatrixElements(nColumns, nRows, size int) *MatrixElements {
 	}
 }
 
+func divideCeil(a, b int) int {
+	at := float64(a)
+	bt := float64(b)
+	return int(math.Ceil(at / bt))
+}
+
 // start thinking how to link stuff together, the objects have to know that on the right there are some objects ecc....
 // so maybe use a wrapper for ElementTree, where i can store information about my neighbour
 func (m *MatrixElements) addElement(element ElementTree) {
-	divide := func(a, b int) int {
-		at := float64(a)
-		bt := float64(b)
-		return int(math.Ceil(at / bt))
-	}
 
 	x, y := element.GetPos()
 	width, height := element.GetSize()
@@ -44,19 +45,20 @@ func (m *MatrixElements) addElement(element ElementTree) {
 	startingColumn := x / m.sizeCell
 	startingRow := y / m.sizeCell
 
-	column := divide(width, m.sizeCell)
-	row := divide(height, m.sizeCell)
+	column := divideCeil(width, m.sizeCell)
+	row := divideCeil(height, m.sizeCell)
 
-	for ir := range row {
-		for iw := range column {
+	for ir := range row + 1 {
+		for iw := range column + 1 {
 			if ir+startingRow >= m.nRows {
 				continue
 			}
 			if iw+startingColumn >= m.nColumns {
 				continue
 			}
-			m.matrix[ir+startingRow][iw+startingColumn] =
-				append(m.matrix[ir+startingRow][iw+startingColumn], MatrixElement[ElementTree]{object: element})
+			currentRow, currentColumn := ir+startingRow, iw+startingColumn
+			m.matrix[currentRow][currentColumn] =
+				append(m.matrix[currentRow][currentColumn], MatrixElement[ElementTree]{object: element})
 		}
 	}
 }
@@ -89,15 +91,17 @@ func (m *MatrixElements) search(x, y int) (res []ElementTree) {
 }
 
 type MatrixHandler struct {
-	elements []ElementTree
-	layers   []*MatrixElements
-	w, h     int
+	elements               []ElementTree
+	layers                 []*MatrixElements
+	nCollumns, nRows, size int
 }
 
-func CreateMatrixHandler(w, h int) *MatrixHandler {
+// TODO: i have to pass the size of the screen and from that compute the w and h
+func CreateMatrixHandler(w, h, sizeCell int) *MatrixHandler {
 	return &MatrixHandler{
-		w: w,
-		h: h,
+		nCollumns: divideCeil(w, sizeCell),
+		nRows:     divideCeil(h, sizeCell),
+		size:      sizeCell,
 	}
 }
 
@@ -117,7 +121,8 @@ func (m *MatrixHandler) AddElement(eles ...ElementTree) {
 			m.layers = append(m.layers, nil)
 		}
 		if m.layers[layer] == nil {
-			m.layers[layer] = CreateMatrixElements(m.w, m.h, 10)
+			m.layers[layer] = CreateMatrixElements(m.nCollumns, m.nRows, 10)
+
 		}
 		m.layers[layer].addElement(ele)
 		m.elements = append(m.elements, ele)
@@ -129,7 +134,7 @@ func (m *MatrixHandler) GetLayerN() int {
 }
 
 func (m *MatrixHandler) Refresh() {
-	handler := CreateMatrixHandler(m.w, m.h)
+	handler := CreateMatrixHandler(m.nCollumns, m.nRows, m.size)
 	handler.AddElement(m.elements...)
 	*m = *handler
 }
@@ -139,8 +144,8 @@ func (m *MatrixHandler) ExecuteOnLayer(layer int, cond func(ele ElementTree) boo
 	if m.layers[layer] == nil {
 		return
 	}
-	for iy := range m.h {
-		for ix := range m.w {
+	for iy := range m.nRows {
+		for ix := range m.nCollumns {
 			for _, ele := range m.layers[layer].matrix[iy][ix] {
 				if !cond(ele.object) {
 					return
