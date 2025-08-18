@@ -68,11 +68,11 @@ func (c *Gtui) initEventManager() {
 		group := sync.WaitGroup{}
 		group.Add(2)
 		go func() {
-			c.drawingTree.Refresh()
+			c.drawingTree = c.drawingTree.Refresh(c.xSize, c.ySize, 5)
 			group.Done()
 		}()
 		go func() {
-			c.componentTree.Refresh()
+			c.componentTree = c.componentTree.Refresh(c.xSize, c.ySize, 5)
 			group.Done()
 		}()
 		c.SetCur(c.xCursor, c.yCursor)
@@ -181,7 +181,7 @@ func (c *Gtui) lazyCheck() {
 	time.AfterFunc(time.Second*2, func() {
 		if c.term.Resized() {
 			c.xSize, c.ySize = c.term.Size()
-			EventManager.Call(EventManager.ForceRefresh, nil)
+			EventManager.Call(EventManager.ReorganizeElements, nil)
 		}
 		c.lazyCheck()
 	})
@@ -309,23 +309,32 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 	var str strings.Builder
 	var drawing Core.IDrawing
 	var drew bool = false
+	var elementToRefresh map[Core.ElementTree]struct{} = make(map[Core.ElementTree]struct{})
 	cond := func(ele Core.ElementTree) bool {
 		drawing = ele.(Core.IDrawing)
 		if !drawing.GetVisibility() {
 			return true
 		}
-		//	if onlyTouched && !drawing.IsTouched() {
-		//		return true
-		//	}
+		if onlyTouched && !drawing.IsTouched() {
+			return true
+		}
 		x, y := drawing.GetPos()
 		width, height := drawing.GetSize()
 		str.WriteString(c.ClearZone(x, y, width, height))
 		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 		drew = true
+		for _, child := range c.drawingTree.GetCollidingElement(int(layer), ele) {
+			elementToRefresh[child] = struct{}{}
+		}
 		return true
 	}
+
 	c.drawingTree.ExecuteOnLayer(int(layer), cond)
+	for drawing := range elementToRefresh {
+		str.WriteString(drawing.(Core.IDrawing).GetAnsiCode(c.globalColor))
+		str.WriteString(c.globalColor.GetAnsiColor())
+	}
 	return str, drew
 }
 
