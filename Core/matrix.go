@@ -1,28 +1,29 @@
 package Core
 
-import "math"
-
 type ElementTree interface {
 	GetPos() (int, int)
 	GetSize() (int, int)
 	GetLayer() Layer
 }
-type MatrixElement[T ElementTree] struct {
+
+type WrapperElement[T ElementTree] struct {
 	object T
 }
-type matrix[T any] [][][]MatrixElement[ElementTree] //rows,columns,elements
-type MatrixElements struct {
-	matrix                    matrix[MatrixElement[ElementTree]]
+type matrix[T any] [][][]T //rows,columns,elements
+type MatrixLayer struct {
+	matrix                    matrix[WrapperElement[ElementTree]]
 	nColumns, nRows, sizeCell int
 	elements                  []ElementTree
 }
 
-func CreateMatrixElements(nColumns, nRows, size int) *MatrixElements {
-	var matrix matrix[MatrixElement[ElementTree]] = make(matrix[MatrixElement[ElementTree]], nRows+1)
+func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
+	nColumns++
+	nRows++
+	var matrix matrix[WrapperElement[ElementTree]] = make(matrix[WrapperElement[ElementTree]], nRows)
 	for y := range nRows {
-		matrix[y] = make([][]MatrixElement[ElementTree], nColumns+1)
+		matrix[y] = make([][]WrapperElement[ElementTree], nColumns)
 	}
-	return &MatrixElements{
+	return &MatrixLayer{
 		nColumns: nColumns,
 		nRows:    nRows,
 		matrix:   matrix,
@@ -30,15 +31,9 @@ func CreateMatrixElements(nColumns, nRows, size int) *MatrixElements {
 	}
 }
 
-func divideCeil(a, b int) int {
-	at := float64(a)
-	bt := float64(b)
-	return int(math.Ceil(at / bt))
-}
-
 // start thinking how to link stuff together, the objects have to know that on the right there are some objects ecc....
 // so maybe use a wrapper for ElementTree, where i can store information about my neighbour
-func (m *MatrixElements) addElement(element ElementTree) {
+func (m *MatrixLayer) addElement(element ElementTree) {
 	m.elements = append(m.elements, element)
 	x, y := element.GetPos()
 	width, height := element.GetSize()
@@ -59,7 +54,7 @@ func (m *MatrixElements) addElement(element ElementTree) {
 				continue
 			}
 			m.matrix[currentRow][currentColumn] =
-				append(m.matrix[currentRow][currentColumn], MatrixElement[ElementTree]{object: element})
+				append(m.matrix[currentRow][currentColumn], WrapperElement[ElementTree]{object: element})
 		}
 	}
 }
@@ -71,7 +66,7 @@ func isCollidingWith(xToSearch, yToSearch int, xElement, yElement, wElement, hEl
 	return false
 }
 
-func (m *MatrixElements) search(x, y int) (res []ElementTree) {
+func (m *MatrixLayer) search(x, y int) (res []ElementTree) {
 	row := int(y / m.sizeCell)
 	column := int(x / m.sizeCell)
 	if row >= m.nRows {
@@ -92,16 +87,16 @@ func (m *MatrixElements) search(x, y int) (res []ElementTree) {
 }
 
 type MatrixHandler struct {
-	layers                 []*MatrixElements
-	nCollumns, nRows, size int
+	layers                []*MatrixLayer
+	nColumns, nRows, size int
 }
 
 // TODO: i have to pass the size of the screen and from that compute the w and h
 func CreateMatrixHandler(w, h, sizeCell int) *MatrixHandler {
 	return &MatrixHandler{
-		nCollumns: w / sizeCell,
-		nRows:     h / sizeCell,
-		size:      sizeCell,
+		nColumns: w / sizeCell,
+		nRows:    h / sizeCell,
+		size:     sizeCell,
 	}
 }
 
@@ -114,14 +109,14 @@ func (m *MatrixHandler) SearchInAllLayers(x, y int) (res [][]ElementTree) {
 	return res
 }
 
-func (m *MatrixHandler) AddElement(eles ...ElementTree) {
-	for _, ele := range eles {
+func (m *MatrixHandler) AddElement(elements ...ElementTree) {
+	for _, ele := range elements {
 		layer := ele.GetLayer()
 		for int(layer) >= len(m.layers) {
 			m.layers = append(m.layers, nil)
 		}
 		if m.layers[layer] == nil {
-			m.layers[layer] = CreateMatrixElements(m.nCollumns, m.nRows, m.size)
+			m.layers[layer] = CreateMatrixLayer(m.nColumns, m.nRows, m.size)
 
 		}
 		m.layers[layer].addElement(ele)
@@ -154,7 +149,7 @@ func (m *MatrixHandler) ExecuteOnLayer(layer int, cond func(ele ElementTree) boo
 	}
 }
 
-func (t *MatrixElement[ElementTree]) isCollidingWithNode(x, y int, width, height int) bool {
+func (t *WrapperElement[ElementTree]) isCollidingWithNode(x, y int, width, height int) bool {
 	elementX, elementY := t.object.GetPos()
 	elementWidth, elementHeight := t.object.GetSize()
 	if x >= elementX && x < elementX+elementWidth && y >= elementY && y < elementY+elementHeight {
@@ -176,7 +171,7 @@ func (t *MatrixElement[ElementTree]) isCollidingWithNode(x, y int, width, height
 func (m *MatrixHandler) GetCollidingElement(layer int, elementWhichCollides ElementTree) (res []ElementTree) {
 	x, y := elementWhichCollides.GetPos()
 	width, height := elementWhichCollides.GetSize()
-	var tElement MatrixElement[ElementTree]
+	var tElement WrapperElement[ElementTree]
 	for i := range m.layers[layer].elements {
 		if m.layers[layer].elements[i] == elementWhichCollides {
 			continue
