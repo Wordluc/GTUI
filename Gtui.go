@@ -203,16 +203,16 @@ func (c *Gtui) AddComponent(componentsToAdd ...Core.IComponent) error {
 
 func (c *Gtui) AddContainer(container Core.IContainer) error {
 	drawings := container.GetGraphics()
-	componets := container.GetComponents()
+	components := container.GetComponents()
 	c.AddDrawing(drawings...)
-	c.AddComponent(componets...)
+	c.AddComponent(components...)
 	return nil
 }
 
 func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error {
-	componets := complEle.GetComponents()
+	components := complEle.GetComponents()
 	drawings := complEle.GetGraphics()
-	for _, comp := range componets {
+	for _, comp := range components {
 		c.componentTree.AddElement(comp)
 		comp.OnLeave()
 	}
