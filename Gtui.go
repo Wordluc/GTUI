@@ -309,7 +309,7 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 	var str strings.Builder
 	var drawing Core.IDrawing
 	var drew bool = false
-	var elementToRefresh map[Core.ElementTree]struct{} = make(map[Core.ElementTree]struct{})
+	//	var elementToRefresh map[Core.ElementTree]struct{} = make(map[Core.ElementTree]struct{})
 	cond := func(ele Core.ElementTree) bool {
 		drawing = ele.(Core.IDrawing)
 		if !drawing.GetVisibility() {
@@ -324,17 +324,17 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 		drew = true
-		for _, child := range c.drawingTree.GetCollidingElement(int(layer), ele) {
-			elementToRefresh[child] = struct{}{}
-		}
+		//		for _, child := range c.drawingTree.GetCollidingElement(int(layer), ele) {
+		//			elementToRefresh[child] = struct{}{}
+		//		}
 		return true
 	}
 
 	c.drawingTree.ExecuteOnLayer(int(layer), cond)
-	for drawing := range elementToRefresh {
-		str.WriteString(drawing.(Core.IDrawing).GetAnsiCode(c.globalColor))
-		str.WriteString(c.globalColor.GetAnsiColor())
-	}
+	//	for drawing := range elementToRefresh {
+	//		str.WriteString(drawing.(Core.IDrawing).GetAnsiCode(c.globalColor))
+	//		str.WriteString(c.globalColor.GetAnsiColor())
+	//	}
 	return str, drew
 }
 
