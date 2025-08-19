@@ -35,6 +35,8 @@ func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox
 	if e := cont.AddDrawings(rect); e != nil {
 		return nil, e
 	}
+	rect.SetLayer(Core.L1)
+	textBox.SetLayer(Core.L2)
 	if e := cont.AddDrawings(textBox); e != nil {
 		return nil, e
 	}
