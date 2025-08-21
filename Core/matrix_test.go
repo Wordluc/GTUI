@@ -5,14 +5,6 @@ import (
 	"testing"
 )
 
-type mockElementMatrix struct {
-	x     int
-	y     int
-	xSize int
-	ySize int
-	name  string
-}
-
 func createMockElementMatrix(x, y, xSize, ySize int, name string) mockElementMatrix {
 	return mockElementMatrix{
 		x:     x,
@@ -21,18 +13,6 @@ func createMockElementMatrix(x, y, xSize, ySize int, name string) mockElementMat
 		ySize: ySize,
 		name:  name,
 	}
-}
-func (e mockElementMatrix) GetPos() (int, int) {
-	return e.x, e.y
-}
-func (e mockElementMatrix) GetSize() (int, int) {
-	return e.xSize, e.ySize
-}
-func (e mockElementMatrix) GetLayer() Layer {
-	return L1
-}
-func (e mockElementMatrix) SetLayer(layer Layer) {
-	return
 }
 
 func testElement(x, y int, t *testing.T, matrix *MatrixHandler, nametest string, expected ...string) {
@@ -128,5 +108,29 @@ func TestMatrixElementNextToAnotherElementSameH(t *testing.T) {
 	for i := 6; i < 5; i++ {
 		testElement(31, i, t, matrix, "nona verifica 1", "textBox")
 		print("---\n")
+	}
+}
+func TestAdjacentComponentX(t *testing.T) {
+	matrix := CreateMatrixHandler(100, 100, 20)
+	matrix.AddElement(createMockElementMatrix(30, 10, 5, 5, "A"))
+	matrix.AddElement(createMockElementMatrix(31, 10, 5, 5, "B"))
+	matrix.AddElement(createMockElementMatrix(33, 10, 5, 5, "C"))
+	//	matrix.AddElement(createMockElementMatrix(31, 10, 5, 5, "B"))
+	//	matrix.AddElement(createMockElementMatrix(32, 10, 5, 5, "D"))
+	res := matrix.searchInAllLayersRaw(34, 11)
+
+	getEle := func(name string, elements []WrapperElement[ElementMatrix]) WrapperElement[ElementMatrix] {
+		for i := range elements {
+
+			if elements[i].object.(mockElementMatrix).name == name {
+				return elements[i]
+			}
+		}
+		return WrapperElement[ElementMatrix]{}
+	}
+	var ele = getEle("A", res[0])
+	for ele.object != nil {
+		println(ele.object.(mockElementMatrix).name)
+		ele = *ele.right
 	}
 }
