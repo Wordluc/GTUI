@@ -1,5 +1,29 @@
 package Core
 
+import (
+	"math"
+)
+
+type mockElementMatrix struct {
+	x     int
+	y     int
+	xSize int
+	ySize int
+	name  string
+}
+
+func (e mockElementMatrix) GetPos() (int, int) {
+	return e.x, e.y
+}
+func (e mockElementMatrix) GetSize() (int, int) {
+	return e.xSize, e.ySize
+}
+func (e mockElementMatrix) GetLayer() Layer {
+	return L1
+}
+func (e mockElementMatrix) SetLayer(layer Layer) {
+}
+
 type ElementMatrix interface {
 	GetPos() (int, int)
 	GetSize() (int, int)
@@ -8,6 +32,10 @@ type ElementMatrix interface {
 
 type WrapperElement[T ElementMatrix] struct {
 	object T
+	left   *WrapperElement[T]
+	right  *WrapperElement[T]
+	up     *WrapperElement[T]
+	down   *WrapperElement[T]
 }
 type matrix[T any] [][][]T //rows,columns,elements
 type MatrixLayer struct {
@@ -29,6 +57,61 @@ func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
 		matrix:   matrix,
 		sizeCell: size,
 	}
+}
+func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) WrapperElement[ElementMatrix] {
+	res := WrapperElement[ElementMatrix]{object: element}
+	currentCell := m.matrix[row][column]
+	return res
+	getDistBetween := func(a ElementMatrix, b ElementMatrix) (int, int) {
+		xA, yA := a.GetPos()
+		xB, yB := b.GetPos()
+		disX, disY := xA-xB, yA-yB
+		return disX, disY
+	}
+	for _, matrixEle := range currentCell {
+		disX, disY := getDistBetween(matrixEle.object, element)
+		if math.Abs(float64(disX)) > math.Abs(float64(disY)) {
+			if disX >= 0 {
+				println(matrixEle.object.(mockElementMatrix).name)
+				break
+			}
+		} else {
+			if disY >= 0 {
+				break
+			}
+		}
+	}
+
+	//		else {
+	//				previousEle := matrixEle.left
+	//				if previousEle == nil {
+	//					matrixEle.left = &res
+	//					res.right = &matrixEle
+	//					break
+	//				}
+	//				previousEle.right = &res
+	//				res.left = previousEle
+	//				res.right = &matrixEle
+	//				break
+	//			}
+	//		} else {
+	//			if disY >= 0 {
+	//				continue
+	//			} else {
+	//				previousEle := matrixEle.up
+	//				if previousEle == nil {
+	//					matrixEle.down = &res
+	//					res.up = &matrixEle
+	//					break
+	//				}
+	//				previousEle.down = &res
+	//				res.up = previousEle
+	//				res.down = &matrixEle
+	//				break
+	//			}
+	//		}
+	//	}
+	return res
 }
 
 // start thinking how to link stuff together, the objects have to know that on the right there are some objects ecc....
@@ -54,7 +137,7 @@ func (m *MatrixLayer) addElement(element ElementMatrix) {
 				continue
 			}
 			m.matrix[currentRow][currentColumn] =
-				append(m.matrix[currentRow][currentColumn], WrapperElement[ElementMatrix]{object: element})
+				append(m.matrix[currentRow][currentColumn], m.createElement(currentRow, currentColumn, element))
 		}
 	}
 }
@@ -66,6 +149,25 @@ func isCollidingWith(xToSearch, yToSearch int, xElement, yElement, wElement, hEl
 	return false
 }
 
+func (m *MatrixLayer) searchRaw(x, y int) (res []WrapperElement[ElementMatrix]) {
+	row := int(y / m.sizeCell)
+	column := int(x / m.sizeCell)
+	if row >= m.nRows {
+		return res
+	}
+	if column >= m.nColumns {
+		return res
+	}
+	var xEle, yEle, wEle, hEle int
+	for i := range m.matrix[row][column] {
+		xEle, yEle = m.matrix[row][column][i].object.GetPos()
+		wEle, hEle = m.matrix[row][column][i].object.GetSize()
+		if isCollidingWith(x, y, xEle, yEle, wEle, hEle) {
+			res = append(res, m.matrix[row][column][i])
+		}
+	}
+	return res
+}
 func (m *MatrixLayer) search(x, y int) (res []ElementMatrix) {
 	row := int(y / m.sizeCell)
 	column := int(x / m.sizeCell)
@@ -99,6 +201,15 @@ func CreateMatrixHandler(w, h, sizeCell int) *MatrixHandler {
 	}
 }
 
+func (m *MatrixHandler) searchInAllLayersRaw(x, y int) (res [][]WrapperElement[ElementMatrix]) {
+	for i := range m.layers {
+		if m.layers[i] != nil {
+			res = append(res, m.layers[i].searchRaw(x, y))
+		}
+	}
+	return res
+}
+
 func (m *MatrixHandler) SearchInAllLayers(x, y int) (res [][]ElementMatrix) {
 	for i := range m.layers {
 		if m.layers[i] != nil {
@@ -107,7 +218,6 @@ func (m *MatrixHandler) SearchInAllLayers(x, y int) (res [][]ElementMatrix) {
 	}
 	return res
 }
-
 func (m *MatrixHandler) AddElement(elements ...ElementMatrix) {
 	for _, ele := range elements {
 		layer := ele.GetLayer()
