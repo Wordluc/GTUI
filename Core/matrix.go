@@ -1,27 +1,27 @@
 package Core
 
-type ElementTree interface {
+type ElementMatrix interface {
 	GetPos() (int, int)
 	GetSize() (int, int)
 	GetLayer() Layer
 }
 
-type WrapperElement[T ElementTree] struct {
+type WrapperElement[T ElementMatrix] struct {
 	object T
 }
 type matrix[T any] [][][]T //rows,columns,elements
 type MatrixLayer struct {
-	matrix                    matrix[WrapperElement[ElementTree]]
+	matrix                    matrix[WrapperElement[ElementMatrix]]
 	nColumns, nRows, sizeCell int
-	elements                  []ElementTree
+	elements                  []ElementMatrix
 }
 
 func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
 	nColumns++
 	nRows++
-	var matrix matrix[WrapperElement[ElementTree]] = make(matrix[WrapperElement[ElementTree]], nRows)
+	var matrix matrix[WrapperElement[ElementMatrix]] = make(matrix[WrapperElement[ElementMatrix]], nRows)
 	for y := range nRows {
-		matrix[y] = make([][]WrapperElement[ElementTree], nColumns)
+		matrix[y] = make([][]WrapperElement[ElementMatrix], nColumns)
 	}
 	return &MatrixLayer{
 		nColumns: nColumns,
@@ -33,7 +33,7 @@ func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
 
 // start thinking how to link stuff together, the objects have to know that on the right there are some objects ecc....
 // so maybe use a wrapper for ElementTree, where i can store information about my neighbour
-func (m *MatrixLayer) addElement(element ElementTree) {
+func (m *MatrixLayer) addElement(element ElementMatrix) {
 	m.elements = append(m.elements, element)
 	x, y := element.GetPos()
 	width, height := element.GetSize()
@@ -54,7 +54,7 @@ func (m *MatrixLayer) addElement(element ElementTree) {
 				continue
 			}
 			m.matrix[currentRow][currentColumn] =
-				append(m.matrix[currentRow][currentColumn], WrapperElement[ElementTree]{object: element})
+				append(m.matrix[currentRow][currentColumn], WrapperElement[ElementMatrix]{object: element})
 		}
 	}
 }
@@ -66,7 +66,7 @@ func isCollidingWith(xToSearch, yToSearch int, xElement, yElement, wElement, hEl
 	return false
 }
 
-func (m *MatrixLayer) search(x, y int) (res []ElementTree) {
+func (m *MatrixLayer) search(x, y int) (res []ElementMatrix) {
 	row := int(y / m.sizeCell)
 	column := int(x / m.sizeCell)
 	if row >= m.nRows {
@@ -91,7 +91,6 @@ type MatrixHandler struct {
 	nColumns, nRows, size int
 }
 
-// TODO: i have to pass the size of the screen and from that compute the w and h
 func CreateMatrixHandler(w, h, sizeCell int) *MatrixHandler {
 	return &MatrixHandler{
 		nColumns: w / sizeCell,
@@ -100,7 +99,7 @@ func CreateMatrixHandler(w, h, sizeCell int) *MatrixHandler {
 	}
 }
 
-func (m *MatrixHandler) SearchInAllLayers(x, y int) (res [][]ElementTree) {
+func (m *MatrixHandler) SearchInAllLayers(x, y int) (res [][]ElementMatrix) {
 	for i := range m.layers {
 		if m.layers[i] != nil {
 			res = append(res, m.layers[i].search(x, y))
@@ -109,7 +108,7 @@ func (m *MatrixHandler) SearchInAllLayers(x, y int) (res [][]ElementTree) {
 	return res
 }
 
-func (m *MatrixHandler) AddElement(elements ...ElementTree) {
+func (m *MatrixHandler) AddElement(elements ...ElementMatrix) {
 	for _, ele := range elements {
 		layer := ele.GetLayer()
 		for int(layer) >= len(m.layers) {
@@ -138,7 +137,7 @@ func (m *MatrixHandler) Refresh(w, h, sizeCell int) *MatrixHandler {
 	return handler
 }
 
-func (m *MatrixHandler) ExecuteOnLayer(layer int, cond func(ele ElementTree) bool) {
+func (m *MatrixHandler) ExecuteOnLayer(layer int, cond func(ele ElementMatrix) bool) {
 	if m.layers[layer] == nil {
 		return
 	}
@@ -168,10 +167,10 @@ func (t *WrapperElement[ElementTree]) isCollidingWithNode(x, y int, width, heigh
 }
 
 // to optimize ? maybe with some chacing
-func (m *MatrixHandler) GetCollidingElement(layer int, elementWhichCollides ElementTree) (res []ElementTree) {
+func (m *MatrixHandler) GetCollidingElement(layer int, elementWhichCollides ElementMatrix) (res []ElementMatrix) {
 	x, y := elementWhichCollides.GetPos()
 	width, height := elementWhichCollides.GetSize()
-	var tElement WrapperElement[ElementTree]
+	var tElement WrapperElement[ElementMatrix]
 	for i := range m.layers[layer].elements {
 		if m.layers[layer].elements[i] == elementWhichCollides {
 			continue
