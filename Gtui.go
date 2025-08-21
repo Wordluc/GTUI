@@ -20,8 +20,8 @@ type Gtui struct {
 	globalColor          Color.Color
 	term                 Terminal.ITerminal
 	keyb                 Keyboard.IKeyBoard
-	drawingTree          *Core.MatrixHandler
-	componentTree        *Core.MatrixHandler
+	drawingsHandler      *Core.MatrixHandler
+	componentsHandler    *Core.MatrixHandler
 	xCursor              int
 	yCursor              int
 	xSize                int
@@ -35,17 +35,17 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 	xSize, ySize := term.Size()
 	EventManager.Setup()
 	return &Gtui{
-		globalColor:      Color.GetDefaultColor(),
-		cursorVisibility: true,
-		loop:             loop,
-		term:             term,
-		keyb:             keyb,
-		drawingTree:      Core.CreateMatrixHandler(xSize, ySize, 5),
-		componentTree:    Core.CreateMatrixHandler(xSize, ySize, 5),
-		xCursor:          0,
-		yCursor:          0,
-		xSize:            xSize,
-		ySize:            ySize,
+		globalColor:       Color.GetDefaultColor(),
+		cursorVisibility:  true,
+		loop:              loop,
+		term:              term,
+		keyb:              keyb,
+		drawingsHandler:   Core.CreateMatrixHandler(xSize, ySize, 5),
+		componentsHandler: Core.CreateMatrixHandler(xSize, ySize, 5),
+		xCursor:           0,
+		yCursor:           0,
+		xSize:             xSize,
+		ySize:             ySize,
 	}, nil
 }
 
@@ -68,11 +68,11 @@ func (c *Gtui) initEventManager() {
 		group := sync.WaitGroup{}
 		group.Add(2)
 		go func() {
-			c.drawingTree = c.drawingTree.Refresh(c.xSize, c.ySize, 5)
+			c.drawingsHandler = c.drawingsHandler.Refresh(c.xSize, c.ySize, 5)
 			group.Done()
 		}()
 		go func() {
-			c.componentTree = c.componentTree.Refresh(c.xSize, c.ySize, 5)
+			c.componentsHandler = c.componentsHandler.Refresh(c.xSize, c.ySize, 5)
 			group.Done()
 		}()
 		group.Wait()
@@ -81,7 +81,7 @@ func (c *Gtui) initEventManager() {
 	})
 }
 func (c *Gtui) getHigherLayerElementsNoDisabled(x, y int) (res []Core.IComponent) {
-	compInLayers := c.componentTree.SearchInAllLayers(x, y)
+	compInLayers := c.componentsHandler.SearchInAllLayers(x, y)
 	for i := len(compInLayers) - 1; i >= 0; i-- {
 		if compInLayers[i] == nil {
 			continue
@@ -188,14 +188,14 @@ func (c *Gtui) lazyCheck() {
 }
 func (c *Gtui) AddDrawing(entitiesToAdd ...Core.IDrawing) {
 	for _, draw := range entitiesToAdd {
-		c.drawingTree.AddElement(draw)
+		c.drawingsHandler.AddElement(draw)
 	}
 }
 
 func (c *Gtui) AddComponent(componentsToAdd ...Core.IComponent) error {
 	for _, componentToAdd := range componentsToAdd {
 		c.AddDrawing(componentToAdd.GetGraphics()...)
-		c.componentTree.AddElement(componentToAdd)
+		c.componentsHandler.AddElement(componentToAdd)
 		componentToAdd.OnLeave()
 	}
 	return nil
@@ -213,11 +213,11 @@ func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error {
 	components := complEle.GetComponents()
 	drawings := complEle.GetGraphics()
 	for _, comp := range components {
-		c.componentTree.AddElement(comp)
+		c.componentsHandler.AddElement(comp)
 		comp.OnLeave()
 	}
 	for _, draw := range drawings {
-		c.drawingTree.AddElement(draw)
+		c.drawingsHandler.AddElement(draw)
 	}
 	return nil
 }
@@ -287,7 +287,7 @@ func (c *Gtui) refresh(onlyTouched bool) error {
 	var str strings.Builder
 	var s strings.Builder
 	var drew bool
-	for i := 0; i < c.drawingTree.GetLayerN(); i++ {
+	for i := 0; i < c.drawingsHandler.GetLayerN(); i++ {
 		s, drew = c.refreshLayer(Core.Layer(i), onlyTouched)
 		if drew {
 			onlyTouched = false
@@ -310,7 +310,7 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 	var drawing Core.IDrawing
 	var drew bool = false
 	//	var elementToRefresh map[Core.ElementTree]struct{} = make(map[Core.ElementTree]struct{})
-	cond := func(ele Core.ElementTree) bool {
+	cond := func(ele Core.ElementMatrix) bool {
 		drawing = ele.(Core.IDrawing)
 		if !drawing.GetVisibility() {
 			return true
@@ -330,7 +330,7 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 		return true
 	}
 
-	c.drawingTree.ExecuteOnLayer(int(layer), cond)
+	c.drawingsHandler.ExecuteOnLayer(int(layer), cond)
 	//	for drawing := range elementToRefresh {
 	//		str.WriteString(drawing.(Core.IDrawing).GetAnsiCode(c.globalColor))
 	//		str.WriteString(c.globalColor.GetAnsiColor())
