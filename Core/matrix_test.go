@@ -110,15 +110,15 @@ func TestMatrixElementNextToAnotherElementSameH(t *testing.T) {
 		print("---\n")
 	}
 }
-func TestAdjacentComponentX(t *testing.T) {
-	matrix := CreateMatrixHandler(100, 100, 20)
-	matrix.AddElement(createMockElementMatrix(30, 10, 5, 5, "A"))
-	matrix.AddElement(createMockElementMatrix(31, 10, 5, 5, "B"))
-	matrix.AddElement(createMockElementMatrix(33, 10, 5, 5, "C"))
-	//	matrix.AddElement(createMockElementMatrix(31, 10, 5, 5, "B"))
-	//	matrix.AddElement(createMockElementMatrix(32, 10, 5, 5, "D"))
-	res := matrix.searchInAllLayersRaw(34, 11)
 
+const (
+	up    = iota
+	down  = iota
+	left  = iota
+	right = iota
+)
+
+func utilityToTestAdjacents(elements []WrapperElement[ElementMatrix], whereStart string, whatToExpect []string, howToMove int) {
 	getEle := func(name string, elements []WrapperElement[ElementMatrix]) WrapperElement[ElementMatrix] {
 		for i := range elements {
 
@@ -128,9 +128,51 @@ func TestAdjacentComponentX(t *testing.T) {
 		}
 		return WrapperElement[ElementMatrix]{}
 	}
-	var ele = getEle("A", res[0])
-	for ele.object != nil {
+	var ele = getEle(whereStart, elements)
+	for i := range whatToExpect {
 		println(ele.object.(mockElementMatrix).name)
-		ele = *ele.right
+		if ele.object.(mockElementMatrix).name != whatToExpect[i] {
+			//		panic(fmt.Sprintf("Exp: %v,got %v", whatToExpect[i], ele.object.(mockElementMatrix).name))
+
+		}
+		if i == len(whatToExpect)-1 {
+			break
+		}
+		switch howToMove {
+		case up:
+			ele = *ele.up
+		case down:
+			ele = *ele.down
+		case right:
+			ele = *ele.right
+		case left:
+			ele = *ele.left
+		}
 	}
+}
+func TestAdjacentComponentX(t *testing.T) {
+	matrix := CreateMatrixHandler(100, 100, 20)
+	matrix.AddElement(createMockElementMatrix(30, 10, 5, 5, "A"))
+	matrix.AddElement(createMockElementMatrix(33, 10, 5, 5, "D"))
+	matrix.AddElement(createMockElementMatrix(32, 10, 5, 5, "C"))
+	matrix.AddElement(createMockElementMatrix(31, 10, 5, 5, "B"))
+	matrix.AddElement(createMockElementMatrix(34, 10, 5, 5, "E"))
+	res := matrix.searchInAllLayersRaw(34, 11)
+	utilityToTestAdjacents(res[0], "A", []string{"A", "B", "C", "D", "E"}, right)
+	utilityToTestAdjacents(res[0], "D", []string{"D", "C", "B", "A"}, left)
+	utilityToTestAdjacents(res[0], "A", []string{"A"}, left)
+	utilityToTestAdjacents(res[0], "C", []string{"C", "D", "E"}, right)
+}
+func TestAdjacentComponentY(t *testing.T) {
+	matrix := CreateMatrixHandler(100, 100, 20)
+	matrix.AddElement(createMockElementMatrix(10, 30, 5, 5, "A"))
+	matrix.AddElement(createMockElementMatrix(10, 33, 5, 5, "D"))
+	matrix.AddElement(createMockElementMatrix(10, 32, 5, 5, "C"))
+	matrix.AddElement(createMockElementMatrix(10, 31, 5, 5, "B"))
+	matrix.AddElement(createMockElementMatrix(10, 34, 5, 5, "E"))
+	res := matrix.searchInAllLayersRaw(10, 34)
+	utilityToTestAdjacents(res[0], "A", []string{"A", "B", "C", "D", "E"}, down)
+	utilityToTestAdjacents(res[0], "D", []string{"D", "C", "B", "A"}, up)
+	utilityToTestAdjacents(res[0], "A", []string{"A"}, up)
+	utilityToTestAdjacents(res[0], "C", []string{"C", "D", "E"}, down)
 }
