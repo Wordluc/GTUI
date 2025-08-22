@@ -69,7 +69,7 @@ func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) *Wra
 	}
 	x, y := element.GetPos()
 	var left, right, up, down *WrapperElement[ElementMatrix]
-	var leftX, rightX, upY, downY int = 10000, 10000, 10000, 10000
+	var leftX, rightX, upY, downY int = int(math.Inf(1)), int(math.Inf(1)), int(math.Inf(1)), int(math.Inf(1))
 	var disX, disY int
 	for i := range currentCell {
 		xM, yM := currentCell[i].object.GetPos()
@@ -168,8 +168,6 @@ func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) *Wra
 	return res
 }
 
-// start thinking how to link stuff together, the objects have to know that on the right there are some objects ecc....
-// so maybe use a wrapper for ElementTree, where i can store information about my neighbour
 func (m *MatrixLayer) addElement(element ElementMatrix) {
 	m.elements = append(m.elements, element)
 	x, y := element.GetPos()
