@@ -39,7 +39,7 @@ type WrapperElement[T ElementMatrix] struct {
 }
 type matrix[T any] [][][]T //rows,columns,elements
 type MatrixLayer struct {
-	matrix                    matrix[WrapperElement[ElementMatrix]]
+	matrix                    matrix[*WrapperElement[ElementMatrix]]
 	nColumns, nRows, sizeCell int
 	elements                  []ElementMatrix
 }
@@ -47,9 +47,9 @@ type MatrixLayer struct {
 func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
 	nColumns++
 	nRows++
-	var matrix matrix[WrapperElement[ElementMatrix]] = make(matrix[WrapperElement[ElementMatrix]], nRows)
+	var matrix matrix[*WrapperElement[ElementMatrix]] = make(matrix[*WrapperElement[ElementMatrix]], nRows)
 	for y := range nRows {
-		matrix[y] = make([][]WrapperElement[ElementMatrix], nColumns)
+		matrix[y] = make([][]*WrapperElement[ElementMatrix], nColumns)
 	}
 	return &MatrixLayer{
 		nColumns: nColumns,
@@ -58,59 +58,113 @@ func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
 		sizeCell: size,
 	}
 }
-func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) WrapperElement[ElementMatrix] {
-	res := WrapperElement[ElementMatrix]{object: element}
+
+// TODO: refactor!!!!
+func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) *WrapperElement[ElementMatrix] {
+	res := &WrapperElement[ElementMatrix]{object: element}
 	currentCell := m.matrix[row][column]
-	return res
-	getDistBetween := func(a ElementMatrix, b ElementMatrix) (int, int) {
-		xA, yA := a.GetPos()
-		xB, yB := b.GetPos()
-		disX, disY := xA-xB, yA-yB
+	getDistBetween := func(xMa, yMa, xB, yB int) (int, int) {
+		disX, disY := xMa-xB, yMa-yB
 		return disX, disY
 	}
-	for _, matrixEle := range currentCell {
-		disX, disY := getDistBetween(matrixEle.object, element)
-		if math.Abs(float64(disX)) > math.Abs(float64(disY)) {
-			if disX >= 0 {
-				println(matrixEle.object.(mockElementMatrix).name)
-				break
+	x, y := element.GetPos()
+	var left, right, up, down *WrapperElement[ElementMatrix]
+	var leftX, rightX, upY, downY int = 10000, 10000, 10000, 10000
+	var disX, disY int
+	for i := range currentCell {
+		xM, yM := currentCell[i].object.GetPos()
+		disX, disY = getDistBetween(xM, yM, x, y)
+		if disX < 0 {
+			//LEFT OF ELEMENT
+			if math.Abs(float64(disX)) <= math.Abs(float64(leftX)) {
+				leftX = disX
+				left = currentCell[i]
 			}
 		} else {
-			if disY >= 0 {
-				break
+			//RIGHT OF ELEMENT
+			if math.Abs(float64(disX)) <= math.Abs(float64(rightX)) {
+				rightX = disX
+				right = currentCell[i]
+			}
+		}
+		if disY < 0 {
+			//UP OF ELEMENT
+			if math.Abs(float64(disY)) <= math.Abs(float64(upY)) {
+				upY = disY
+				up = currentCell[i]
+			}
+		} else {
+			//DOWN OF ELEMENT
+			if math.Abs(float64(disY)) <= math.Abs(float64(downY)) {
+				downY = disY
+				down = currentCell[i]
 			}
 		}
 	}
 
-	//		else {
-	//				previousEle := matrixEle.left
-	//				if previousEle == nil {
-	//					matrixEle.left = &res
-	//					res.right = &matrixEle
-	//					break
-	//				}
-	//				previousEle.right = &res
-	//				res.left = previousEle
-	//				res.right = &matrixEle
-	//				break
-	//			}
-	//		} else {
-	//			if disY >= 0 {
-	//				continue
-	//			} else {
-	//				previousEle := matrixEle.up
-	//				if previousEle == nil {
-	//					matrixEle.down = &res
-	//					res.up = &matrixEle
-	//					break
-	//				}
-	//				previousEle.down = &res
-	//				res.up = previousEle
-	//				res.down = &matrixEle
-	//				break
-	//			}
-	//		}
-	//	}
+	if math.Abs(float64(leftX)) < math.Abs(float64(rightX)) {
+		if left != nil {
+			if left.right == nil {
+				left.right = res
+				res.left = left
+			} else {
+				t := left.right
+				left.right = res
+				res.left = left
+
+				t.left = res
+				res.right = t
+			}
+		}
+	} else {
+		if right != nil {
+			if right.left == nil {
+				right.left = res
+				res.right = right
+
+			} else {
+				t := right.left
+				right.left = res
+				res.right = right
+
+				t.right = res
+				res.left = t
+			}
+		}
+	}
+
+	if math.Abs(float64(upY)) < math.Abs(float64(downY)) {
+		if up != nil {
+			if up.down == nil {
+				up.down = res
+				res.up = up
+
+			} else {
+				t := up.down
+				up.down = res
+				res.up = up
+
+				t.up = res
+				res.down = t
+			}
+		}
+	} else {
+		if down != nil {
+			if down.up == nil {
+				down.up = res
+				res.down = down
+
+			} else {
+				t := down.up
+				down.up = res
+				res.down = down
+
+				t.down = res
+				res.up = t
+			}
+		}
+	}
+
 	return res
 }
 
@@ -163,7 +217,7 @@ func (m *MatrixLayer) searchRaw(x, y int) (res []WrapperElement[ElementMatrix]) 
 		xEle, yEle = m.matrix[row][column][i].object.GetPos()
 		wEle, hEle = m.matrix[row][column][i].object.GetSize()
 		if isCollidingWith(x, y, xEle, yEle, wEle, hEle) {
-			res = append(res, m.matrix[row][column][i])
+			res = append(res, *m.matrix[row][column][i])
 		}
 	}
 	return res
@@ -277,7 +331,7 @@ func (t *WrapperElement[ElementTree]) isCollidingWithNode(x, y int, width, heigh
 }
 
 // to optimize ? maybe with some chacing
-func (m *MatrixHandler) GetCollidingElement(layer int, elementWhichCollides ElementMatrix) (res []ElementMatrix) {
+func (m *MatrixHandler) GetCollidingElements(layer int, elementWhichCollides ElementMatrix) (res []ElementMatrix) {
 	x, y := elementWhichCollides.GetPos()
 	width, height := elementWhichCollides.GetSize()
 	var tElement WrapperElement[ElementMatrix]
