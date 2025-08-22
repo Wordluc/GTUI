@@ -43,46 +43,45 @@ func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
 func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) *WrapperElement[ElementMatrix] {
 	res := &WrapperElement[ElementMatrix]{object: element}
 	currentCell := m.matrix[row][column]
-	getDistBetween := func(xMa, yMa, xB, yB int) (int, int) {
-		disX, disY := xMa-xB, yMa-yB
-		return disX, disY
-	}
 	x, y := element.GetPos()
 	var left, right, up, down *WrapperElement[ElementMatrix]
 	var leftX, rightX, upY, downY int = int(math.Inf(1)), int(math.Inf(1)), int(math.Inf(1)), int(math.Inf(1))
 	var disX, disY int
+	isAbsoluteValueLessOrEqual := func(a, b int) bool {
+		return math.Abs(float64(a)) <= math.Abs(float64(b))
+	}
 	for i := range currentCell {
 		xM, yM := currentCell[i].object.GetPos()
-		disX, disY = getDistBetween(xM, yM, x, y)
+		disX, disY = xM-x, yM-y
 		if disX < 0 {
 			//LEFT OF ELEMENT
-			if math.Abs(float64(disX)) <= math.Abs(float64(leftX)) {
+			if isAbsoluteValueLessOrEqual(disX, leftX) {
 				leftX = disX
 				left = currentCell[i]
 			}
 		} else {
 			//RIGHT OF ELEMENT
-			if math.Abs(float64(disX)) <= math.Abs(float64(rightX)) {
+			if isAbsoluteValueLessOrEqual(disX, rightX) {
 				rightX = disX
 				right = currentCell[i]
 			}
 		}
 		if disY < 0 {
 			//UP OF ELEMENT
-			if math.Abs(float64(disY)) <= math.Abs(float64(upY)) {
+			if isAbsoluteValueLessOrEqual(disY, upY) {
 				upY = disY
 				up = currentCell[i]
 			}
 		} else {
 			//DOWN OF ELEMENT
-			if math.Abs(float64(disY)) <= math.Abs(float64(downY)) {
+			if isAbsoluteValueLessOrEqual(disY, downY) {
 				downY = disY
 				down = currentCell[i]
 			}
 		}
 	}
 
-	if math.Abs(float64(leftX)) < math.Abs(float64(rightX)) {
+	if isAbsoluteValueLessOrEqual(leftX, rightX) {
 		if left != nil {
 			if left.right == nil {
 				left.right = res
@@ -113,7 +112,7 @@ func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) *Wra
 		}
 	}
 
-	if math.Abs(float64(upY)) < math.Abs(float64(downY)) {
+	if isAbsoluteValueLessOrEqual(upY, downY) {
 		if up != nil {
 			if up.down == nil {
 				up.down = res
