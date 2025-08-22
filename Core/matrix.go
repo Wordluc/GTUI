@@ -4,26 +4,6 @@ import (
 	"math"
 )
 
-type mockElementMatrix struct {
-	x     int
-	y     int
-	xSize int
-	ySize int
-	name  string
-}
-
-func (e mockElementMatrix) GetPos() (int, int) {
-	return e.x, e.y
-}
-func (e mockElementMatrix) GetSize() (int, int) {
-	return e.xSize, e.ySize
-}
-func (e mockElementMatrix) GetLayer() Layer {
-	return L1
-}
-func (e mockElementMatrix) SetLayer(layer Layer) {
-}
-
 type ElementMatrix interface {
 	GetPos() (int, int)
 	GetSize() (int, int)
