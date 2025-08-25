@@ -38,6 +38,91 @@ func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
 	}
 }
 
+func (m *MatrixLayer) addElement(element *WrapperElement[ElementMatrix]) {
+	x, y := element.object.GetPos()
+	width, height := element.object.GetSize()
+
+	startingColumn := x / m.sizeCell
+	startingRow := y / m.sizeCell
+
+	column := width / m.sizeCell
+	row := height / m.sizeCell
+
+	for ir := range row + 1 {
+		for iw := range column + 1 {
+			currentRow, currentColumn := ir+startingRow, iw+startingColumn
+			if ir+startingRow >= m.nRows {
+				continue
+			}
+			if iw+startingColumn >= m.nColumns {
+				continue
+			}
+			m.matrix[currentRow][currentColumn] =
+				append(m.matrix[currentRow][currentColumn], element)
+		}
+	}
+}
+
+func isCollidingWith(xToSearch, yToSearch int, xElement, yElement, wElement, hElement int) bool {
+	if xToSearch >= xElement && xToSearch < xElement+wElement && yToSearch >= yElement && yToSearch < yElement+hElement {
+		return true
+	}
+	return false
+}
+
+func (m *MatrixLayer) searchRaw(x, y int) (res []WrapperElement[ElementMatrix]) {
+	row := int(y / m.sizeCell)
+	column := int(x / m.sizeCell)
+	if row >= m.nRows {
+		return res
+	}
+	if column >= m.nColumns {
+		return res
+	}
+	var xEle, yEle, wEle, hEle int
+	for i := range m.matrix[row][column] {
+		xEle, yEle = m.matrix[row][column][i].object.GetPos()
+		wEle, hEle = m.matrix[row][column][i].object.GetSize()
+		if isCollidingWith(x, y, xEle, yEle, wEle, hEle) {
+			res = append(res, *m.matrix[row][column][i])
+		}
+	}
+	return res
+}
+func (m *MatrixLayer) search(x, y int) (res []ElementMatrix) {
+	row := int(y / m.sizeCell)
+	column := int(x / m.sizeCell)
+	if row >= m.nRows {
+		return res
+	}
+	if column >= m.nColumns {
+		return res
+	}
+	var xEle, yEle, wEle, hEle int
+	for i := range m.matrix[row][column] {
+		xEle, yEle = m.matrix[row][column][i].object.GetPos()
+		wEle, hEle = m.matrix[row][column][i].object.GetSize()
+		if isCollidingWith(x, y, xEle, yEle, wEle, hEle) {
+			res = append(res, m.matrix[row][column][i].object)
+		}
+	}
+	return res
+}
+
+type MatrixHandler struct {
+	layers                []*MatrixLayer
+	nColumns, nRows, size int
+	elements              []*WrapperElement[ElementMatrix]
+}
+
+func CreateMatrixHandler(w, h, sizeCell int) *MatrixHandler {
+	return &MatrixHandler{
+		nColumns: w / sizeCell,
+		nRows:    h / sizeCell,
+		size:     sizeCell,
+	}
+}
+
 // TODO: refactor!!!!
 func (m *MatrixHandler) createElement(element ElementMatrix) *WrapperElement[ElementMatrix] {
 	res := &WrapperElement[ElementMatrix]{object: element}
@@ -144,92 +229,6 @@ func (m *MatrixHandler) createElement(element ElementMatrix) *WrapperElement[Ele
 
 	return res
 }
-
-func (m *MatrixLayer) addElement(element *WrapperElement[ElementMatrix]) {
-	x, y := element.object.GetPos()
-	width, height := element.object.GetSize()
-
-	startingColumn := x / m.sizeCell
-	startingRow := y / m.sizeCell
-
-	column := width / m.sizeCell
-	row := height / m.sizeCell
-
-	for ir := range row + 1 {
-		for iw := range column + 1 {
-			currentRow, currentColumn := ir+startingRow, iw+startingColumn
-			if ir+startingRow >= m.nRows {
-				continue
-			}
-			if iw+startingColumn >= m.nColumns {
-				continue
-			}
-			m.matrix[currentRow][currentColumn] =
-				append(m.matrix[currentRow][currentColumn], element)
-		}
-	}
-}
-
-func isCollidingWith(xToSearch, yToSearch int, xElement, yElement, wElement, hElement int) bool {
-	if xToSearch >= xElement && xToSearch < xElement+wElement && yToSearch >= yElement && yToSearch < yElement+hElement {
-		return true
-	}
-	return false
-}
-
-func (m *MatrixLayer) searchRaw(x, y int) (res []WrapperElement[ElementMatrix]) {
-	row := int(y / m.sizeCell)
-	column := int(x / m.sizeCell)
-	if row >= m.nRows {
-		return res
-	}
-	if column >= m.nColumns {
-		return res
-	}
-	var xEle, yEle, wEle, hEle int
-	for i := range m.matrix[row][column] {
-		xEle, yEle = m.matrix[row][column][i].object.GetPos()
-		wEle, hEle = m.matrix[row][column][i].object.GetSize()
-		if isCollidingWith(x, y, xEle, yEle, wEle, hEle) {
-			res = append(res, *m.matrix[row][column][i])
-		}
-	}
-	return res
-}
-func (m *MatrixLayer) search(x, y int) (res []ElementMatrix) {
-	row := int(y / m.sizeCell)
-	column := int(x / m.sizeCell)
-	if row >= m.nRows {
-		return res
-	}
-	if column >= m.nColumns {
-		return res
-	}
-	var xEle, yEle, wEle, hEle int
-	for i := range m.matrix[row][column] {
-		xEle, yEle = m.matrix[row][column][i].object.GetPos()
-		wEle, hEle = m.matrix[row][column][i].object.GetSize()
-		if isCollidingWith(x, y, xEle, yEle, wEle, hEle) {
-			res = append(res, m.matrix[row][column][i].object)
-		}
-	}
-	return res
-}
-
-type MatrixHandler struct {
-	layers                []*MatrixLayer
-	nColumns, nRows, size int
-	elements              []*WrapperElement[ElementMatrix]
-}
-
-func CreateMatrixHandler(w, h, sizeCell int) *MatrixHandler {
-	return &MatrixHandler{
-		nColumns: w / sizeCell,
-		nRows:    h / sizeCell,
-		size:     sizeCell,
-	}
-}
-
 func (m *MatrixHandler) searchInAllLayersRaw(x, y int) (res [][]WrapperElement[ElementMatrix]) {
 	for i := range m.layers {
 		if m.layers[i] != nil {
@@ -288,4 +287,44 @@ func (m *MatrixHandler) ExecuteOnLayer(layer int, cond func(ele ElementMatrix) b
 			return
 		}
 	}
+}
+
+type Direction int8
+
+const (
+	Up    Direction = iota
+	Down  Direction = iota
+	Right Direction = iota
+	Left  Direction = iota
+)
+
+func (m *MatrixHandler) GetNextElement(elementWhereTOStart ElementMatrix, whereToGo Direction) ElementMatrix {
+	var ele *WrapperElement[ElementMatrix]
+	for i := range m.elements {
+		if m.elements[i].object == elementWhereTOStart {
+			ele = m.elements[i]
+			break
+		}
+	}
+	if ele == nil {
+		return nil
+	}
+	println("jfkdslf")
+	getObject := func(ele *WrapperElement[ElementMatrix]) ElementMatrix {
+		if ele == nil {
+			return nil
+		}
+		return ele.object
+	}
+	switch whereToGo {
+	case Up:
+		return getObject(ele.up)
+	case Down:
+		return getObject(ele.down)
+	case Right:
+		return getObject(ele.right)
+	case Left:
+		return getObject(ele.left)
+	}
+	return nil
 }
