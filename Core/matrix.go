@@ -21,7 +21,6 @@ type matrix[T any] [][][]T //rows,columns,elements
 type MatrixLayer struct {
 	matrix                    matrix[*WrapperElement[ElementMatrix]]
 	nColumns, nRows, sizeCell int
-	elements                  []ElementMatrix
 }
 
 func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
@@ -40,9 +39,8 @@ func CreateMatrixLayer(nColumns, nRows, size int) *MatrixLayer {
 }
 
 // TODO: refactor!!!!
-func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) *WrapperElement[ElementMatrix] {
+func (m *MatrixHandler) createElement(element ElementMatrix) *WrapperElement[ElementMatrix] {
 	res := &WrapperElement[ElementMatrix]{object: element}
-	currentCell := m.matrix[row][column]
 	x, y := element.GetPos()
 	var left, right, up, down *WrapperElement[ElementMatrix]
 	var leftX, rightX, upY, downY int = int(math.Inf(1)), int(math.Inf(1)), int(math.Inf(1)), int(math.Inf(1))
@@ -50,33 +48,33 @@ func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) *Wra
 	isAbsoluteValueLessOrEqual := func(a, b int) bool {
 		return math.Abs(float64(a)) <= math.Abs(float64(b))
 	}
-	for i := range currentCell {
-		xM, yM := currentCell[i].object.GetPos()
+	for i := range m.elements {
+		xM, yM := m.elements[i].object.GetPos()
 		disX, disY = xM-x, yM-y
 		if disX < 0 {
 			//LEFT OF ELEMENT
 			if isAbsoluteValueLessOrEqual(disX, leftX) {
 				leftX = disX
-				left = currentCell[i]
+				left = m.elements[i]
 			}
 		} else {
 			//RIGHT OF ELEMENT
 			if isAbsoluteValueLessOrEqual(disX, rightX) {
 				rightX = disX
-				right = currentCell[i]
+				right = m.elements[i]
 			}
 		}
 		if disY < 0 {
 			//UP OF ELEMENT
 			if isAbsoluteValueLessOrEqual(disY, upY) {
 				upY = disY
-				up = currentCell[i]
+				up = m.elements[i]
 			}
 		} else {
 			//DOWN OF ELEMENT
 			if isAbsoluteValueLessOrEqual(disY, downY) {
 				downY = disY
-				down = currentCell[i]
+				down = m.elements[i]
 			}
 		}
 	}
@@ -147,10 +145,9 @@ func (m *MatrixLayer) createElement(row, column int, element ElementMatrix) *Wra
 	return res
 }
 
-func (m *MatrixLayer) addElement(element ElementMatrix) {
-	m.elements = append(m.elements, element)
-	x, y := element.GetPos()
-	width, height := element.GetSize()
+func (m *MatrixLayer) addElement(element *WrapperElement[ElementMatrix]) {
+	x, y := element.object.GetPos()
+	width, height := element.object.GetSize()
 
 	startingColumn := x / m.sizeCell
 	startingRow := y / m.sizeCell
@@ -168,7 +165,7 @@ func (m *MatrixLayer) addElement(element ElementMatrix) {
 				continue
 			}
 			m.matrix[currentRow][currentColumn] =
-				append(m.matrix[currentRow][currentColumn], m.createElement(currentRow, currentColumn, element))
+				append(m.matrix[currentRow][currentColumn], element)
 		}
 	}
 }
@@ -222,6 +219,7 @@ func (m *MatrixLayer) search(x, y int) (res []ElementMatrix) {
 type MatrixHandler struct {
 	layers                []*MatrixLayer
 	nColumns, nRows, size int
+	elements              []*WrapperElement[ElementMatrix]
 }
 
 func CreateMatrixHandler(w, h, sizeCell int) *MatrixHandler {
@@ -250,8 +248,9 @@ func (m *MatrixHandler) SearchInAllLayers(x, y int) (res [][]ElementMatrix) {
 	return res
 }
 func (m *MatrixHandler) AddElement(elements ...ElementMatrix) {
-	for _, ele := range elements {
-		layer := ele.GetLayer()
+	for i := range elements {
+
+		layer := elements[i].GetLayer()
 		for int(layer) >= len(m.layers) {
 			m.layers = append(m.layers, nil)
 		}
@@ -259,7 +258,9 @@ func (m *MatrixHandler) AddElement(elements ...ElementMatrix) {
 			m.layers[layer] = CreateMatrixLayer(m.nColumns, m.nRows, m.size)
 
 		}
+		ele := m.createElement(elements[i])
 		m.layers[layer].addElement(ele)
+		m.elements = append(m.elements, ele)
 	}
 }
 
@@ -269,11 +270,8 @@ func (m *MatrixHandler) GetLayerN() int {
 
 func (m *MatrixHandler) Refresh(w, h, sizeCell int) *MatrixHandler {
 	handler := CreateMatrixHandler(w, h, sizeCell)
-	for i := range m.layers {
-		if m.layers[i] == nil {
-			continue
-		}
-		handler.AddElement(m.layers[i].elements...)
+	for i := range m.elements {
+		handler.AddElement(m.elements[i].object)
 	}
 	return handler
 }
@@ -282,44 +280,12 @@ func (m *MatrixHandler) ExecuteOnLayer(layer int, cond func(ele ElementMatrix) b
 	if m.layers[layer] == nil {
 		return
 	}
-	for _, ele := range m.layers[layer].elements {
-		if !cond(ele) {
+	for _, ele := range m.elements {
+		if ele.object.GetLayer() != Layer(layer) {
+			continue
+		}
+		if !cond(ele.object) {
 			return
 		}
 	}
-}
-
-func (t *WrapperElement[ElementTree]) isCollidingWithNode(x, y int, width, height int) bool {
-	elementX, elementY := t.object.GetPos()
-	elementWidth, elementHeight := t.object.GetSize()
-	if x >= elementX && x < elementX+elementWidth && y >= elementY && y < elementY+elementHeight {
-		return true
-	}
-	if x+width >= elementX && x+width < elementX+elementWidth && y >= elementY && y < elementY+elementHeight {
-		return true
-	}
-	if x >= elementX && x < elementX+elementWidth && y+height >= elementY && y+height < elementY+elementHeight {
-		return true
-	}
-	if x+width >= elementX && x+width < elementX+elementWidth && y+height >= elementY && y+height < elementY+elementHeight {
-		return true
-	}
-	return false
-}
-
-// to optimize ? maybe with some chacing
-func (m *MatrixHandler) GetCollidingElements(layer int, elementWhichCollides ElementMatrix) (res []ElementMatrix) {
-	x, y := elementWhichCollides.GetPos()
-	width, height := elementWhichCollides.GetSize()
-	var tElement WrapperElement[ElementMatrix]
-	for i := range m.layers[layer].elements {
-		if m.layers[layer].elements[i] == elementWhichCollides {
-			continue
-		}
-		tElement.object = m.layers[layer].elements[i]
-		if tElement.isCollidingWithNode(x, y, width, height) {
-			res = append(res, m.layers[layer].elements[i])
-		}
-	}
-	return res
 }
