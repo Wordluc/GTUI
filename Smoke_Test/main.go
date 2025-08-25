@@ -90,7 +90,19 @@ func loop(keyb Kd.IKeyBoard, core *GTUI.Gtui) bool {
 	if keyb.IsKeySPressed(Keyboard.Left) {
 		x--
 	}
-
+	core.SetCur(x, y)
+	if keyb.IsKeyPressed('S') {
+		core.GoTo(Core.Down)
+	}
+	if keyb.IsKeyPressed('W') {
+		core.GoTo(Core.Up)
+	}
+	if keyb.IsKeyPressed('D') {
+		core.GoTo(Core.Right)
+	}
+	if keyb.IsKeyPressed('A') {
+		core.GoTo(Core.Left)
+	}
 	if keyb.IsKeySPressed(Keyboard.CtrlS) {
 		button2.SetPos(x, y)
 	}
@@ -99,7 +111,6 @@ func loop(keyb Kd.IKeyBoard, core *GTUI.Gtui) bool {
 		modal.SetPos(x, y)
 	}
 
-	core.SetCur(x, y)
 	if keyb.IsKeyPressed('v') {
 		modal.SetActive(!modal.GetVisibility())
 		modal.SetVisibility(!modal.GetVisibility())
