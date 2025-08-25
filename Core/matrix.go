@@ -309,7 +309,6 @@ func (m *MatrixHandler) GetNextElement(elementWhereTOStart ElementMatrix, whereT
 	if ele == nil {
 		return nil
 	}
-	println("jfkdslf")
 	getObject := func(ele *WrapperElement[ElementMatrix]) ElementMatrix {
 		if ele == nil {
 			return nil

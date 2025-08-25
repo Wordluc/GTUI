@@ -166,6 +166,7 @@ func TestAdjacentComponentX(t *testing.T) {
 	utilityToTestAdjacents(matrix, "A", []string{"A"}, Left)
 	utilityToTestAdjacents(matrix, "C", []string{"C", "D", "E"}, Right)
 }
+
 func TestAdjacentComponentY(t *testing.T) {
 	matrix := CreateMatrixHandler(100, 100, 20)
 	matrix.AddElement(createMockElementMatrix(10, 30, 5, 5, "A"))

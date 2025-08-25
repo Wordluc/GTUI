@@ -29,6 +29,7 @@ type Gtui struct {
 	cursorVisibility     bool
 	loop                 Loop
 	preComponentsHovered []Core.IComponent
+	currentComponent     Core.IComponent
 }
 
 func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
@@ -118,6 +119,7 @@ func (c *Gtui) SetCur(x, y int) error {
 			}
 		}
 		comp.OnHover()
+		c.currentComponent = comp
 	}
 
 	for i, comp := range inPreButNotInPost {
@@ -139,6 +141,7 @@ func (c *Gtui) SetCur(x, y int) error {
 				return nil
 			} else {
 				comp.OnHover()
+				c.currentComponent = comp
 			}
 			break
 		}
@@ -324,20 +327,12 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 		str.WriteString(drawing.GetAnsiCode(c.globalColor))
 		str.WriteString(c.globalColor.GetAnsiColor())
 		drew = true
-		//		for _, child := range c.drawingTree.GetCollidingElement(int(layer), ele) {
-		//			elementToRefresh[child] = struct{}{}
-		//		}
 		return true
 	}
 
 	c.drawingsHandler.ExecuteOnLayer(int(layer), cond)
-	//	for drawing := range elementToRefresh {
-	//		str.WriteString(drawing.(Core.IDrawing).GetAnsiCode(c.globalColor))
-	//		str.WriteString(c.globalColor.GetAnsiColor())
-	//	}
 	return str, drew
 }
-
 func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	c.alignCursor()
 	if !c.loop(c.keyb, c) {
@@ -345,4 +340,24 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	}
 	c.refresh(true)
 	return true
+}
+func (c *Gtui) GoTo(direction Core.Direction) {
+	ele := c.componentsHandler.GetNextElement(c.currentComponent, direction)
+	for {
+		if ele == nil {
+			return
+		}
+		if ele.(Core.IComponent).GetActive() {
+			if _, ok := ele.(*Component.NullComponent); !ok {
+				break
+			}
+		}
+		t := c.componentsHandler.GetNextElement(c.currentComponent, direction)
+		if t == ele {
+			return
+		}
+		ele = t
+	}
+	x, y := ele.GetPos()
+	c.SetCur(x+1, y+1)
 }
