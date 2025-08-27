@@ -2,6 +2,7 @@ package GTUI
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 	"strings"
 	"sync"
@@ -399,6 +400,10 @@ func (c *Gtui) GoTo(direction Core.Direction) {
 	}
 	x, y := ele.GetPos()
 	c.SetCur(x+1, y+1)
+}
+
+func Logf(text string, a ...string) {
+	_logger.text.Paste(fmt.Sprintf(text+"\n", a))
 }
 
 func Log(text string) {
