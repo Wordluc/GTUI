@@ -229,14 +229,6 @@ func (m *MatrixHandler) createElement(element ElementMatrix) *WrapperElement[Ele
 
 	return res
 }
-func (m *MatrixHandler) searchInAllLayersRaw(x, y int) (res [][]WrapperElement[ElementMatrix]) {
-	for i := range m.layers {
-		if m.layers[i] != nil {
-			res = append(res, m.layers[i].searchRaw(x, y))
-		}
-	}
-	return res
-}
 
 func (m *MatrixHandler) SearchInAllLayers(x, y int) (res [][]ElementMatrix) {
 	for i := range m.layers {
