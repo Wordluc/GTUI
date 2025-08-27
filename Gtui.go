@@ -348,8 +348,6 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	return true
 }
 
-var i = 0
-
 func (c *Gtui) GoTo(direction Core.Direction) {
 	ele := c.componentsHandler.GetNextElement(c.currentComponent, direction)
 	for {
