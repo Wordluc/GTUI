@@ -62,12 +62,10 @@ func (b *Container) SetLayer(layer Core.Layer) error {
 		return errors.New("layer can't be negative")
 	}
 	for _, comp := range b.components {
-		diff := layer - comp.GetLayer()
-		comp.SetLayer(comp.GetLayer() + diff)
+		comp.SetLayer(comp.GetLayer() + layer)
 	}
 	for _, draw := range b.drawings {
-		diff := layer - draw.GetLayer()
-		draw.SetLayer(draw.GetLayer() + diff)
+		draw.SetLayer(draw.GetLayer() + layer)
 	}
 	b.layer = layer
 	EventManager.Call(EventManager.ReorganizeElements, b)
