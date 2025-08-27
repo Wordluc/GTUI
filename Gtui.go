@@ -28,9 +28,10 @@ type logger struct {
 }
 
 func (l *logger) toggle() {
-	l.modal.SetActive(!l.modal.GetActivity())
+	l.modal.SetActive(!l.modal.GetVisibility())
 	l.modal.SetVisibility(!l.modal.GetVisibility())
 }
+
 func init() {
 	_logger = createLogger()
 }
@@ -72,8 +73,8 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 }
 
 func createLogger() *logger {
-	modal := Component.CreateModal(50, 20)
 	text := Drawing.CreateTextBlock(1, 1, 48, 18, 0)
+	modal := Component.CreateModal(50, 20)
 	modal.AddDrawing(text)
 	modal.SetVisibility(false)
 	modal.SetActive(false)
@@ -101,6 +102,7 @@ func (c *Gtui) initEventManager() {
 		c.reoarganizeELement()
 	})
 }
+
 func (c *Gtui) reoarganizeELement() {
 	c.IClear()
 	group := sync.WaitGroup{}
@@ -115,6 +117,9 @@ func (c *Gtui) reoarganizeELement() {
 	}()
 	group.Wait()
 	c.SetCur(c.xCursor, c.yCursor)
+	if c.drawingsHandler.GetLayerN() == int(_logger.modal.GetLayer()) {
+		_logger.modal.SetLayer(Core.Layer(c.drawingsHandler.GetLayerN()) + 1)
+	}
 	c.refresh(false)
 }
 func (c *Gtui) getHigherLayerElementsNoDisabled(x, y int) (res []Core.IComponent) {
@@ -373,10 +378,10 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 	return str, drew
 }
 func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
+	c.alignCursor()
 	if keyb.IsKeySPressed(Keyboard.F1) {
 		_logger.toggle()
 	}
-	c.alignCursor()
 	if !c.loop(c.keyb, c) {
 		return false
 	}
