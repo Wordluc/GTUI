@@ -106,9 +106,8 @@ func (b *Container) SetLayer(layer Core.Layer) error {
 	if layer < 0 {
 		panic("layer can't be negative")
 	}
-	diff := layer - b.layer
 	for _, comp := range b.drawings {
-		comp.SetLayer(comp.GetLayer() + diff)
+		comp.SetLayer(comp.GetLayer() + layer)
 	}
 	b.layer = layer
 	b.Touch()
