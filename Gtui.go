@@ -15,6 +15,8 @@ import (
 	"github.com/Wordluc/GTUI/Terminal"
 )
 
+const sizeCell = 10
+
 type Loop func(Keyboard.IKeyBoard, *Gtui) bool
 type Gtui struct {
 	globalColor          Color.Color
@@ -41,8 +43,8 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 		loop:              loop,
 		term:              term,
 		keyb:              keyb,
-		drawingsHandler:   Core.CreateMatrixHandler(xSize, ySize, 5),
-		componentsHandler: Core.CreateMatrixHandler(xSize, ySize, 5),
+		drawingsHandler:   Core.CreateMatrixHandler(xSize, ySize, sizeCell),
+		componentsHandler: Core.CreateMatrixHandler(xSize, ySize, sizeCell),
 		xCursor:           0,
 		yCursor:           0,
 		xSize:             xSize,
@@ -65,21 +67,24 @@ func (c *Gtui) initEventManager() {
 	})
 
 	EventManager.Subscribe(EventManager.ReorganizeElements, 100, func(comp []any) {
-		c.IClear()
-		group := sync.WaitGroup{}
-		group.Add(2)
-		go func() {
-			c.drawingsHandler = c.drawingsHandler.Refresh(c.xSize, c.ySize, 5)
-			group.Done()
-		}()
-		go func() {
-			c.componentsHandler = c.componentsHandler.Refresh(c.xSize, c.ySize, 5)
-			group.Done()
-		}()
-		group.Wait()
-		c.SetCur(c.xCursor, c.yCursor)
-		c.refresh(false)
+		c.reoarganizeELement()
 	})
+}
+func (c *Gtui) reoarganizeELement() {
+	c.IClear()
+	group := sync.WaitGroup{}
+	group.Add(2)
+	go func() {
+		c.drawingsHandler = c.drawingsHandler.Refresh(c.xSize, c.ySize, sizeCell)
+		group.Done()
+	}()
+	go func() {
+		c.componentsHandler = c.componentsHandler.Refresh(c.xSize, c.ySize, sizeCell)
+		group.Done()
+	}()
+	group.Wait()
+	c.SetCur(c.xCursor, c.yCursor)
+	c.refresh(false)
 }
 func (c *Gtui) getHigherLayerElementsNoDisabled(x, y int) (res []Core.IComponent) {
 	compInLayers := c.componentsHandler.SearchInAllLayers(x, y)
@@ -176,7 +181,7 @@ func (c *Gtui) Start() {
 	c.term.Start()
 	c.term.Clear()
 	c.lazyCheck()
-	c.refresh(true)
+	c.reoarganizeELement()
 	c.keyb.Start(c.innerLoop)
 	c.term.Stop()
 }
@@ -216,6 +221,9 @@ func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error {
 	components := complEle.GetComponents()
 	drawings := complEle.GetGraphics()
 	for _, comp := range components {
+		if _, ok := comp.(*Component.NullComponent); ok {
+			continue
+		}
 		c.componentsHandler.AddElement(comp)
 		comp.OnLeave()
 	}
@@ -356,7 +364,6 @@ func (c *Gtui) GoTo(direction Core.Direction) {
 		if t == ele {
 			return
 		}
-		ele = t
 	}
 	x, y := ele.GetPos()
 	c.SetCur(x+1, y+1)

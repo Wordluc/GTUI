@@ -70,6 +70,7 @@ func main() {
 	modal.AddDrawing(text)
 	modal.AddComponent(esplodi)
 	modal.AddComponent(ok)
+	modal.SetPos(60, 10)
 	if e := core.AddComplexElement(modal); e != nil {
 		panic(e)
 	}
