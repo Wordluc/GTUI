@@ -150,7 +150,6 @@ func loop(keyb Kd.IKeyBoard, core *GTUI.Gtui) bool {
 	}
 
 	if keyb.IsKeySPressed(Keyboard.CtrlC) {
-		GTUI.Log("cioa ")
 		core.CallEventOn(x, y, func(c Core.IComponent) {
 			if c, ok := c.(*Component.TextBox); ok {
 				if c.IsTyping() {
