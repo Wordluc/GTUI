@@ -2,6 +2,7 @@ package GTUI
 
 import (
 	"errors"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -221,9 +222,6 @@ func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error {
 	components := complEle.GetComponents()
 	drawings := complEle.GetGraphics()
 	for _, comp := range components {
-		if _, ok := comp.(*Component.NullComponent); ok {
-			continue
-		}
 		c.componentsHandler.AddElement(comp)
 		comp.OnLeave()
 	}
@@ -349,21 +347,25 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	c.refresh(true)
 	return true
 }
+
+var i = 0
+
 func (c *Gtui) GoTo(direction Core.Direction) {
 	ele := c.componentsHandler.GetNextElement(c.currentComponent, direction)
 	for {
 		if ele == nil {
 			return
 		}
-		if ele.(Core.IComponent).GetActive() {
-			if _, ok := ele.(*Component.NullComponent); !ok {
-				break
-			}
+		x, y := ele.GetPos()
+		compsPostSet := c.getHigherLayerElementsNoDisabled(x+1, y+1)
+		if slices.Contains(compsPostSet, ele.(Core.IComponent)) {
+			break
 		}
-		t := c.componentsHandler.GetNextElement(c.currentComponent, direction)
+		t := c.componentsHandler.GetNextElement(ele, direction)
 		if t == ele {
 			return
 		}
+		ele = t
 	}
 	x, y := ele.GetPos()
 	c.SetCur(x+1, y+1)
