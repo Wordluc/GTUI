@@ -9,6 +9,7 @@ import (
 
 	"github.com/Wordluc/GTUI/Core"
 	"github.com/Wordluc/GTUI/Core/Component"
+	"github.com/Wordluc/GTUI/Core/Drawing"
 	"github.com/Wordluc/GTUI/Core/EventManager"
 	"github.com/Wordluc/GTUI/Core/Utils"
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
@@ -17,6 +18,21 @@ import (
 )
 
 const sizeCell = 10
+
+var _logger *logger
+
+type logger struct {
+	modal *Component.Modal
+	text  *Drawing.TextBlock
+}
+
+func (l *logger) toggle() {
+	l.modal.SetActive(!l.modal.GetActivity())
+	l.modal.SetVisibility(!l.modal.GetVisibility())
+}
+func init() {
+	_logger = createLogger()
+}
 
 type Loop func(Keyboard.IKeyBoard, *Gtui) bool
 type Gtui struct {
@@ -38,6 +54,7 @@ type Gtui struct {
 func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
 	xSize, ySize := term.Size()
 	EventManager.Setup()
+
 	return &Gtui{
 		globalColor:       Color.GetDefaultColor(),
 		cursorVisibility:  true,
@@ -51,6 +68,18 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 		xSize:             xSize,
 		ySize:             ySize,
 	}, nil
+}
+
+func createLogger() *logger {
+	modal := Component.CreateModal(50, 20)
+	text := Drawing.CreateTextBlock(1, 1, 48, 18, 0)
+	modal.AddDrawing(text)
+	modal.SetVisibility(false)
+	modal.SetActive(false)
+	return &logger{
+		text:  text,
+		modal: modal,
+	}
 }
 
 func (c *Gtui) initEventManager() {
@@ -183,6 +212,9 @@ func (c *Gtui) Start() {
 	c.term.Clear()
 	c.lazyCheck()
 	c.reoarganizeELement()
+	if e := c.AddComplexElement(_logger.modal); e != nil {
+		panic(e)
+	}
 	c.keyb.Start(c.innerLoop)
 	c.term.Stop()
 }
@@ -340,6 +372,9 @@ func (c *Gtui) refreshLayer(layer Core.Layer, onlyTouched bool) (strings.Builder
 	return str, drew
 }
 func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
+	if keyb.IsKeySPressed(Keyboard.F1) {
+		_logger.toggle()
+	}
 	c.alignCursor()
 	if !c.loop(c.keyb, c) {
 		return false
@@ -364,4 +399,8 @@ func (c *Gtui) GoTo(direction Core.Direction) {
 	}
 	x, y := ele.GetPos()
 	c.SetCur(x+1, y+1)
+}
+
+func Log(text string) {
+	_logger.text.Paste(text + "\n")
 }

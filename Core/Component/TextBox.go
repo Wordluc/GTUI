@@ -116,12 +116,7 @@ func (v *TextBox) DeleteLastCharacter() {
 }
 
 func (v *TextBox) Paste(text string) {
-	for _, char := range []rune(text) {
-		if char == '\r' {
-			continue
-		}
-		v.textBlock.Type(char)
-	}
+	v.textBlock.Paste(text)
 }
 
 func (v *TextBox) GetSelectedText() string {
