@@ -362,9 +362,6 @@ func (c *Gtui) GoTo(direction Core.Direction) {
 			break
 		}
 		t := c.componentsHandler.GetNextElement(ele, direction)
-		if t == ele {
-			return
-		}
 		ele = t
 	}
 	x, y := ele.GetPos()
