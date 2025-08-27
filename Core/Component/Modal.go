@@ -37,6 +37,10 @@ func (b *Modal) SetActive(activity bool) {
 	b.container.SetActive(activity)
 }
 
+func (b *Modal) GetActivity() bool {
+	return b.container.GetActivity()
+}
+
 func (b *Modal) GetVisibility() bool {
 	return b.container.GetVisibility()
 }

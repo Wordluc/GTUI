@@ -642,6 +642,14 @@ func (t *TextBlock) Type(char rune) {
 	t.typeSilent(char)
 }
 
+func (v *TextBlock) Paste(text string) {
+	for _, char := range []rune(text) {
+		if char == '\r' {
+			continue
+		}
+		v.Type(char)
+	}
+}
 func (t *TextBlock) SetText(s string) {
 	t.ClearAll()
 	for _, char := range s {
