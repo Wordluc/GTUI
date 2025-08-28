@@ -398,7 +398,9 @@ func (c *Gtui) GoTo(direction Core.Direction) {
 		x, y := ele.GetPos()
 		compsPostSet := c.getHigherLayerElementsNoDisabled(x+1, y+1)
 		if slices.Contains(compsPostSet, ele.(Core.IComponent)) {
-			break
+			if _, ok := ele.(*Component.NullComponent); !ok {
+				break
+			}
 		}
 		t := c.componentsHandler.GetNextElement(ele, direction)
 		ele = t
