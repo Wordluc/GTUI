@@ -407,7 +407,17 @@ func (t *TextBlock) makeAnsiCode(defaultColor Color.Color) string {
 	full.WriteString(defaultColor.GetAnsiColor())
 	return strings.TrimSuffix(full.String(), "\n")
 }
+
+// test purpose
+func (t *TextBlock) _GetText() string {
+	return t.getText(false)
+}
+
 func (t *TextBlock) GetText() string {
+	return t.getText(true)
+}
+
+func (t *TextBlock) getText(isRaw bool) string {
 	var res strings.Builder
 	for i, line := range t.lines {
 		if i < t.yRelativeMinSize {
@@ -420,7 +430,9 @@ func (t *TextBlock) GetText() string {
 			break
 		}
 		text := line.getText()
-		text = t.parseText(text)
+		if !isRaw {
+			text = t.parseText(text)
+		}
 		res.WriteString(text + "\n")
 	}
 	return strings.TrimSuffix(res.String(), "\n")
