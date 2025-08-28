@@ -163,7 +163,7 @@ func (b *TextBox) OnClick() {
 		b.onClick()
 	}
 	b.StartTyping()
-	time.AfterFunc(time.Millisecond*1000, func() {
+	time.AfterFunc(time.Millisecond*100, func() {
 		b.OnRelease()
 		EventManager.Call(EventManager.Refresh, b)
 	})

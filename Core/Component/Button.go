@@ -105,7 +105,7 @@ func (b *Button) OnClick() {
 	if b.onClick != nil {
 		b.onClick()
 	}
-	time.AfterFunc(time.Millisecond*500, func() {
+	time.AfterFunc(time.Millisecond*100, func() {
 		b.OnRelease()
 		EventManager.Call(EventManager.Refresh, b)
 	})
