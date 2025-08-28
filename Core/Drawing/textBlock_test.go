@@ -222,8 +222,8 @@ func TestCreateNewLineFromTwoLines(t *testing.T) {
 	if textBlock.totalLine != 2 {
 		t.Errorf("expected %v, got %v", 2, textBlock.totalLine)
 	}
-	if textBlock.GetText() != "123a1aa\naaaaa" {
-		t.Errorf("expected \n%v\n\ngot\n \n%v", "123a1aa\naaaaa", textBlock.GetText())
+	if textBlock._GetText() != "123a1aa\naaaaa" {
+		t.Errorf("expected \n%v\n\ngot\n \n%v", "123a1aa\naaaaa", textBlock._GetText())
 	}
 }
 func TestNewLineInTheMiddleOfText2(t *testing.T) {
@@ -265,26 +265,26 @@ func TestNewLineFromWhiteLine(t *testing.T) {
 func TestWriteOutSizeX(t *testing.T) {
 	TextBlock := CreateTextBlock(0, 0, 4, 100, 1)
 	typing(TextBlock, "ciao3comeStai")
-	if TextBlock.GetText() != "Stai" {
-		t.Errorf("expected %v, got %v", "Stai", TextBlock.GetText())
+	if TextBlock._GetText() != "Stai" {
+		t.Errorf("expected %v, got %v", "Stai", TextBlock._GetText())
 	}
 	TextBlock.SetCursor_Relative(-1, 0)
 	TextBlock.SetCursor_Relative(-1, 0)
 	TextBlock.SetCursor_Relative(-1, 0)
 	TextBlock.SetCursor_Relative(-1, 0)
-	if TextBlock.GetText() != "come" {
-		t.Errorf("expected %v, got %v", "come", TextBlock.GetText())
+	if TextBlock._GetText() != "come" {
+		t.Errorf("expected %v, got %v", "come", TextBlock._GetText())
 	}
 }
 func TestGoToOutSizeX(t *testing.T) {
 	TextBlock := CreateTextBlock(0, 0, 4, 100, 1)
 	typing(TextBlock, "ciao3comeStai")
-	if TextBlock.GetText() != "Stai" {
-		t.Errorf("expected %v, got %v", "Stai", TextBlock.GetText())
+	if TextBlock._GetText() != "Stai" {
+		t.Errorf("expected %v, got %v", "Stai", TextBlock._GetText())
 	} //Creare helper method for this
 	TextBlock.SetCursor_Relative(-8, 0)
-	if TextBlock.GetText() != "iao3" {
-		t.Errorf("expected %v, got %v", "iao3", TextBlock.GetText())
+	if TextBlock._GetText() != "iao3" {
+		t.Errorf("expected %v, got %v", "iao3", TextBlock._GetText())
 	}
 }
 
@@ -339,8 +339,8 @@ func TestSpecialCharacter(t *testing.T) {
 		textBlock.Type(c)
 	}
 	textBlock.SetCursor_Relative(-6, 0)
-	if textBlock.GetText() != "pblic class persona(string nome,int etá,int 64 s" {
-		t.Errorf("expected %v, got |%v|", "", strings.Split(textBlock.GetText(), "\n")[0])
+	if textBlock._GetText() != "pblic class persona(string nome,int etá,int 64 s" {
+		t.Errorf("expected %v, got |%v|", "", strings.Split(textBlock._GetText(), "\n")[0])
 	}
 }
 func TestSpecialCharacter2(t *testing.T) {
@@ -349,8 +349,8 @@ func TestSpecialCharacter2(t *testing.T) {
 		textBlock.Type(c)
 	}
 	textBlock.setXCursor_Absolute(0)
-	if textBlock.GetText() != "pblic clàss persona(string nome,int etá,int 64 s" {
-		t.Errorf("expected %v, got |%v|", "", strings.Split(textBlock.GetText(), "\n")[0])
+	if textBlock._GetText() != "pblic clàss persona(string nome,int etá,int 64 s" {
+		t.Errorf("expected %v, got |%v|", "", strings.Split(textBlock._GetText(), "\n")[0])
 	}
 }
 func TestCopyTextInline(t *testing.T) {
@@ -376,7 +376,7 @@ func TestCopyTextMultiline(t *testing.T) {
 	textBlock.setYCursor_Absolute(0)
 	textBlock.setXCursor_Relative(10)
 	textBlock.SetWrap(true)
-	textBlock.SetCursor_Relative(9,1)
+	textBlock.SetCursor_Relative(9, 1)
 	copiedText := textBlock.GetSelectedText()
 	if copiedText != "luca\nche bello" {
 		t.Errorf("expected %v, got %v", "luca\nche bello", copiedText)
