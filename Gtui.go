@@ -204,10 +204,14 @@ func (c *Gtui) CreateStreamingCharacter() Component.StreamCharacter {
 	stream.Get = func() chan string {
 		i := c.keyb.NewChannel()
 		stream.IChannel = i
+		stream.IsDeleted = false
 		return c.keyb.GetChannels()[i]
 	}
 	stream.Delete = func() {
-		c.keyb.DeleteChannel(stream.IChannel)
+		if !stream.IsDeleted {
+			c.keyb.DeleteChannel(stream.IChannel)
+		}
+		stream.IsDeleted = true
 	}
 	return stream
 }
