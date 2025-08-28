@@ -97,3 +97,7 @@ func (s *TextField) Touch() {
 func (s *TextField) IsTouched() bool {
 	return s.isChanged
 }
+func (s *TextField) SetText(text string) {
+	s.text = text
+	s.Touch()
+}
