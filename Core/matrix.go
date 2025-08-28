@@ -48,8 +48,8 @@ func (m *MatrixLayer) addElement(element *WrapperElement[ElementMatrix]) {
 	column := width / m.sizeCell
 	row := height / m.sizeCell
 
-	for ir := range row + 1 {
-		for iw := range column + 1 {
+	for ir := range row + 2 {
+		for iw := range column + 2 {
 			currentRow, currentColumn := ir+startingRow, iw+startingColumn
 			if ir+startingRow >= m.nRows {
 				continue
