@@ -395,10 +395,10 @@ func (c *Gtui) GoTo(direction Core.Direction) {
 		if ele == nil {
 			return
 		}
-		x, y := ele.GetPos()
-		compsPostSet := c.getHigherLayerElementsNoDisabled(x+1, y+1)
-		if slices.Contains(compsPostSet, ele.(Core.IComponent)) {
-			if _, ok := ele.(*Component.NullComponent); !ok {
+		if _, ok := ele.(*Component.NullComponent); !ok {
+			x, y := ele.GetPos()
+			compsPostSet := c.getHigherLayerElementsNoDisabled(x+1, y+1)
+			if slices.Contains(compsPostSet, ele.(Core.IComponent)) {
 				break
 			}
 		}
