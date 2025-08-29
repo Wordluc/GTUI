@@ -17,10 +17,8 @@ type Container struct {
 	layer    Core.Layer
 }
 
-func CreateContainer(x, y int) *Container {
+func CreateContainer() *Container {
 	return &Container{
-		xPos:    x,
-		yPos:    y,
 		color:   Color.GetNoneColor(),
 		visible: true,
 	}

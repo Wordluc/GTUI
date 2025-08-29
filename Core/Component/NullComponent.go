@@ -19,10 +19,10 @@ type NullComponent struct {
 }
 
 func CreateNullComponent(x, y, sizeX, sizeY int) *NullComponent {
-	cont := Drawing.CreateContainer(x, y)
+	cont := Drawing.CreateContainer()
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
-	rect.SetPos(x, y)
 	cont.AddDrawings(rect)
+	cont.SetPos(x, y)
 	return &NullComponent{
 		graphics:    cont,
 		active:      true,

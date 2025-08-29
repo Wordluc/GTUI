@@ -29,7 +29,7 @@ type TextBox struct {
 }
 
 func CreateTextBox(x, y, sizeX, sizeY int, streamText StreamCharacter) (*TextBox, error) {
-	cont := Drawing.CreateContainer(0, 0)
+	cont := Drawing.CreateContainer()
 	rect := Drawing.CreateRectangle(0, 0, sizeX, sizeY)
 	textBox := Drawing.CreateTextBlock(1, 1, sizeX-2, sizeY-2, 10)
 	if e := cont.AddDrawings(rect); e != nil {

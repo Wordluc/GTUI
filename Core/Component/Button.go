@@ -26,7 +26,7 @@ type Button struct {
 }
 
 func CreateButton(x, y, sizeX, sizeY int, text string) *Button {
-	cont := Drawing.CreateContainer(0, 0)
+	cont := Drawing.CreateContainer()
 	rect := Drawing.CreateRectangleFull(0, 0, sizeX, sizeY)
 	textD := Drawing.CreateTextField(0, 0, text)
 	rect.SetLayer(Core.L1)
