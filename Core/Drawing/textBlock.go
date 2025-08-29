@@ -420,17 +420,17 @@ func (t *TextBlock) GetText() string {
 func (t *TextBlock) getText(isRaw bool) string {
 	var res strings.Builder
 	for i, line := range t.lines {
-		if i < t.yRelativeMinSize {
-			continue
-		}
-		if i >= t.yRelativeMaxSize {
-			break
-		}
 		if line == nil {
 			break
 		}
 		text := line.getText()
 		if !isRaw {
+			if i < t.yRelativeMinSize {
+				continue
+			}
+			if i >= t.yRelativeMaxSize {
+				break
+			}
 			text = t.parseText(text)
 		}
 		res.WriteString(text + "\n")
