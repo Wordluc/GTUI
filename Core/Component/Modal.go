@@ -20,7 +20,7 @@ type Modal struct {
 func CreateModal(sizeX, sizeY int) *Modal {
 	null := CreateNullComponent(0, 0, sizeX, sizeY)
 	null.SetLayer(modalL1)
-	contComp := CreateContainer(0, 0)
+	contComp := CreateContainer()
 	contComp.SetLayer(modalL2)
 	contComp.AddComponent(null)
 	return &Modal{

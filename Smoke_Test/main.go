@@ -30,11 +30,11 @@ func main() {
 	}
 	rect := Drawing.CreateRectangle(2, 2, xS-1, yS-1)
 	rect1 := Drawing.CreateRectangle(16, 26, 10, 10)
-	contDraw := Drawing.CreateContainer(0, 0)
+	contDraw := Drawing.CreateContainer()
 	contDraw.AddDrawings(rect)
 	contDraw.AddDrawings(rect1)
 	contDraw.SetVisibility(true)
-	compComponent := Component.CreateContainer(0, 0)
+	compComponent := Component.CreateContainer()
 	compComponent.AddDrawing(contDraw.GetGraphics()...)
 	if e := compComponent.AddComponent(c); e != nil {
 		panic(e)

@@ -17,11 +17,9 @@ type Container struct {
 	x, y       int
 }
 
-func CreateContainer(x, y int) *Container {
+func CreateContainer() *Container {
 	return &Container{
 		active:     true,
-		x:          x,
-		y:          y,
 		drawings:   make([]Core.IDrawing, 0),
 		components: make([]Core.IComponent, 0),
 	}
