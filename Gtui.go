@@ -413,10 +413,10 @@ func (c *Gtui) GoTo(direction Core.Direction) {
 	c.SetCur(x+1, y+1)
 }
 
-func Logf(text string, a ...string) {
-	_logger.text.Paste(fmt.Sprintf(text+"\n", a))
+func Logf(text string, a ...any) {
+	_logger.text.Paste(fmt.Sprintf(text, a...) + "\n")
 }
 
-func Log(text string) {
-	_logger.text.Paste(text + "\n")
+func Log(text ...any) {
+	_logger.text.Paste(fmt.Sprint(text...) + "\n")
 }
