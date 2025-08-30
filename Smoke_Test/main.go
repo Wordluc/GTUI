@@ -9,7 +9,6 @@ import (
 	"github.com/Wordluc/GTUI/Core/Utils/Color"
 	"github.com/Wordluc/GTUI/Keyboard"
 	Kd "github.com/Wordluc/GTUI/Keyboard"
-	"github.com/Wordluc/GTUI/Terminal"
 )
 
 var comp *Component.Container
@@ -17,10 +16,9 @@ var button2 *Component.Button
 var modal *Component.Modal
 
 func main() {
-	kbr := Keyboard.NewKeyboard()
-	core, _ := GTUI.NewGtui(loop, kbr, &Terminal.Terminal{})
+	core, _ := GTUI.NewGtui(loop)
 	xS, yS := 50, 40
-	oneLineTextbox, e := Component.CreateTextBox(30, 20, 20, 3, core.CreateStreamingCharacter())
+	oneLineTextbox, e := Component.CreateTextBox(40, 38, 20, 3, core.CreateStreamingCharacter())
 	oneLineTextbox.IsOneLine = true
 	core.AddComponent(oneLineTextbox)
 	c, e := Component.CreateTextBox(30, 5, 20, 10, core.CreateStreamingCharacter())

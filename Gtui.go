@@ -53,7 +53,13 @@ type Gtui struct {
 	currentComponent     Core.IComponent
 }
 
-func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
+func NewGtui(loop Loop) (*Gtui, error) {
+	keyb := Keyboard.NewKeyboard()
+	term := &Terminal.Terminal{}
+	return NewCustomGtui(loop, keyb, term)
+}
+
+func NewCustomGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui, error) {
 	xSize, ySize := term.Size()
 	EventManager.Setup()
 
@@ -71,7 +77,6 @@ func NewGtui(loop Loop, keyb Keyboard.IKeyBoard, term Terminal.ITerminal) (*Gtui
 		ySize:             ySize,
 	}, nil
 }
-
 func createLogger() *logger {
 	text := Drawing.CreateTextBlock(1, 1, 48, 18, 0)
 	modal := Component.CreateModal(50, 20)
@@ -252,11 +257,13 @@ func (c *Gtui) AddComponent(componentsToAdd ...Core.IComponent) error {
 	return nil
 }
 
-func (c *Gtui) AddContainer(container Core.IContainer) error {
-	drawings := container.GetGraphics()
-	components := container.GetComponents()
-	c.AddDrawing(drawings...)
-	c.AddComponent(components...)
+func (c *Gtui) AddContainer(containers ...Core.IContainer) error {
+	for i := range containers {
+		drawings := containers[i].GetGraphics()
+		components := containers[i].GetComponents()
+		c.AddDrawing(drawings...)
+		c.AddComponent(components...)
+	}
 	return nil
 }
 
