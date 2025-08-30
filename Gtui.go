@@ -267,9 +267,13 @@ func (c *Gtui) AddContainer(containers ...Core.IContainer) error {
 	return nil
 }
 
-func (c *Gtui) AddComplexElement(complEle Core.IComplexElement) error {
-	components := complEle.GetComponents()
-	drawings := complEle.GetGraphics()
+func (c *Gtui) AddComplexElement(complEle ...Core.IComplexElement) error {
+	var components []Core.IComponent
+	var drawings []Core.IDrawing
+	for i := range complEle {
+		components = append(components, complEle[i].GetComponents()...)
+		drawings = append(drawings, complEle[i].GetGraphics()...)
+	}
 	for _, comp := range components {
 		c.componentsHandler.AddElement(comp)
 		comp.OnLeave()
