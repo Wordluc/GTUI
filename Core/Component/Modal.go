@@ -50,19 +50,31 @@ func (b *Modal) SetBackgroundColor(color Color.ColorValue) {
 	b.nullComponent.visibleArea.Touch()
 }
 
-func (b *Modal) AddComponent(componentToAdd Core.IComponent) error {
-	if e := componentToAdd.SetLayer(b.container.GetLayer() + 1); e != nil {
-		return e
+func (b *Modal) AddComponent(componentsToAdd ...Core.IComponent) error {
+	for i := range componentsToAdd {
+		if e := componentsToAdd[i].SetLayer(b.container.GetLayer() + 1); e != nil {
+			return e
+		}
+		b.container.AddComponent(componentsToAdd[i])
 	}
-	b.container.AddComponent(componentToAdd)
 	EventManager.Call(EventManager.ReorganizeElements, b)
 	return nil
 }
 
-func (b *Modal) AddDrawing(drawingToAdd Core.IDrawing) error {
-	drawingToAdd.SetLayer(drawingToAdd.GetLayer() + modalL1 + 1)
-	b.container.AddDrawing(drawingToAdd)
+func (b *Modal) AddDrawing(drawingsToAdd ...Core.IDrawing) error {
+	for i := range drawingsToAdd {
+		drawingsToAdd[i].SetLayer(drawingsToAdd[i].GetLayer() + modalL1 + 1)
+		b.container.AddDrawing(drawingsToAdd[i])
+	}
 	EventManager.Call(EventManager.ReorganizeElements, b)
+	return nil
+}
+
+func (c *Modal) AddContainer(containers ...Core.IContainer) error {
+	for _, conp := range containers {
+		c.AddDrawing(conp.GetGraphics()...)
+		c.AddComponent(conp.GetComponents()...)
+	}
 	return nil
 }
 
