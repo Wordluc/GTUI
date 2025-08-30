@@ -20,8 +20,6 @@ type IContainer interface {
 	GetGraphics() []IDrawing
 	GetComponents() []IComponent
 	AddContainer(...IContainer) error
-	AddComponent(...IComponent) error
-	AddDrawing(...IDrawing) error
 }
 type IComplexElement interface {
 	GetGraphics() []IDrawing
