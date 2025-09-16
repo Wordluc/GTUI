@@ -405,6 +405,10 @@ func (c *Gtui) GetCurrentComponent() Core.IComponent {
 	return c.currentComponent
 }
 
+func (c *Gtui) GoToComponent(comp Core.IComponent) {
+	x, y := comp.GetPos()
+	c.SetCur(x+1, y+1)
+}
 func (c *Gtui) GoTo(direction Core.Direction) {
 	ele := c.componentsHandler.GetNextElement(c.currentComponent, direction)
 	for {
