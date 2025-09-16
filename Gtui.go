@@ -150,9 +150,6 @@ func (c *Gtui) SetCur(x, y int) error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
 		return errors.New("cursor out of range")
 	}
-	if !c.cursorVisibility {
-		return nil
-	}
 	compsPostSet := c.getHigherLayerElementsNoDisabled(x, y)
 
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, c.preComponentsHovered)
@@ -402,6 +399,10 @@ func (c *Gtui) innerLoop(keyb Keyboard.IKeyBoard) bool {
 	}
 	c.refresh(true)
 	return true
+}
+
+func (c *Gtui) GetCurrentComponent() Core.IComponent {
+	return c.currentComponent
 }
 
 func (c *Gtui) GoTo(direction Core.Direction) {
