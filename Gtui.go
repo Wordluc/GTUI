@@ -150,6 +150,13 @@ func (c *Gtui) SetCur(x, y int) error {
 	if x < 0 || y < 0 || x >= c.xSize || y >= c.ySize {
 		return errors.New("cursor out of range")
 	}
+	defer func() {
+		compsPostSet := c.getHigherLayerElementsNoDisabled(x, y)
+		if len(compsPostSet) == 0 {
+			return
+		}
+		c.currentComponent = compsPostSet[0]
+	}()
 	compsPostSet := c.getHigherLayerElementsNoDisabled(x, y)
 
 	inPreButNotInPost := Utils.GetDiff(compsPostSet, c.preComponentsHovered)
@@ -162,7 +169,6 @@ func (c *Gtui) SetCur(x, y int) error {
 			}
 		}
 		comp.OnHover()
-		c.currentComponent = comp
 	}
 
 	for i, comp := range inPreButNotInPost {
@@ -184,7 +190,6 @@ func (c *Gtui) SetCur(x, y int) error {
 				return nil
 			} else {
 				comp.OnHover()
-				c.currentComponent = comp
 			}
 			break
 		}
@@ -407,6 +412,10 @@ func (c *Gtui) GetCurrentComponent() Core.IComponent {
 
 func (c *Gtui) GoToComponent(comp Core.IComponent) {
 	x, y := comp.GetPos()
+	c.SetCur(x+1, y+1)
+}
+func (c *Gtui) GoToDrawing(dra Core.IDrawing) {
+	x, y := dra.GetPos()
 	c.SetCur(x+1, y+1)
 }
 func (c *Gtui) GoTo(direction Core.Direction) {
