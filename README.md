@@ -18,4 +18,5 @@ To see a "demo",you can launch `go run Smoke_Test/main.go`
 ### Showcase
 
 To demonstrate the capabilities of this framework, a **TODO app** has been created: https://github.com/Wordluc/Fedi
-![image](https://github.com/user-attachments/assets/e67d8219-b3a2-4a73-8a30-173d706837a3)
+<img width="2880" height="1590" alt="image" src="https://github.com/user-attachments/assets/3c347ce5-0b4e-4d8d-b7c7-5835f9a7956f" />
+
