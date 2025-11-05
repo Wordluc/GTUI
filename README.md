@@ -1,5 +1,5 @@
 # Terminal Interface Framework in Go
-
+<img width="2880" height="1590" alt="image" src="https://github.com/user-attachments/assets/3c347ce5-0b4e-4d8d-b7c7-5835f9a7956f" />
 This framework allows you to build terminal applications in Go without worrying about the complexities of rendering and event calling. It automatically handles screen refreshing when necessary, optimizing performance.
 To see a "demo",you can launch `go run Smoke_Test/main.go`
 ### Features:
@@ -18,5 +18,5 @@ To see a "demo",you can launch `go run Smoke_Test/main.go`
 ### Showcase
 
 To demonstrate the capabilities of this framework, a **TODO app** has been created: https://github.com/Wordluc/Fedi
-<img width="2880" height="1590" alt="image" src="https://github.com/user-attachments/assets/3c347ce5-0b4e-4d8d-b7c7-5835f9a7956f" />
+
 
