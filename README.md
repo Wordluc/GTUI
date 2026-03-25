@@ -18,6 +18,5 @@ To see a "demo",you can launch `go run Smoke_Test/main.go`
   The event system enables asynchronous interaction with the core of the framework, allowing you to trigger events without waiting for the main loop. This decision was made to optimize performance and reduce blocking during user interactions.
 ### Showcase
 
-To demonstrate the capabilities of this framework, a **TODO app** has been created: https://github.com/Wordluc/Fedi
-
+Look for https://github.com/Wordluc/Fedi to see it capabilities!.
 
